@@ -1,3 +1,6 @@
+<button mat-raised-button color="primary" (click)="activateEdgeCreation()">
+  Create Edges {{ edgeCreationMode() ? "🟢" : "" }}
+</button>
 <div id="cy"></div>
 
 <router-outlet></router-outlet>
