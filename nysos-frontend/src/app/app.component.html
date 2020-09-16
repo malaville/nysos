@@ -1,6 +1,14 @@
-<button mat-raised-button color="primary" (click)="activateEdgeCreation()">
-  Create Edges {{ edgeCreationMode() ? "🟢" : "" }}
-</button>
-<div id="cy"></div>
+<mat-drawer-container class="example-container" autosize>
+  <mat-drawer #drawer class="example-sidenav" mode="top">
+    <h1>DU CONTENU EN VEUX-TU EN VOILA</h1>
+  </mat-drawer>
 
+  <button mat-raised-button color="primary" (click)="activateEdgeCreation()">
+    Create Edges {{ edgeCreationMode() ? "🟢" : "" }}
+  </button>
+  <button type="button" mat-button (click)="drawer.toggle()">
+    Toggle sidenav
+  </button>
+  <div id="cy"></div>
+</mat-drawer-container>
 <router-outlet></router-outlet>

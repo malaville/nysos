@@ -14,7 +14,7 @@ export class AppComponent implements OnInit {
   constructor(private cytostate: CytostateService) {}
 
   ngOnInit() {
-    this.cytostate.setCytocoreId('cy');
+    setTimeout(() => this.cytostate.setCytocoreId('cy'), 500);
   }
 
   edgeCreationMode(): boolean {

@@ -26,6 +26,7 @@ export class CytostateService {
     });
 
     this.edgehandles = this.cytocore.edgehandles(defaults);
+    this.edgehandles.disable();
 
     this.cytocore.on('mouseover', 'node', (edge) => {
       this.hoverednode = true;
