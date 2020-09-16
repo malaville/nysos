@@ -1,0 +1,16 @@
+runtime: nodejs12
+default_expiration: "365d"
+env_variables:
+  environment: "--prod"
+handlers:
+  - url: /
+    static_files: nysos-frontend/index.html
+    upload: nysos-frontend/index.html
+    expiration: "0"
+  - url: /(.*\.js)
+    redirect_http_response_code: 301
+    static_files: nysos-frontend/\1
+    mime_type: text/javascript
+    upload: nysos-frontend/.*\.js
+  - url: /
+    static_dir: nysos-frontend
