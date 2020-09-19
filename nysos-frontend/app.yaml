@@ -2,6 +2,7 @@ runtime: nodejs12
 default_expiration: "365d"
 env_variables:
   environment: "--prod"
+
 handlers:
   - url: /
     static_files: nysos-frontend/index.html
