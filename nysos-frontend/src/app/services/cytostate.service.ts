@@ -5,7 +5,7 @@ import cytoscape from 'cytoscape';
 import edgehandles from 'cytoscape-edgehandles';
 import { styles } from './cytostyles';
 import { edgehandlestyles } from './edgehandlesstyles';
-
+const CYTOSAVE_KEY = 'cytosave';
 @Injectable({
   providedIn: 'root',
 })
@@ -40,21 +40,7 @@ export class CytostateService {
       setTimeout(() => !this.hoverednode && this.edgehandles.hide(), 500);
     });
 
-    if (localStorage.getItem('cytosave')) {
-      console.log('load');
-      this.cytocore.add(JSON.parse(localStorage.getItem('cytosave')));
-    } else {
-      this.cytocore.add({
-        group: 'nodes',
-        data: { weight: 75, name: 'Deep Learning' },
-        position: { x: 200, y: 200 },
-      });
-      this.cytocore.add({
-        group: 'nodes',
-        data: { weight: 75, name: 'Plastique' },
-        position: { x: 300, y: 200 },
-      });
-    }
+    this.loadFromLocalStorage();
   }
 
   edgeCreationMode() {
@@ -63,13 +49,20 @@ export class CytostateService {
   }
 
   saveData() {
-    console.log('save');
-
     localStorage.setItem(
-      'cytosave',
+      CYTOSAVE_KEY,
       JSON.stringify(this.cytocore.elements().jsons())
     );
-    console.log('saved is', localStorage.getItem('cytosave'));
+  }
+
+  loadFromLocalStorage(): boolean {
+    const cytosave = localStorage.getItem(CYTOSAVE_KEY);
+    if (cytosave) {
+      this.cytocore.elements().remove();
+      this.cytocore.add(JSON.parse(cytosave));
+      return true;
+    }
+    return false;
   }
 
   addNode() {

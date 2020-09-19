@@ -28,6 +28,10 @@ export class AppComponent implements OnInit {
     this.cytostate.saveData();
   }
 
+  resetClicked() {
+    this.cytostate.loadFromLocalStorage();
+  }
+
   addThemeClicked() {
     this.cytostate.addNode();
   }
