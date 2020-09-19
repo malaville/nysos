@@ -5,6 +5,7 @@ import cytoscape from 'cytoscape';
 import edgehandles from 'cytoscape-edgehandles';
 import { styles } from './cytostyles';
 import { edgehandlestyles } from './edgehandlesstyles';
+import { CytodatabaseService } from './cytodatabase.service';
 const CYTOSAVE_KEY = 'cytosave';
 @Injectable({
   providedIn: 'root',
@@ -15,7 +16,7 @@ export class CytostateService {
   hoverednode: boolean = false;
   addedgemode: boolean = false;
 
-  constructor() {}
+  constructor(private cyDb: CytodatabaseService) {}
 
   setCytocoreId(id: string) {
     // @ts-ignore
@@ -40,7 +41,7 @@ export class CytostateService {
       setTimeout(() => !this.hoverednode && this.edgehandles.hide(), 500);
     });
 
-    this.loadFromLocalStorage();
+    this.cyDb.loadFromLocalStorage(this.cytocore);
   }
 
   edgeCreationMode() {
@@ -49,20 +50,11 @@ export class CytostateService {
   }
 
   saveData() {
-    localStorage.setItem(
-      CYTOSAVE_KEY,
-      JSON.stringify(this.cytocore.elements().jsons())
-    );
+    this.cyDb.saveNodesAndEdges(this.cytocore.elements());
   }
 
-  loadFromLocalStorage(): boolean {
-    const cytosave = localStorage.getItem(CYTOSAVE_KEY);
-    if (cytosave) {
-      this.cytocore.elements().remove();
-      this.cytocore.add(JSON.parse(cytosave));
-      return true;
-    }
-    return false;
+  loadFromLocalStorage() {
+    this.cyDb.loadFromLocalStorage(this.cytocore);
   }
 
   addNode() {
