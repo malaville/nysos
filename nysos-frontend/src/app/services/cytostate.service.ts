@@ -25,6 +25,10 @@ export class CytostateService {
       style: [...styles, ...edgehandlestyles],
     });
 
+    this.cytocore.on('data', (e) => {
+      this.saveData();
+    });
+
     this.edgehandles = this.cytocore.edgehandles(defaults);
     this.edgehandles.disable();
 
@@ -36,20 +40,43 @@ export class CytostateService {
       setTimeout(() => !this.hoverednode && this.edgehandles.hide(), 500);
     });
 
-    this.cytocore.add({
-      group: 'nodes',
-      data: { weight: 75, name: 'Deep Learning' },
-      position: { x: 200, y: 200 },
-    });
-    this.cytocore.add({
-      group: 'nodes',
-      data: { weight: 75, name: 'Plastique' },
-      position: { x: 300, y: 200 },
-    });
+    if (localStorage.getItem('cytosave')) {
+      console.log('load');
+      this.cytocore.add(JSON.parse(localStorage.getItem('cytosave')));
+    } else {
+      this.cytocore.add({
+        group: 'nodes',
+        data: { weight: 75, name: 'Deep Learning' },
+        position: { x: 200, y: 200 },
+      });
+      this.cytocore.add({
+        group: 'nodes',
+        data: { weight: 75, name: 'Plastique' },
+        position: { x: 300, y: 200 },
+      });
+    }
   }
 
   edgeCreationMode() {
     this.addedgemode = !this.addedgemode;
     this.addedgemode ? this.edgehandles.enable() : this.edgehandles.disable();
+  }
+
+  saveData() {
+    console.log('save');
+
+    localStorage.setItem(
+      'cytosave',
+      JSON.stringify(this.cytocore.elements().jsons())
+    );
+    console.log('saved is', localStorage.getItem('cytosave'));
+  }
+
+  addNode() {
+    this.cytocore.add({
+      group: 'nodes',
+      data: { name: 'New Node' },
+      position: { x: 50, y: 50 },
+    });
   }
 }

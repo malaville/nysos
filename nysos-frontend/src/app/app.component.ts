@@ -23,4 +23,12 @@ export class AppComponent implements OnInit {
   activateEdgeCreation() {
     this.cytostate.edgeCreationMode();
   }
+
+  saveClicked() {
+    this.cytostate.saveData();
+  }
+
+  addThemeClicked() {
+    this.cytostate.addNode();
+  }
 }
