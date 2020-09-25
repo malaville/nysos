@@ -1,6 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatSidenav } from '@angular/material/sidenav';
 import cytoscape from 'cytoscape';
-import { CytostateService } from './services/cytostate.service';
+import { Observable } from 'rxjs';
+import {
+  AppstateService,
+  DocumentDataStateInterface,
+} from './services/app/appstate.service';
+import { CytostateService } from './services/cytostate/cytostate.service';
 
 @Component({
   selector: 'app-root',
@@ -10,8 +16,19 @@ import { CytostateService } from './services/cytostate.service';
 export class AppComponent implements OnInit {
   title = 'nysos-frontend';
   cy: cytoscape.Core;
+  documentStateObs: Observable<DocumentDataStateInterface>;
 
-  constructor(private cytostate: CytostateService) {}
+  @ViewChild(MatSidenav)
+  set sidenav(s: MatSidenav) {
+    this.appstate.setSidenavRef(s);
+  }
+
+  constructor(
+    private cytostate: CytostateService,
+    private appstate: AppstateService
+  ) {
+    this.documentStateObs = this.appstate.documentStateObservable;
+  }
 
   ngOnInit() {
     setTimeout(() => this.cytostate.setCytocoreId('cy'), 500);
@@ -34,5 +51,9 @@ export class AppComponent implements OnInit {
 
   addThemeClicked() {
     this.cytostate.addNode();
+  }
+
+  openSideNav() {
+    this.appstate.sidenavref.open();
   }
 }

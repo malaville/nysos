@@ -1,12 +1,18 @@
-<mat-drawer-container class="example-container" autosize>
-  <mat-drawer #drawer class="example-sidenav" mode="top">
-    <h1>DU CONTENU EN VEUX-TU EN VOILA</h1>
-  </mat-drawer>
+<mat-sidenav-container>
+  <mat-sidenav id="mat-sidenav" #sidenav mode="top">
+    <h1>{{ (documentStateObs | async).title }}</h1>
+    <small>node id : {{ (documentStateObs | async).contentId }}</small>
+    <div>
+      <p *ngFor="let lorem of (documentStateObs | async).content">
+        {{ lorem }}
+      </p>
+    </div>
+  </mat-sidenav>
 
   <button mat-raised-button color="primary" (click)="activateEdgeCreation()">
     Create Edges {{ edgeCreationMode() ? "🟢" : "" }}
   </button>
-  <button type="button" mat-button (click)="drawer.toggle()">
+  <button type="button" mat-button (click)="openSideNav()">
     Toggle sidenav
   </button>
   <button type="button" mat-button (click)="saveClicked()">Save</button>
@@ -15,5 +21,5 @@
     Add Theme
   </button>
   <div id="cy"></div>
-</mat-drawer-container>
+</mat-sidenav-container>
 <router-outlet></router-outlet>

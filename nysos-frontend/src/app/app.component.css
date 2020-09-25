@@ -5,3 +5,11 @@
   margin: 100px auto;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
+mat-sidenav-container {
+  height: 100%;
+}
+
+mat-sidenav {
+  width: 600px;
+  padding: 50px;
+}
