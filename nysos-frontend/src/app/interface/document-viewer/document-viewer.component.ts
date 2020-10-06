@@ -41,8 +41,9 @@ export class DocumentViewerComponent implements AfterViewInit {
     this.temporaryTitle = content;
   }
   onTitleOut() {
-    console.log(`titleout , saving ... __${this.temporaryTitle}_`);
+    if (this.titleWasChanged) {
     this.cytostate.changeNodeName(this.temporaryTitle);
+    }
     this.titleWasChanged = false;
     this.temporaryTitle = '';
   }
