@@ -1,0 +1,16 @@
+<h1
+  contenteditable="plaintext-only"
+  (input)="onTitleChange($event.target.innerHTML)"
+  (focusout)="onTitleOut()"
+>
+  {{ (documentStateObs | async).title }}
+</h1>
+<small>node id : {{ (documentStateObs | async).contentId }}</small>
+<div
+  contenteditable="true"
+  (input)="onDescriptionChange($event.target.innerHTML)"
+>
+  <p *ngFor="let lorem of (documentStateObs | async).content">
+    {{ lorem }}
+  </p>
+</div>

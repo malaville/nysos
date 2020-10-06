@@ -29,6 +29,7 @@ export class AppstateService {
   contentSelected(id: string, name: string) {
     this.documentState.title = name;
     this.documentState.contentId = id;
+    console.log(`name __${name}__`);
     this.documentStateBS.next(this.documentState);
 
     this.sidenavref.open();

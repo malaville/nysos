@@ -1,12 +1,7 @@
 <mat-sidenav-container>
-  <mat-sidenav id="mat-sidenav" #sidenav mode="top">
-    <h1>{{ (documentStateObs | async).title }}</h1>
-    <small>node id : {{ (documentStateObs | async).contentId }}</small>
-    <div>
-      <p *ngFor="let lorem of (documentStateObs | async).content">
-        {{ lorem }}
-      </p>
-    </div>
+  <mat-sidenav id="mat-sidenav" #sidenav mode="top" autoFocus="false">
+    <app-document-viewer [documentStateObs]="documentStateObs">
+    </app-document-viewer>
   </mat-sidenav>
 
   <button mat-raised-button color="primary" (click)="activateEdgeCreation()">
