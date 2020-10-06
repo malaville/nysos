@@ -21,4 +21,11 @@ export class CytodatabaseService {
     }
     return false;
   }
+
+  saveContentOf(id: string, content: string) {
+    localStorage.setItem(`${id}:content`, content);
+  }
+  loadContentOf(id: string) {
+    return localStorage.getItem(`${id}:content`) || '';
+  }
 }

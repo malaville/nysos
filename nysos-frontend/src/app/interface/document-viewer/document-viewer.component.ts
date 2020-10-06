@@ -7,7 +7,11 @@ import {
 } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { DocumentDataStateInterface } from 'src/app/services/app/appstate.service';
+import {
+  AppstateService,
+  DocumentDataStateInterface,
+} from 'src/app/services/app/appstate.service';
+import { CytodatabaseService } from 'src/app/services/cytodatabase/cytodatabase.service';
 import { CytostateService } from 'src/app/services/cytostate/cytostate.service';
 
 @Component({
@@ -19,7 +23,10 @@ export class DocumentViewerComponent implements AfterViewInit {
   private temporaryTitle = '';
   private titleWasChanged = false;
 
-  constructor(private cytostate: CytostateService) {}
+  constructor(
+    private cytostate: CytostateService,
+    private appState: AppstateService
+  ) {}
 
   @ViewChild('title') h1: ElementRef;
 
@@ -34,7 +41,7 @@ export class DocumentViewerComponent implements AfterViewInit {
   @Input() documentStateObs: Observable<DocumentDataStateInterface>;
 
   onDescriptionChange(content) {
-    console.log('Content was changed ... _', content);
+    this.appState.saveContent(content);
   }
   onTitleChange(content) {
     this.titleWasChanged = true;

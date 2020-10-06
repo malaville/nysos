@@ -9,8 +9,5 @@
 <div
   contenteditable="true"
   (input)="onDescriptionChange($event.target.innerHTML)"
->
-  <p *ngFor="let lorem of (documentStateObs | async).content">
-    {{ lorem }}
-  </p>
-</div>
+  [innerHTML]="(documentStateObs | async).content"
+></div>
