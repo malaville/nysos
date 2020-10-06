@@ -7,6 +7,7 @@
 ></h1>
 <small>node id : {{ (documentStateObs | async).contentId }}</small>
 <div
+  id="content-of-document"
   contenteditable="true"
   (input)="onDescriptionChange($event.target.innerHTML)"
   [innerHTML]="(documentStateObs | async).content"

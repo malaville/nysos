@@ -15,3 +15,13 @@ h1 {
 div:focus {
   outline: none;
 }
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+#content-of-document {
+  flex: 1 0 100px;
+}
