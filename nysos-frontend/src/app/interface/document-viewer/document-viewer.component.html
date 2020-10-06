@@ -1,10 +1,9 @@
 <h1
+  #title
   contenteditable="plaintext-only"
   (input)="onTitleChange($event.target.innerHTML)"
   (focusout)="onTitleOut()"
->
-  {{ (documentStateObs | async).title }}
-</h1>
+></h1>
 <small>node id : {{ (documentStateObs | async).contentId }}</small>
 <div
   contenteditable="true"

@@ -72,4 +72,11 @@ export class CytostateService {
       position: { x: 50, y: 50 },
     });
   }
+
+  changeNodeName(newName: string) {
+    const id = this.appstate.documentState.contentId;
+    console.log(this.cytocore.getElementById(id).id());
+    this.cytocore.getElementById(id).data({ name: newName });
+    this.appstate.contentSelected(id, newName);
+  }
 }
