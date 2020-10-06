@@ -3,6 +3,7 @@
   contenteditable="plaintext-only"
   (input)="onTitleChange($event.target.innerHTML)"
   (focusout)="onTitleOut()"
+  (keydown.enter)="unFocus()"
 ></h1>
 <small>node id : {{ (documentStateObs | async).contentId }}</small>
 <div

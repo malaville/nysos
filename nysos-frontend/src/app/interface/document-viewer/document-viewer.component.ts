@@ -40,9 +40,13 @@ export class DocumentViewerComponent implements AfterViewInit {
     this.titleWasChanged = true;
     this.temporaryTitle = content;
   }
+
+  unFocus() {
+    this.h1.nativeElement.blur();
+  }
   onTitleOut() {
     if (this.titleWasChanged) {
-    this.cytostate.changeNodeName(this.temporaryTitle);
+      this.cytostate.changeNodeName(this.temporaryTitle);
     }
     this.titleWasChanged = false;
     this.temporaryTitle = '';
