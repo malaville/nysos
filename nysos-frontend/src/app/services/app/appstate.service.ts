@@ -6,7 +6,10 @@ export interface DocumentDataStateInterface {
   title: string;
   contentId: string;
   content: string;
+  edgeTargetId?: string;
+  edgeSourceId?: string;
 }
+
 @Injectable({
   providedIn: 'root',
 })
@@ -27,10 +30,13 @@ export class AppstateService {
     this.sidenavref = sidenavref;
   }
 
-  contentSelected(id: string, name: string) {
+  contentSelected(id: string, name: string, edgeInfos: any = {}) {
     this.documentState.title = name;
     this.documentState.contentId = id;
     this.documentState.content = this.cytoDb.loadContentOf(id);
+    const { source, target } = edgeInfos;
+    this.documentState.edgeSourceId = source || undefined;
+    this.documentState.edgeTargetId = target || undefined;
     this.documentStateBS.next(this.documentState);
 
     this.sidenavref.open();

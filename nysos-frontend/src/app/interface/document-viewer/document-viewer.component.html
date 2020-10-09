@@ -5,10 +5,18 @@
   (focusout)="onTitleOut()"
   (keydown.enter)="unFocus()"
 ></h1>
-<small>node id : {{ (documentStateObs | async).contentId }}</small>
+
 <div
   id="content-of-document"
   contenteditable="true"
   (input)="onDescriptionChange($event.target.innerHTML)"
   [innerHTML]="(documentStateObs | async).content"
 ></div>
+
+<small>node id : {{ (documentStateObs | async).contentId }}</small>
+<small *ngIf="(documentStateObs | async).edgeTargetId">
+  target : {{ (documentStateObs | async).edgeTargetId }}
+</small>
+<small *ngIf="(documentStateObs | async).edgeSourceId">
+  source : {{ (documentStateObs | async).edgeSourceId }}
+</small>
