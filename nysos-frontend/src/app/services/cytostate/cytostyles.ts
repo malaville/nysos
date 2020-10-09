@@ -10,6 +10,9 @@ export const styles = [
     style: {
       'curve-style': 'bezier',
       'target-arrow-shape': 'triangle',
+      content: 'data(name)',
+      'text-outline-color': 'white',
+      'text-outline-width': 1,
     },
   },
 ];

@@ -38,6 +38,12 @@ export class CytostateService {
       this.appstate.contentSelected(e.target.id(), e.target.data().name);
     });
 
+    this.cytocore.on('click', 'edge', (e) => {
+      const id = e.target.id();
+      const { name, source, target } = e.target.data();
+      this.appstate.contentSelected(id, name || '', { source, target });
+    });
+
     this.edgehandles = this.cytocore.edgehandles(defaults);
     this.edgehandles.disable();
 
@@ -75,8 +81,11 @@ export class CytostateService {
 
   changeNodeName(newName: string) {
     const id = this.appstate.documentState.contentId;
-    console.log(this.cytocore.getElementById(id).id());
     this.cytocore.getElementById(id).data({ name: newName });
-    this.appstate.contentSelected(id, newName);
+    this.appstate.contentSelected(
+      id,
+      newName,
+      this.cytocore.getElementById(id).data()
+    );
   }
 }
