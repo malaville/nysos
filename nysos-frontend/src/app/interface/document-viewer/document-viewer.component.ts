@@ -11,7 +11,6 @@ import {
   AppstateService,
   DocumentDataStateInterface,
 } from 'src/app/services/app/appstate.service';
-import { CytodatabaseService } from 'src/app/services/cytodatabase/cytodatabase.service';
 import { CytostateService } from 'src/app/services/cytostate/cytostate.service';
 
 @Component({
@@ -35,6 +34,9 @@ export class DocumentViewerComponent implements AfterViewInit {
       .pipe(map((docState) => docState.title))
       .subscribe((title) => {
         this.h1.nativeElement.innerHTML = title;
+        if (!title) {
+          setTimeout(() => this.h1.nativeElement.focus(), 500);
+        }
       });
   }
 
