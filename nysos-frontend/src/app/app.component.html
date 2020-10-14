@@ -1,7 +1,16 @@
 <mat-sidenav-container>
-  <mat-sidenav id="mat-sidenav" #sidenav mode="top" autoFocus="false">
-    <app-document-viewer [documentStateObs]="documentStateObs">
-    </app-document-viewer>
+  <mat-sidenav
+    id="mat-sidenav"
+    #sidenav
+    mode="top"
+    autoFocus="false"
+    [class.large]="large"
+  >
+    <button (click)="large = !large">enlarge</button>
+    <div id="mat-sidenav-content">
+      <app-document-viewer [documentStateObs]="documentStateObs">
+      </app-document-viewer>
+    </div>
   </mat-sidenav>
 
   <button mat-raised-button color="primary" (click)="activateEdgeCreation()">

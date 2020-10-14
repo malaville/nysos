@@ -10,7 +10,21 @@ mat-sidenav-container {
   height: 100%;
 }
 
+#mat-sidenav-content {
+  height: 100%;
+}
+
 mat-sidenav {
   width: 600px;
   padding: 50px;
+  transition: width 0.5s;
+}
+mat-sidenav.large {
+  width: 1200px;
+  padding: 50px;
+  transition: width 0.5s;
+}
+
+app-document-viewer {
+  width: 480px;
 }

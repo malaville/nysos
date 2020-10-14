@@ -17,6 +17,7 @@ export class AppComponent implements OnInit {
   title = 'nysos-frontend';
   cy: cytoscape.Core;
   documentStateObs: Observable<DocumentDataStateInterface>;
+  large = false;
 
   @ViewChild(MatSidenav)
   set sidenav(s: MatSidenav) {
