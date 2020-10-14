@@ -1,0 +1,8 @@
+<form [formGroup]="myForm" autocomplete="off" novalidate>
+  <input formControlName="acronym" placeholder="Acronym" />
+  <input formControlName="title" placeholder="Title" />
+  <input formControlName="link" placeholder="Link" />
+  <input formControlName="year" placeholder="Year" />
+  <input formControlName="author" placeholder="Author" />
+  <button type="submit" [disabled]="!this.myForm.valid">Submit</button>
+</form>
