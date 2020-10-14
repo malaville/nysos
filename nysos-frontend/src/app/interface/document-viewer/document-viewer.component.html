@@ -6,8 +6,19 @@
   (focusout)="onNameOut()"
   (keydown.enter)="unFocus()"
 ></h1>
+<button
+  mat-flat-button
+  *ngIf="!(documentStateObs | async).bibliography"
+  (click)="newDocumentClicked()"
+>
+  <mat-icon>rate_review</mat-icon>
+  Add Source
+</button>
 <ng-container *ngIf="(documentStateObs | async).bibliography">
-  <h1>{{ (documentStateObs | async).bibliography.acronym }}</h1>
+  <small>{{ (documentStateObs | async).bibliography.acronym }}</small>
+  <button mat-icon-button (click)="editDocumentClicked()">
+    <mat-icon>edit</mat-icon>
+  </button>
   <h2>
     <small
       >{{ (documentStateObs | async).bibliography.author }} ({{
@@ -15,8 +26,15 @@
       }})</small
     >
     - {{ (documentStateObs | async).bibliography.title }}
+    <small
+      ><a
+        mat-icon-button
+        color="primary"
+        [href]="(documentStateObs | async).bibliography.link"
+        ><mat-icon>link</mat-icon></a
+      ></small
+    >
   </h2>
-  <a [href]="(documentStateObs | async).bibliography.link">LINK</a>
 </ng-container>
 
 <div
@@ -25,17 +43,13 @@
   (input)="onDescriptionChange($event.target.innerHTML)"
   [innerHTML]="(documentStateObs | async).content"
 ></div>
-<p *ngFor="let bib of bibliography">
-  <button mat-icon-button aria-label="Article button">
+<span *ngFor="let bib of bibliography">
+  <button
+    mat-icon-button
+    aria-label="Article button"
+    (click)="onDocumentClicked(bib.contentId)"
+  >
     <mat-icon>article</mat-icon>
   </button>
-  {{ bib.name }} - {{ bib.title }}
-</p>
-
-<small>node id : {{ (documentStateObs | async).contentId }}</small>
-<small *ngIf="(documentStateObs | async).edgeTargetId">
-  target : {{ (documentStateObs | async).edgeTargetId }}
-</small>
-<small *ngIf="(documentStateObs | async).edgeSourceId">
-  source : {{ (documentStateObs | async).edgeSourceId }}
-</small>
+  {{ bib.acronym }} - {{ bib.title }}
+</span>

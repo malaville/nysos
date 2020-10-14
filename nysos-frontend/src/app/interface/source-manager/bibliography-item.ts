@@ -9,7 +9,8 @@ export class BibliographyItem {
     public link = '',
     public acronym = '',
     public author = '',
-    public year = new Date().getFullYear()
+    public year = new Date().getFullYear(),
+    public contentId = undefined
   ) {}
 
   static fromFormGroup(fg: FormGroup) {
@@ -27,14 +28,18 @@ export class BibliographyItem {
     );
   }
 
-  static fromEdge(cyEdge: cytoscape.CollectionReturnValue) {
+  static fromEdge(
+    cyEdge: cytoscape.CollectionReturnValue | cytoscape.SingularElementArgument
+  ) {
     const data = cyEdge.data();
+    const id = cyEdge.id();
     return new BibliographyItem(
       data.title,
       data.link,
       data.name,
       data.author,
-      data.year
+      data.year,
+      id
     );
   }
 

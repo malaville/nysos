@@ -46,14 +46,6 @@ export class AppstateService {
 
   setSidenavRef(sidenavref: MatSidenav) {
     this.sidenavref = sidenavref;
-    setTimeout(
-      () =>
-        this.contentSelected(
-          '5f9f73e4-8864-4ac3-9d5e-27c8bec69c9c',
-          'Titre de dingue on est vraiment contents'
-        ),
-      20
-    );
   }
 
   contentSelected(
@@ -83,12 +75,17 @@ export class AppstateService {
   }
 
   openNewDocument(editDocument = false) {
-    if (editDocument) {
-      this.UIstate.editDocument = true;
+    if (this.UIstate.editDocument || this.UIstate.addingDocument) {
+      this.UIstate.editDocument = false;
       this.UIstate.addingDocument = false;
     } else {
-      this.UIstate.editDocument = false;
-      this.UIstate.addingDocument = true;
+      if (editDocument) {
+        this.UIstate.editDocument = true;
+        this.UIstate.addingDocument = false;
+      } else {
+        this.UIstate.editDocument = false;
+        this.UIstate.addingDocument = true;
+      }
     }
     this.UIstateBS.next(this.UIstate);
   }
