@@ -1,10 +1,23 @@
 <h1
-  #title
+  [hidden]="(documentStateObs | async).bibliography"
+  #name
   contenteditable="plaintext-only"
-  (input)="onTitleChange($event.target.innerHTML)"
-  (focusout)="onTitleOut()"
+  (input)="onNameChange($event.target.innerHTML)"
+  (focusout)="onNameOut()"
   (keydown.enter)="unFocus()"
 ></h1>
+<ng-container *ngIf="(documentStateObs | async).bibliography">
+  <h1>{{ (documentStateObs | async).bibliography.acronym }}</h1>
+  <h2>
+    <small
+      >{{ (documentStateObs | async).bibliography.author }} ({{
+        (documentStateObs | async).bibliography.year
+      }})</small
+    >
+    - {{ (documentStateObs | async).bibliography.title }}
+  </h2>
+  <a [href]="(documentStateObs | async).bibliography.link">LINK</a>
+</ng-container>
 
 <div
   id="content-of-document"
@@ -12,6 +25,7 @@
   (input)="onDescriptionChange($event.target.innerHTML)"
   [innerHTML]="(documentStateObs | async).content"
 ></div>
+<p *ngFor="let bib of bibliography">{{ bib.name }} - {{ bib.title }}</p>
 
 <small>node id : {{ (documentStateObs | async).contentId }}</small>
 <small *ngIf="(documentStateObs | async).edgeTargetId">

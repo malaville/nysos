@@ -1,7 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import cytoscape from 'cytoscape';
-import { Observable } from 'rxjs';
+import { Observable, scheduled } from 'rxjs';
+import { map } from 'rxjs/operators';
 import {
   AppstateService,
   DocumentDataStateInterface,
@@ -17,7 +18,7 @@ export class AppComponent implements OnInit {
   title = 'nysos-frontend';
   cy: cytoscape.Core;
   documentStateObs: Observable<DocumentDataStateInterface>;
-  large = false;
+  large: Observable<boolean> = scheduled([false], null);
 
   @ViewChild(MatSidenav)
   set sidenav(s: MatSidenav) {
@@ -27,11 +28,13 @@ export class AppComponent implements OnInit {
   constructor(
     private cytostate: CytostateService,
     private appstate: AppstateService
-  ) {
-    this.documentStateObs = this.appstate.documentStateObservable;
-  }
+  ) {}
 
   ngOnInit() {
+    this.documentStateObs = this.appstate.documentStateObservable;
+    this.large = this.appstate.UIstateObservable.pipe(
+      map((uistate) => uistate.addingDocument || uistate.editDocument)
+    );
     setTimeout(() => this.cytostate.setCytocoreId('cy'), 500);
   }
 
@@ -56,5 +59,9 @@ export class AppComponent implements OnInit {
 
   openSideNav() {
     this.appstate.sidenavref.open();
+  }
+
+  newDocumentClicked() {
+    this.appstate.openNewDocument(!!this.appstate.documentState.bibliography);
   }
 }

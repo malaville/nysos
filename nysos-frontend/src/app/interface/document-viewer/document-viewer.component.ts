@@ -19,24 +19,26 @@ import { CytostateService } from 'src/app/services/cytostate/cytostate.service';
   styleUrls: ['./document-viewer.component.css'],
 })
 export class DocumentViewerComponent implements AfterViewInit {
-  private temporaryTitle = '';
-  private titleWasChanged = false;
+  private temporaryName = '';
+  private nameWasChanged = false;
+  public bibliography = [];
 
   constructor(
     private cytostate: CytostateService,
     private appState: AppstateService
   ) {}
 
-  @ViewChild('title') h1: ElementRef;
+  @ViewChild('name') h1: ElementRef;
 
   ngAfterViewInit() {
     this.documentStateObs
-      .pipe(map((docState) => docState.title))
-      .subscribe((title) => {
-        this.h1.nativeElement.innerHTML = title;
-        if (!title) {
+      .pipe(map((docState) => docState.name))
+      .subscribe((name) => {
+        this.h1.nativeElement.innerHTML = name;
+        if (!name) {
           setTimeout(() => this.h1.nativeElement.focus(), 500);
         }
+        this.findBibliography();
       });
   }
 
@@ -45,19 +47,29 @@ export class DocumentViewerComponent implements AfterViewInit {
   onDescriptionChange(content) {
     this.appState.saveContent(content);
   }
-  onTitleChange(content) {
-    this.titleWasChanged = true;
-    this.temporaryTitle = content;
+  onNameChange(content) {
+    this.nameWasChanged = true;
+    this.temporaryName = content;
   }
 
   unFocus() {
     this.h1.nativeElement.blur();
   }
-  onTitleOut() {
-    if (this.titleWasChanged) {
-      this.cytostate.changeNodeName(this.temporaryTitle);
+  onNameOut() {
+    if (this.nameWasChanged) {
+      this.cytostate.changeNodeName(this.temporaryName);
     }
-    this.titleWasChanged = false;
-    this.temporaryTitle = '';
+    this.nameWasChanged = false;
+    this.temporaryName = '';
+  }
+  onTitleChange(content) {}
+
+  onTitleOut() {}
+
+  findBibliography() {
+    this.bibliography =
+      this.cytostate.findBibliographyAbout(
+        this.appState.documentState.contentId
+      ) || [];
   }
 }

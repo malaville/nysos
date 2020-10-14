@@ -8,6 +8,13 @@ import { edgehandlestyles } from './edgehandlesstyles';
 import { CytodatabaseService } from '../cytodatabase/cytodatabase.service';
 import { AppstateService } from '../app/appstate.service';
 import { BibliographyItem } from 'src/app/interface/source-manager/bibliography-item';
+
+enum EDGE_TYPES {
+  IDEA_LINK = 'IDEA_LINK',
+  DOCUMENT_ON_THEME = 'DOCUMENT_LINK',
+  DOCUMENT_BETWEEN_THEMES = 'DOCUMENT_BETWEEN_THEME',
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -41,7 +48,14 @@ export class CytostateService {
     this.cytocore.on('click', 'edge', (e) => {
       const id = e.target.id();
       const { name, source, target } = e.target.data();
-      this.appstate.contentSelected(id, name || '', { source, target });
+      if (e.target.data().type == EDGE_TYPES.DOCUMENT_ON_THEME) {
+        const { title, link, author, year } = e.target.data();
+        const bib = new BibliographyItem(title, link, name, author, year);
+        this.appstate.contentSelected(id, name || '', { source, target }, bib);
+      } else {
+        console.log('Edge selected without bibliography');
+        this.appstate.contentSelected(id, name || '', { source, target });
+      }
     });
 
     this.edgehandles = this.cytocore.edgehandles(defaults);
@@ -69,6 +83,7 @@ export class CytostateService {
 
   loadFromLocalStorage() {
     this.cyDb.loadFromLocalStorage(this.cytocore);
+    this.cytocore.reset();
   }
 
   addNode() {
@@ -93,8 +108,49 @@ export class CytostateService {
     const { contentId } = this.appstate.documentState;
     this.cytocore.add({
       group: 'edges',
-      data: { name: biblioItem.acronym, source: contentId, target: contentId },
+      data: {
+        name: biblioItem.acronym,
+        source: contentId,
+        target: contentId,
+        type: EDGE_TYPES.DOCUMENT_ON_THEME,
+        title: biblioItem.title,
+        author: biblioItem.author,
+        year: biblioItem.year,
+        link: biblioItem.link,
+      },
     });
-    console.log(this.cytocore.edges().map((node) => ({ ...node.data() })));
+    this.appstate.closeNewDocument();
+  }
+
+  modifyBibliography(id: string, biblioItem: BibliographyItem) {
+    const edgeData = biblioItem.toEdgeData();
+    const edgeDataModified = this.cytocore.getElementById(id).data(edgeData);
+
+    this.appstate.contentSelected(
+      id,
+      edgeDataModified.data().name,
+      edgeDataModified.data(),
+      BibliographyItem.fromEdge(edgeDataModified)
+    );
+  }
+
+  findBibliographyAbout(id: string) {
+    return this.cytocore
+      ?.getElementById(id)
+      .neighborhood()
+      .filter(
+        (ele) => ele.isEdge() && ele.data().type == EDGE_TYPES.DOCUMENT_ON_THEME
+      )
+      .map((edge) => {
+        return edge.data();
+      });
+  }
+
+  findBibliographyById(id: string) {
+    const bibliography = this.cytocore?.getElementById(id);
+    if (bibliography) {
+      return BibliographyItem.fromEdge(bibliography);
+    }
+    return new BibliographyItem();
   }
 }

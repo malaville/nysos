@@ -4,13 +4,22 @@
     #sidenav
     mode="top"
     autoFocus="false"
-    [class.large]="large"
+    [class.large]="large | async"
   >
-    <button id="enlarge-button" (click)="large = !large">enlarge</button>
+    <button id="enlarge-button" (click)="newDocumentClicked()">
+      {{
+        (documentStateObs | async).bibliography
+          ? "Edit Document"
+          : "New Document"
+      }}
+    </button>
     <div id="mat-sidenav-content">
       <app-document-viewer [documentStateObs]="documentStateObs">
       </app-document-viewer>
-      <app-source-manager [class.large]="large"></app-source-manager>
+      <app-source-manager
+        [class.large]="large | async"
+        [bibliographyId]="(documentStateObs | async).contentId"
+      ></app-source-manager>
     </div>
   </mat-sidenav>
 
