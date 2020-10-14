@@ -2,12 +2,14 @@ import { Injectable } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { BehaviorSubject } from 'rxjs';
 import { CytodatabaseService } from '../cytodatabase/cytodatabase.service';
+
 export interface DocumentDataStateInterface {
   title: string;
   contentId: string;
   content: string;
   edgeTargetId?: string;
   edgeSourceId?: string;
+  bibliographyId: string;
 }
 
 @Injectable({
@@ -20,6 +22,7 @@ export class AppstateService {
     title: undefined,
     contentId: undefined,
     content: LOREM_IPSUMS,
+    bibliographyId: undefined,
   };
   private documentStateBS = new BehaviorSubject(this.documentState);
   readonly documentStateObservable = this.documentStateBS.asObservable();
@@ -28,6 +31,10 @@ export class AppstateService {
 
   setSidenavRef(sidenavref: MatSidenav) {
     this.sidenavref = sidenavref;
+    this.contentSelected(
+      '5f9f73e4-8864-4ac3-9d5e-27c8bec69c9c',
+      'Titre de dingue on est vraiment contents'
+    );
   }
 
   contentSelected(id: string, name: string, edgeInfos: any = {}) {
