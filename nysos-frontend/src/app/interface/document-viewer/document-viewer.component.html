@@ -25,7 +25,12 @@
   (input)="onDescriptionChange($event.target.innerHTML)"
   [innerHTML]="(documentStateObs | async).content"
 ></div>
-<p *ngFor="let bib of bibliography">{{ bib.name }} - {{ bib.title }}</p>
+<p *ngFor="let bib of bibliography">
+  <button mat-icon-button aria-label="Article button">
+    <mat-icon>article</mat-icon>
+  </button>
+  {{ bib.name }} - {{ bib.title }}
+</p>
 
 <small>node id : {{ (documentStateObs | async).contentId }}</small>
 <small *ngIf="(documentStateObs | async).edgeTargetId">
