@@ -18,7 +18,10 @@
       </app-document-viewer>
       <app-source-manager
         [class.large]="large | async"
-        [bibliographyId]="(documentStateObs | async).contentId"
+        [bibliographyId]="
+          (documentStateObs | async).bibliography &&
+          (documentStateObs | async).contentId
+        "
       ></app-source-manager>
     </div>
   </mat-sidenav>

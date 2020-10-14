@@ -7,7 +7,7 @@ export class BibliographyItem {
   constructor(
     public title = '',
     public link = '',
-    public acronym = 'DOC',
+    public acronym = '',
     public author = '',
     public year = new Date().getFullYear()
   ) {}
