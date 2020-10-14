@@ -45,7 +45,6 @@ export class AppstateService {
     this.documentState.edgeSourceId = source || undefined;
     this.documentState.edgeTargetId = target || undefined;
     this.documentStateBS.next(this.documentState);
-
     this.sidenavref.open();
   }
 

@@ -6,10 +6,11 @@
     autoFocus="false"
     [class.large]="large"
   >
-    <button (click)="large = !large">enlarge</button>
+    <button id="enlarge-button" (click)="large = !large">enlarge</button>
     <div id="mat-sidenav-content">
       <app-document-viewer [documentStateObs]="documentStateObs">
       </app-document-viewer>
+      <app-source-manager [class.large]="large"></app-source-manager>
     </div>
   </mat-sidenav>
 
