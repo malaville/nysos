@@ -7,7 +7,7 @@ import { styles } from './cytostyles';
 import { edgehandlestyles } from './edgehandlesstyles';
 import { CytodatabaseService } from '../cytodatabase/cytodatabase.service';
 import { AppstateService } from '../app/appstate.service';
-const CYTOSAVE_KEY = 'cytosave';
+import { BibliographyItem } from 'src/app/interface/source-manager/bibliography-item';
 @Injectable({
   providedIn: 'root',
 })
@@ -87,5 +87,14 @@ export class CytostateService {
       newName,
       this.cytocore.getElementById(id).data()
     );
+  }
+
+  addBibliography(biblioItem: BibliographyItem) {
+    const { contentId } = this.appstate.documentState;
+    this.cytocore.add({
+      group: 'edges',
+      data: { name: biblioItem.acronym, source: contentId, target: contentId },
+    });
+    console.log(this.cytocore.edges().map((node) => ({ ...node.data() })));
   }
 }

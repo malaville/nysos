@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { BehaviorSubject } from 'rxjs';
+import { BibliographyItem } from 'src/app/interface/source-manager/bibliography-item';
 import { CytodatabaseService } from '../cytodatabase/cytodatabase.service';
+import { CytostateService } from '../cytostate/cytostate.service';
 
 export interface DocumentDataStateInterface {
   title: string;
@@ -31,9 +33,13 @@ export class AppstateService {
 
   setSidenavRef(sidenavref: MatSidenav) {
     this.sidenavref = sidenavref;
-    this.contentSelected(
-      '5f9f73e4-8864-4ac3-9d5e-27c8bec69c9c',
-      'Titre de dingue on est vraiment contents'
+    setTimeout(
+      () =>
+        this.contentSelected(
+          '5f9f73e4-8864-4ac3-9d5e-27c8bec69c9c',
+          'Titre de dingue on est vraiment contents'
+        ),
+      20
     );
   }
 

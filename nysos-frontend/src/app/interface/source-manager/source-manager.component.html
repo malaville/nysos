@@ -4,5 +4,7 @@
   <input formControlName="link" placeholder="Link" />
   <input formControlName="year" placeholder="Year" />
   <input formControlName="author" placeholder="Author" />
-  <button type="submit" [disabled]="!this.myForm.valid">Submit</button>
+  <button (click)="submitClicked()" [disabled]="!this.myForm.valid">
+    Submit
+  </button>
 </form>
