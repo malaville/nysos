@@ -1,18 +1,12 @@
-<div class="title-and-button-wrapper">
-  <h1
-    [hidden]="(documentStateObs | async).bibliography"
-    #name
-    contenteditable="plaintext-only"
-    (input)="onNameChange($event.target.innerHTML)"
-    (focusout)="onNameOut()"
-    (keydown.enter)="unFocus()"
-  ></h1>
-  <button
-    mat-mini-fab
-    color="primary"
-    *ngIf="!(documentStateObs | async).bibliography"
-    (click)="newDocumentClicked()"
-  >
+<app-document-title
+  [newDocumentClicked]="newDocumentClicked"
+  [bibliography]="(documentStateObs | async).bibliography"
+></app-document-title>
+
+<app-bibliography-details
+  [bibliography]="(documentStateObs | async).bibliography"
+  [editDocumentClicked]="editDocumentClicked"
+>
 </app-bibliography-details>
 
 <div
@@ -21,6 +15,7 @@
   (input)="onDescriptionChange($event.target.innerHTML)"
   [innerHTML]="(documentStateObs | async).content"
 ></div>
+
 <span *ngFor="let bib of bibliography">
   <button
     mat-icon-button

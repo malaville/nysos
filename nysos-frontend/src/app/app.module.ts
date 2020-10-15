@@ -15,7 +15,7 @@ import { AppComponent } from './app.component';
 import { DocumentViewerComponent } from './interface/document-viewer/document-viewer.component';
 import { SourceManagerComponent } from './interface/source-manager/source-manager.component';
 import { BibliographyDetailsComponent } from './interface/document-viewer/bibliography-details/bibliography-details.component';
-// import { DocumentTitleComponent } from './interface/document-viewer/document-title/document-title.component';
+import { DocumentTitleComponent } from './interface/document-viewer/document-title/document-title.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +23,7 @@ import { BibliographyDetailsComponent } from './interface/document-viewer/biblio
     DocumentViewerComponent,
     SourceManagerComponent,
     BibliographyDetailsComponent,
-    // DocumentTitleComponent,
+    DocumentTitleComponent,
   ],
   imports: [
     BrowserModule,

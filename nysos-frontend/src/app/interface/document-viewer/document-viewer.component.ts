@@ -23,16 +23,12 @@ import {
   styleUrls: ['./document-viewer.component.css'],
 })
 export class DocumentViewerComponent implements AfterViewInit {
-  private temporaryName = '';
-  private nameWasChanged = false;
   public bibliography: BibliographyItemLink[] = [];
 
   constructor(
     private cytostate: CytostateService,
     private appState: AppstateService
   ) {}
-
-  @ViewChild('name') h1: ElementRef;
 
   ngAfterViewInit() {
     this.documentStateObs
@@ -51,24 +47,6 @@ export class DocumentViewerComponent implements AfterViewInit {
   onDescriptionChange(content) {
     this.appState.saveContent(content);
   }
-  onNameChange(content) {
-    this.nameWasChanged = true;
-    this.temporaryName = content;
-  }
-
-  unFocus() {
-    this.h1.nativeElement.blur();
-  }
-  onNameOut() {
-    if (this.nameWasChanged) {
-      this.cytostate.changeNodeName(this.temporaryName);
-    }
-    this.nameWasChanged = false;
-    this.temporaryName = '';
-  }
-  onTitleChange(content) {}
-
-  onTitleOut() {}
 
   findBibliography() {
     this.bibliography =
