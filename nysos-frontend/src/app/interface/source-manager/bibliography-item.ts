@@ -64,7 +64,11 @@ export class BibliographyItem {
 }
 
 export class BibliographyItemLink extends BibliographyItem {
-  constructor(bib: BibliographyItem, public description = '') {
+  constructor(
+    bib: BibliographyItem,
+    public description = '',
+    public linkid = ''
+  ) {
     super(
       bib.title,
       bib.link,

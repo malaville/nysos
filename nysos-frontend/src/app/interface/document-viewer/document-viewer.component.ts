@@ -33,9 +33,8 @@ export class DocumentViewerComponent {
     this.appState.saveContent(content);
   }
 
-  onDocumentClicked(documentId: string) {
-    this.cytostate.selectContent(documentId);
-  }
+  onLinkDescriptionChangeCallback = () => (id: string, description: string) =>
+    this.appState.saveContentOf(id, description);
 
   newDocumentClicked() {
     this.appState.openNewDocument(!!this.appState.documentState.bibliography);

@@ -1,0 +1,15 @@
+<button
+  mat-icon-button
+  aria-label="Article button"
+  (click)="onDocumentClicked(bib.contentId)"
+>
+  <mat-icon>article</mat-icon>
+</button>
+{{ bib.acronym }} - {{ bib.title }}<br />
+<div
+  #doclinkdesc
+  class="document-link-description"
+  contenteditable="plaintext-only"
+  (keydown.enter)="onEnter()"
+  (input)="onBiblioLinkDescriptionChange($event.target.innerHTML)"
+></div>

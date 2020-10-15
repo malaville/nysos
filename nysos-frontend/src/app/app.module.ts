@@ -16,6 +16,7 @@ import { DocumentViewerComponent } from './interface/document-viewer/document-vi
 import { SourceManagerComponent } from './interface/source-manager/source-manager.component';
 import { BibliographyDetailsComponent } from './interface/document-viewer/bibliography-details/bibliography-details.component';
 import { DocumentTitleComponent } from './interface/document-viewer/document-title/document-title.component';
+import { BibliographyLinkComponent } from './interface/document-viewer/bibliography-link/bibliography-link.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { DocumentTitleComponent } from './interface/document-viewer/document-tit
     SourceManagerComponent,
     BibliographyDetailsComponent,
     DocumentTitleComponent,
+    BibliographyLinkComponent,
   ],
   imports: [
     BrowserModule,

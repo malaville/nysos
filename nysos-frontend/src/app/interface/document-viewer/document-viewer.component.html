@@ -16,15 +16,8 @@
 ></div>
 
 <span *ngFor="let bib of bibliography | async">
-  <button
-    mat-icon-button
-    aria-label="Article button"
-    (click)="onDocumentClicked(bib.contentId)"
-  >
-    <mat-icon>article</mat-icon>
-  </button>
-  {{ bib.acronym }} - {{ bib.title }}<br />
-  <div class="document-link-description" contenteditable="plaintext-only">
-    {{ bib.description }}
-  </div>
+  <app-bibliography-link
+    [bib]="bib"
+    [linkDescriptionChange]="onLinkDescriptionChangeCallback()"
+  ></app-bibliography-link>
 </span>

@@ -166,17 +166,16 @@ export class CytostateService {
           const linkBetweenBibAndObject = this.cytocore.elements(
             `edge[target = "${id}"][source = "${bib.contentId}"]`
           );
-          console.log(
-            'We looked for target = ',
-            id,
-            'linkBetweenBibAndObject',
-            linkBetweenBibAndObject.map((ele) => ele.data())
-          );
+
           const idOfLinkBetweenBibAndObject = linkBetweenBibAndObject.id();
           const description = this.cyDb.loadContentOf(
             idOfLinkBetweenBibAndObject
           );
-          return new BibliographyItemLink(bib, description);
+          return new BibliographyItemLink(
+            bib,
+            description,
+            idOfLinkBetweenBibAndObject
+          );
         });
       } else {
         const bibs = this.cytocore
@@ -184,7 +183,11 @@ export class CytostateService {
           .sources()
           .map(
             (ele) =>
-              new BibliographyItemLink(BibliographyItem.fromNode(ele), '')
+              new BibliographyItemLink(
+                BibliographyItem.fromNode(ele),
+                '',
+                ele.id()
+              )
           );
 
         return bibs;
