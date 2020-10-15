@@ -1,58 +1,36 @@
-import {
-  Component,
-  ElementRef,
-  Input,
-  AfterViewInit,
-  ViewChild,
-} from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component } from '@angular/core';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
   AppstateService,
   DocumentDataStateInterface,
 } from 'src/app/services/app/appstate.service';
 import { CytostateService } from 'src/app/services/cytostate/cytostate.service';
-import {
-  BibliographyItem,
-  BibliographyItemLink,
-} from '../source-manager/bibliography-item';
+import { BibliographyItemLink } from '../source-manager/bibliography-item';
 
 @Component({
   selector: 'app-document-viewer',
   templateUrl: './document-viewer.component.html',
   styleUrls: ['./document-viewer.component.css'],
 })
-export class DocumentViewerComponent implements AfterViewInit {
-  public bibliography: BibliographyItemLink[] = [];
+export class DocumentViewerComponent {
+  public bibliography: Observable<BibliographyItemLink[]> = of([]);
+  documentStateObs: Observable<DocumentDataStateInterface>;
 
   constructor(
     private cytostate: CytostateService,
     private appState: AppstateService
   ) {}
 
-  ngAfterViewInit() {
-    this.documentStateObs
-      .pipe(map((docState) => docState.name))
-      .subscribe((name) => {
-        this.h1.nativeElement.innerHTML = name;
-        if (!name) {
-          setTimeout(() => this.h1.nativeElement.focus(), 500);
-        }
-        this.findBibliography();
-      });
+  ngOnInit() {
+    this.documentStateObs = this.appState.documentStateObservable;
+    this.bibliography = this.documentStateObs.pipe(
+      map((doc) => this.cytostate.findBibliographyAbout(doc.contentId) || [])
+    );
   }
-
-  @Input() documentStateObs: Observable<DocumentDataStateInterface>;
 
   onDescriptionChange(content) {
     this.appState.saveContent(content);
-  }
-
-  findBibliography() {
-    this.bibliography =
-      this.cytostate.findBibliographyAbout(
-        this.appState.documentState.contentId
-      ) || [];
   }
 
   onDocumentClicked(documentId: string) {
@@ -60,10 +38,6 @@ export class DocumentViewerComponent implements AfterViewInit {
   }
 
   newDocumentClicked() {
-    this.appState.openNewDocument(!!this.appState.documentState.bibliography);
-  }
-
-  editDocumentClicked() {
     this.appState.openNewDocument(!!this.appState.documentState.bibliography);
   }
 }

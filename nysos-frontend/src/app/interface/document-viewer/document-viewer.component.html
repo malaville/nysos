@@ -5,7 +5,6 @@
 
 <app-bibliography-details
   [bibliography]="(documentStateObs | async).bibliography"
-  [editDocumentClicked]="editDocumentClicked"
 >
 </app-bibliography-details>
 
@@ -16,7 +15,7 @@
   [innerHTML]="(documentStateObs | async).content"
 ></div>
 
-<span *ngFor="let bib of bibliography">
+<span *ngFor="let bib of bibliography | async">
   <button
     mat-icon-button
     aria-label="Article button"

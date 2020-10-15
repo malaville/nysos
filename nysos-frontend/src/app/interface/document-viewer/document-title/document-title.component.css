@@ -1,0 +1,23 @@
+h1:focus {
+  cursor: auto;
+  background-color: rgba(0, 0, 0, 0.1);
+  outline: none;
+  padding: 10px;
+  margin-right: 20px;
+  transition: padding 0.5s, background-color 0.3s, margin-right 0.5s;
+}
+
+h1 {
+  cursor: pointer;
+  padding: 0px;
+  margin-right: 40px;
+  transition: padding 0.5s, margin-right 0.5s;
+  flex-grow: 1;
+}
+
+:host {
+  display: flex;
+  align-items: center;
+  padding-right: 10px;
+  justify-content: space-between;
+}
