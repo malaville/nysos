@@ -13,31 +13,7 @@
     *ngIf="!(documentStateObs | async).bibliography"
     (click)="newDocumentClicked()"
   >
-    <mat-icon>rate_review</mat-icon>
-  </button>
-</div>
-<ng-container *ngIf="(documentStateObs | async).bibliography">
-  <small>{{ (documentStateObs | async).bibliography.acronym }}</small>
-  <button mat-icon-button (click)="editDocumentClicked()">
-    <mat-icon>edit</mat-icon>
-  </button>
-  <h2>
-    <small
-      >{{ (documentStateObs | async).bibliography.author }} ({{
-        (documentStateObs | async).bibliography.year
-      }})</small
-    >
-    - {{ (documentStateObs | async).bibliography.title }}
-    <small
-      ><a
-        mat-icon-button
-        color="primary"
-        [href]="(documentStateObs | async).bibliography.link"
-        ><mat-icon>link</mat-icon></a
-      ></small
-    >
-  </h2>
-</ng-container>
+</app-bibliography-details>
 
 <div
   id="content-of-document"
