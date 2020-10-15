@@ -5,10 +5,10 @@ export class BibliographyItem {
   id: string;
 
   constructor(
-    public title = '',
+    public title = 'This is a random title',
     public link = '',
-    public acronym = '',
-    public author = '',
+    public acronym = 'RND',
+    public author = 'Alban Gauthier',
     public year = new Date().getFullYear(),
     public contentId = undefined
   ) {}
@@ -28,11 +28,11 @@ export class BibliographyItem {
     );
   }
 
-  static fromEdge(
-    cyEdge: cytoscape.CollectionReturnValue | cytoscape.SingularElementArgument
+  static fromNode(
+    cyNode: cytoscape.CollectionReturnValue | cytoscape.SingularElementArgument
   ) {
-    const data = cyEdge.data();
-    const id = cyEdge.id();
+    const data = cyNode.data();
+    const id = cyNode.id();
     return new BibliographyItem(
       data.title,
       data.link,
@@ -43,7 +43,7 @@ export class BibliographyItem {
     );
   }
 
-  toEdgeData() {
+  toNodeData() {
     const data = { ...this, name: this.acronym };
     delete data['acronym'];
     return data;
@@ -60,5 +60,18 @@ export class BibliographyItem {
       ],
       author: [this.author, [Validators.required, Validators.minLength(8)]],
     };
+  }
+}
+
+export class BibliographyItemLink extends BibliographyItem {
+  constructor(bib: BibliographyItem, public description = '') {
+    super(
+      bib.title,
+      bib.link,
+      bib.acronym,
+      bib.author,
+      bib.year,
+      bib.contentId
+    );
   }
 }

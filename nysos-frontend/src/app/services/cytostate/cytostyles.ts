@@ -1,4 +1,4 @@
-export const DOCUMENT_EDGE = 'DOCUMENT_EDGE';
+import { EDGE_TYPES, NODE_TYPES } from './models';
 
 export const styles = [
   {
@@ -18,7 +18,19 @@ export const styles = [
     },
   },
   {
-    selector: '.' + DOCUMENT_EDGE,
+    selector: '.' + EDGE_TYPES.DOCUMENT_ON_THEME,
+    style: {
+      opacity: 0,
+    },
+  },
+  {
+    selector: '.' + EDGE_TYPES.DOCUMENT_ON_RELATION,
+    style: {
+      opacity: 0,
+    },
+  },
+  {
+    selector: '.' + NODE_TYPES.DOCUMENT_NODE,
     style: {
       opacity: 0,
     },

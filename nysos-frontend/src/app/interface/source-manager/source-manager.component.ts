@@ -18,16 +18,7 @@ export class SourceManagerComponent implements OnChanges {
   @Input() bibliographyId: string;
 
   constructor(private fb: FormBuilder, private cytostate: CytostateService) {
-    this.myForm = this.fb.group({
-      title: ['', [Validators.required, Validators.minLength(10)]],
-      acronym: ['', Validators.maxLength(10)],
-      link: ['', [Validators.pattern(this.myreg)]],
-      year: [
-        2020,
-        [Validators.min(1000), Validators.max(2030), Number.isInteger],
-      ],
-      author: ['', [Validators.required, Validators.minLength(8)]],
-    });
+    this.myForm = this.fb.group(new BibliographyItem().toFormGroupObject());
   }
 
   ngOnChanges(): void {

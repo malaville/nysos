@@ -12,7 +12,10 @@ import {
   DocumentDataStateInterface,
 } from 'src/app/services/app/appstate.service';
 import { CytostateService } from 'src/app/services/cytostate/cytostate.service';
-import { BibliographyItem } from '../source-manager/bibliography-item';
+import {
+  BibliographyItem,
+  BibliographyItemLink,
+} from '../source-manager/bibliography-item';
 
 @Component({
   selector: 'app-document-viewer',
@@ -22,7 +25,7 @@ import { BibliographyItem } from '../source-manager/bibliography-item';
 export class DocumentViewerComponent implements AfterViewInit {
   private temporaryName = '';
   private nameWasChanged = false;
-  public bibliography: BibliographyItem[] = [];
+  public bibliography: BibliographyItemLink[] = [];
 
   constructor(
     private cytostate: CytostateService,

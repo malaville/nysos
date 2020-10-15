@@ -1,19 +1,21 @@
-<h1
-  [hidden]="(documentStateObs | async).bibliography"
-  #name
-  contenteditable="plaintext-only"
-  (input)="onNameChange($event.target.innerHTML)"
-  (focusout)="onNameOut()"
-  (keydown.enter)="unFocus()"
-></h1>
-<button
-  mat-flat-button
-  *ngIf="!(documentStateObs | async).bibliography"
-  (click)="newDocumentClicked()"
->
-  <mat-icon>rate_review</mat-icon>
-  Add Source
-</button>
+<div class="title-and-button-wrapper">
+  <h1
+    [hidden]="(documentStateObs | async).bibliography"
+    #name
+    contenteditable="plaintext-only"
+    (input)="onNameChange($event.target.innerHTML)"
+    (focusout)="onNameOut()"
+    (keydown.enter)="unFocus()"
+  ></h1>
+  <button
+    mat-mini-fab
+    color="primary"
+    *ngIf="!(documentStateObs | async).bibliography"
+    (click)="newDocumentClicked()"
+  >
+    <mat-icon>rate_review</mat-icon>
+  </button>
+</div>
 <ng-container *ngIf="(documentStateObs | async).bibliography">
   <small>{{ (documentStateObs | async).bibliography.acronym }}</small>
   <button mat-icon-button (click)="editDocumentClicked()">
@@ -51,5 +53,8 @@
   >
     <mat-icon>article</mat-icon>
   </button>
-  {{ bib.acronym }} - {{ bib.title }}
+  {{ bib.acronym }} - {{ bib.title }}<br />
+  <div class="document-link-description" contenteditable="plaintext-only">
+    {{ bib.description }}
+  </div>
 </span>
