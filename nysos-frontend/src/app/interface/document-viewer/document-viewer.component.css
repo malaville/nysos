@@ -14,3 +14,28 @@ div:focus {
   max-height: 500px;
   overflow-y: auto;
 }
+
+.button-container {
+  display: flex;
+  right: 20px;
+  top: 20px;
+  position: absolute;
+  z-index: 100;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 90px;
+  transform-origin: right;
+  transition: transform 0.5s, top 0.5s, right 0.5s;
+}
+:host.large .button-container {
+  transform-origin: right;
+  transform: rotate(-90deg);
+  right: 40px;
+  top: -10px;
+  transition: transform 0.5s, top 0.5s, right 0.5s;
+}
+
+:host.large .button-container button {
+  transform: rotate(90deg);
+  transition: transform 0.5s;
+}

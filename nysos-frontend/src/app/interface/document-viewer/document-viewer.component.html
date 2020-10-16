@@ -1,7 +1,18 @@
-<app-document-title
-  [newDocumentClicked]="newDocumentClicked"
-  [bibliography]="(documentStateObs | async).bibliography"
-></app-document-title>
+<div class="button-container">
+  <button mat-mini-fab color="primary" (click)="addAChildClicked()">
+    <mat-icon>center_focus_strong</mat-icon>
+  </button>
+  <button
+    mat-mini-fab
+    color="primary"
+    *ngIf="!(documentStateObs | async).bibliography"
+    (click)="newDocumentClicked()"
+  >
+    <mat-icon>rate_review</mat-icon>
+  </button>
+</div>
+
+<app-document-title></app-document-title>
 
 <app-bibliography-details
   [bibliography]="(documentStateObs | async).bibliography"

@@ -57,7 +57,8 @@ export class CytostateService {
     });
     this.cytocore.on('mouseout', 'node', (edge) => {
       this.hoverednode = false;
-      setTimeout(() => !this.hoverednode && this.edgehandles.hide(), 500);
+      !edge.target.data().name &&
+        setTimeout(() => !this.hoverednode && this.edgehandles.hide(), 500);
     });
 
     this.cyDb.loadFromLocalStorage(this.cytocore);
@@ -77,11 +78,11 @@ export class CytostateService {
     this.cytocore.reset();
   }
 
-  addNode() {
+  addNode(params: { parent?: string; x?: number; y?: number } = {}) {
     this.cytocore.add({
       group: 'nodes',
-      data: { name: 'New Node' },
-      position: { x: 50, y: 50 },
+      data: { name: '', parent: params.parent },
+      position: { x: params.x || 50, y: params.y || 50 },
     });
   }
 
@@ -112,6 +113,7 @@ export class CytostateService {
       })
       .id();
     this.addBibliographyLink(documentId, contentId);
+    this.appstate.refreshDocummentState();
     this.appstate.closeNewDocument();
   }
 
@@ -218,5 +220,12 @@ export class CytostateService {
       const { name, source, target } = targetObj.data();
       this.appstate.contentSelected(id, name || '', { source, target });
     }
+  }
+
+  addChildToCurrentNode() {
+    const currentId = this.appstate.documentState.contentId;
+    const { x, y } = this.cytocore.getElementById(currentId).position();
+    this.addNode({ parent: currentId, x, y });
+    this.appstate.sidenavref.close();
   }
 }

@@ -6,11 +6,3 @@
   (focusout)="onNameOut()"
   (keydown.enter)="unFocus()"
 ></h1>
-<button
-  mat-mini-fab
-  color="primary"
-  *ngIf="!bibliography"
-  (click)="newDocumentClicked()"
->
-  <mat-icon>rate_review</mat-icon>
-</button>

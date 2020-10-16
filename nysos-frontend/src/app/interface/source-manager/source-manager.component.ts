@@ -53,11 +53,9 @@ export class SourceManagerComponent implements OnChanges, OnInit {
   }
 
   submitClicked(): void {
-    console.log('Submit Clicked');
     if (this.myForm.valid && this.myForm.dirty) {
       const bib = BibliographyItem.fromFormGroup(this.myForm);
       if (this.bibliographyId) {
-        console.log('Bibliography modified', this.bibliographyId);
         this.cytostate.modifyBibliography(this.bibliographyId, bib);
       } else {
         this.cytostate.addBibliography(bib);

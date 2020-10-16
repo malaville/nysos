@@ -39,4 +39,8 @@ export class DocumentViewerComponent {
   newDocumentClicked() {
     this.appState.openNewDocument(!!this.appState.documentState.bibliography);
   }
+
+  addAChildClicked = () => {
+    this.cytostate.addChildToCurrentNode();
+  };
 }

@@ -10,7 +10,6 @@ import { BibliographyItem } from '../../source-manager/bibliography-item';
   styleUrls: ['./document-title.component.css'],
 })
 export class DocumentTitleComponent implements OnInit {
-  @Input() newDocumentClicked: () => void;
   @Input() bibliography: BibliographyItem;
 
   constructor(

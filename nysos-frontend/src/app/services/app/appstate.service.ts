@@ -99,6 +99,10 @@ export class AppstateService {
     this.UIstate.editDocument = false;
     this.UIstateBS.next(this.UIstate);
   }
+
+  refreshDocummentState() {
+    this.documentStateBS.next(this.documentState);
+  }
 }
 
 const LOREM_IPSUMS = '<p>Hello <b>Bold</b> is amzing</p>';

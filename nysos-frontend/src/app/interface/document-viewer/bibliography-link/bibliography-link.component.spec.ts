@@ -8,9 +8,8 @@ describe('BibliographyLinkComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ BibliographyLinkComponent ]
-    })
-    .compileComponents();
+      declarations: [BibliographyLinkComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
