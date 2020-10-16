@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
@@ -16,6 +16,8 @@ import { BibliographyItemLink } from '../source-manager/bibliography-item';
 export class DocumentViewerComponent {
   public bibliography: Observable<BibliographyItemLink[]> = of([]);
   documentStateObs: Observable<DocumentDataStateInterface>;
+
+  @Input() large: boolean;
 
   constructor(
     private cytostate: CytostateService,

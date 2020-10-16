@@ -21,11 +21,14 @@ div:focus {
   top: 20px;
   position: absolute;
   z-index: 100;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 90px;
+  flex-direction: row-reverse;
+  width: 130px;
   transform-origin: right;
   transition: transform 0.5s, top 0.5s, right 0.5s;
+}
+
+.button-container > * {
+  margin: 5px;
 }
 :host.large .button-container {
   transform-origin: right;
@@ -35,7 +38,7 @@ div:focus {
   transition: transform 0.5s, top 0.5s, right 0.5s;
 }
 
-:host.large .button-container button {
+:host.large .button-container > * {
   transform: rotate(90deg);
   transition: transform 0.5s;
 }

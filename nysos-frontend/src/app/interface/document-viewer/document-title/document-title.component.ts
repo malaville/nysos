@@ -22,6 +22,7 @@ export class DocumentTitleComponent implements OnInit {
   @ViewChild('name') h1: ElementRef;
   private temporaryName = '';
   private nameWasChanged = false;
+
   onNameChange(content) {
     this.nameWasChanged = true;
     this.temporaryName = content;

@@ -1,18 +1,34 @@
 <div class="button-container">
+  <button
+    mat-mini-fab
+    [color]="large ? 'warn' : 'primary'"
+    (click)="newDocumentClicked()"
+  >
+    <mat-icon>{{
+      large
+        ? "close"
+        : (documentStateObs | async).bibliography
+        ? "edit"
+        : "rate_review"
+    }}</mat-icon>
+  </button>
   <button mat-mini-fab color="primary" (click)="addAChildClicked()">
     <mat-icon>center_focus_strong</mat-icon>
   </button>
-  <button
+  <a
+    *ngIf="(documentStateObs | async).bibliography"
     mat-mini-fab
     color="primary"
-    *ngIf="!(documentStateObs | async).bibliography"
-    (click)="newDocumentClicked()"
+    [disabled]="!(documentStateObs | async).bibliography?.link"
+    [href]="(documentStateObs | async).bibliography?.link"
   >
-    <mat-icon>rate_review</mat-icon>
-  </button>
+    <mat-icon>link</mat-icon>
+  </a>
 </div>
 
-<app-document-title></app-document-title>
+<app-document-title
+  *ngIf="!(documentStateObs | async).bibliography"
+></app-document-title>
 
 <app-bibliography-details
   [bibliography]="(documentStateObs | async).bibliography"
