@@ -9,15 +9,17 @@
 </app-bibliography-details>
 
 <div
+  #contentdiv
   id="content-of-document"
   contenteditable="true"
   (input)="onDescriptionChange($event.target.innerHTML)"
   [innerHTML]="(documentStateObs | async).content"
 ></div>
-
-<span *ngFor="let bib of bibliography | async">
-  <app-bibliography-link
-    [bib]="bib"
-    [linkDescriptionChange]="onLinkDescriptionChangeCallback()"
-  ></app-bibliography-link>
-</span>
+<div>
+  <span *ngFor="let bib of bibliography | async">
+    <app-bibliography-link
+      [bib]="bib"
+      [linkDescriptionChange]="onLinkDescriptionChangeCallback()"
+    ></app-bibliography-link>
+  </span>
+</div>
