@@ -192,7 +192,7 @@ export class CytostateService {
             (ele) =>
               new BibliographyItemLink(
                 BibliographyItem.fromNode(ele),
-                '',
+                this.cyDb.loadContentOf(ele.id()),
                 ele.id()
               )
           );
