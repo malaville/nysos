@@ -60,6 +60,11 @@ export class CytostateService {
       !edge.target.data().name &&
         setTimeout(() => !this.hoverednode && this.edgehandles.hide(), 500);
     });
+    this.cytocore.on(
+      'mouseup',
+      'node',
+      (edge) => !edge.target.data().name && this.selectContent(edge.target.id())
+    );
 
     this.cyDb.loadFromLocalStorage(this.cytocore);
   }
