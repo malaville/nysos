@@ -5,10 +5,10 @@ export class BibliographyItem {
   id: string;
 
   constructor(
-    public title = 'This is a random title',
+    public title = '',
     public link = '',
-    public acronym = 'RND',
-    public author = 'Alban Gauthier',
+    public acronym = '',
+    public author = '',
     public year = new Date().getFullYear(),
     public contentId = undefined
   ) {}
