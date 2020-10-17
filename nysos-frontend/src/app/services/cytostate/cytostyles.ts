@@ -12,6 +12,11 @@ export const styles = [
     style: {
       'curve-style': 'bezier',
       'target-arrow-shape': 'triangle',
+    },
+  },
+  {
+    selector: 'edge[name]',
+    style: {
       content: 'data(name)',
       'text-outline-color': 'white',
       'text-outline-width': 1,
