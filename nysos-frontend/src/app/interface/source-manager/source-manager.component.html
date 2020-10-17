@@ -1,5 +1,5 @@
 <h2>{{ title | async }}</h2>
-<form [formGroup]="myForm" autocomplete="off" novalidate>
+<form [formGroup]="myForm" #form="ngForm" autocomplete="off" novalidate>
   <div class="double-form-field-container">
     <mat-form-field appearance="fill">
       <mat-label>Acronym</mat-label>
@@ -47,5 +47,8 @@
     (click)="submitClicked()"
   >
     Save the document
+  </button>
+  <button mat-stroked-button (click)="mockDataClicked()">
+    Mock the document
   </button>
 </form>

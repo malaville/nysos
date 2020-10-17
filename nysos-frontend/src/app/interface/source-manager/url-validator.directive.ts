@@ -1,10 +1,6 @@
 import { Directive, forwardRef } from '@angular/core';
-import {
-  FormControl,
-  NG_VALIDATORS,
-  Validator,
-  Validators,
-} from '@angular/forms';
+import { FormControl, NG_VALIDATORS, Validator } from '@angular/forms';
+import { validateUrl } from './validateUrl';
 
 export const URL_VALIDATOR = {
   provide: NG_VALIDATORS,
@@ -23,18 +19,3 @@ export class UrlValidatorDirective implements Validator {
     return validateUrl(c);
   }
 }
-
-const validateUrl = (ctrl: FormControl) => {
-  const myreg = new RegExp(
-    '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?'
-  );
-
-  const valid = ctrl.value && myreg.test(ctrl.value);
-  return valid
-    ? null
-    : {
-        validateUrl: {
-          valid,
-        },
-      };
-};
