@@ -14,9 +14,11 @@ import { BibliographyItem } from './bibliography-item';
 })
 export class SourceManagerComponent implements OnChanges, OnInit {
   myForm: FormGroup;
-  public myreg = '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?';
 
   @Input() bibliographyId: string;
+
+  @Input() open: boolean;
+  // Used to trigger ngOnChanges() when closing opening the panel
 
   title: Observable<string>;
 
@@ -42,7 +44,6 @@ export class SourceManagerComponent implements OnChanges, OnInit {
 
   ngOnChanges(): void {
     if (this.bibliographyId) {
-      console.log('this.bibliographyId', this.bibliographyId);
       const bibliographItemFormGroup = this.cytostate
         .findBibliographyById(this.bibliographyId)
         .toFormGroupObject();
@@ -61,6 +62,8 @@ export class SourceManagerComponent implements OnChanges, OnInit {
         this.cytostate.addBibliography(bib);
       }
       console.log(bib.acronym);
+    } else {
+      this.myForm.controls.title.markAsTouched();
     }
   }
 }

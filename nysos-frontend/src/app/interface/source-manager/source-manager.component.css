@@ -1,7 +1,13 @@
-input.ng-dirty.ng-invalid {
-  border: 3px solid red;
-}
 form {
   display: flex;
   flex-direction: column;
+}
+
+form > * {
+  margin-top: 10px;
+}
+
+.double-form-field-container {
+  display: flex;
+  justify-content: space-between;
 }

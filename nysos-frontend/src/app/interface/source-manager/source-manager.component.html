@@ -1,11 +1,51 @@
 <h2>{{ title | async }}</h2>
 <form [formGroup]="myForm" autocomplete="off" novalidate>
-  <input formControlName="acronym" placeholder="Acronym" />
-  <input formControlName="title" placeholder="Title" />
-  <input formControlName="link" placeholder="Link" />
-  <input formControlName="year" placeholder="Year" />
-  <input formControlName="author" placeholder="Author" />
-  <button (click)="submitClicked()" [disabled]="!this.myForm.valid">
+  <div class="double-form-field-container">
+    <mat-form-field appearance="fill">
+      <mat-label>Acronym</mat-label>
+      <input formControlName="acronym" matInput />
+      <mat-error *ngIf="myForm.controls.acronym.errors?.maxlength">
+        The acronym is too long (max : 10)
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Year</mat-label>
+      <input formControlName="year" matInput />
+    </mat-form-field>
+  </div>
+  <mat-form-field appearance="fill">
+    <mat-label>Link</mat-label>
+    <input formControlName="link" matInput url />
+    <mat-error *ngIf="myForm.controls.link.errors?.validateUrl">
+      The url doesn't match the right pattern
+    </mat-error>
+  </mat-form-field>
+  <mat-form-field appearance="fill">
+    <mat-label>Title</mat-label>
+    <input formControlName="title" matInput />
+    <mat-error *ngIf="myForm.controls.title.errors?.required">
+      The title is required
+    </mat-error>
+    <mat-error *ngIf="myForm.controls.title.errors?.minlength">
+      The title should be longer than 10 chars
+    </mat-error>
+  </mat-form-field>
+  <mat-form-field appearance="fill">
+    <mat-label>Author</mat-label>
+    <input formControlName="author" matInput />
+    <mat-error *ngIf="myForm.controls.author.errors?.required">
+      The Author is required
+    </mat-error>
+    <mat-error *ngIf="myForm.controls.author.errors?.minlength">
+      The author should be longer than 8 chars
+    </mat-error>
+  </mat-form-field>
+
+  <button
+    mat-raised-button
+    [color]="myForm.touched && !myForm.valid ? 'warn' : 'primary'"
+    (click)="submitClicked()"
+  >
     Save the document
   </button>
 </form>

@@ -1,5 +1,4 @@
 import { FormGroup, Validators } from '@angular/forms';
-const myreg = '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?';
 
 export class BibliographyItem {
   id: string;
@@ -53,7 +52,7 @@ export class BibliographyItem {
     return {
       title: [this.title, [Validators.required, Validators.minLength(10)]],
       acronym: [this.acronym, Validators.maxLength(10)],
-      link: [this.link, [Validators.pattern(myreg)]],
+      link: [this.link, []],
       year: [
         this.year,
         [Validators.min(1000), Validators.max(2030), Number.isInteger],

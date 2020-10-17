@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 // Components
 import { AppRoutingModule } from './app-routing.module';
@@ -17,6 +18,7 @@ import { SourceManagerComponent } from './interface/source-manager/source-manage
 import { BibliographyDetailsComponent } from './interface/document-viewer/bibliography-details/bibliography-details.component';
 import { DocumentTitleComponent } from './interface/document-viewer/document-title/document-title.component';
 import { BibliographyLinkComponent } from './interface/document-viewer/bibliography-link/bibliography-link.component';
+import { UrlValidatorDirective } from './interface/source-manager/url-validator.directive';
 
 @NgModule({
   declarations: [
@@ -26,6 +28,7 @@ import { BibliographyLinkComponent } from './interface/document-viewer/bibliogra
     BibliographyDetailsComponent,
     DocumentTitleComponent,
     BibliographyLinkComponent,
+    UrlValidatorDirective,
   ],
   imports: [
     BrowserModule,
@@ -37,6 +40,7 @@ import { BibliographyLinkComponent } from './interface/document-viewer/bibliogra
     MatFormFieldModule,
     ReactiveFormsModule,
     MatIconModule,
+    MatInputModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
