@@ -20,6 +20,27 @@ import { DocumentTitleComponent } from './interface/document-viewer/document-tit
 import { BibliographyLinkComponent } from './interface/document-viewer/bibliography-link/bibliography-link.component';
 import { UrlValidatorDirective } from './interface/source-manager/url-validator.directive';
 
+// Login
+import {
+  SocialAuthService,
+  GoogleLoginProvider,
+  SocialLoginModule,
+} from 'angularx-social-login';
+const config = new SocialAuthService({
+  providers: [
+    {
+      id: GoogleLoginProvider.PROVIDER_ID,
+      provider: new GoogleLoginProvider(
+        '474297745605-buejhpmh7r2hpl9mf40l8o519ropn9no.apps.googleusercontent.com'
+      ),
+    },
+  ],
+});
+
+export function provideConfig() {
+  return config;
+}
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -41,8 +62,14 @@ import { UrlValidatorDirective } from './interface/source-manager/url-validator.
     ReactiveFormsModule,
     MatIconModule,
     MatInputModule,
+    SocialLoginModule,
   ],
-  providers: [],
+  providers: [
+    {
+      provide: SocialAuthService,
+      useFactory: provideConfig,
+    },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

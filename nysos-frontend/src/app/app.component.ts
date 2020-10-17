@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
+import { GoogleLoginProvider, SocialAuthService } from 'angularx-social-login';
 import cytoscape from 'cytoscape';
 import { Observable, scheduled } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -19,6 +20,7 @@ export class AppComponent implements OnInit {
   cy: cytoscape.Core;
   documentStateObs: Observable<DocumentDataStateInterface>;
   large: Observable<boolean> = scheduled([false], null);
+  user: string;
 
   @ViewChild(MatSidenav)
   set sidenav(s: MatSidenav) {
@@ -27,7 +29,8 @@ export class AppComponent implements OnInit {
 
   constructor(
     private cytostate: CytostateService,
-    private appstate: AppstateService
+    private appstate: AppstateService,
+    private authService: SocialAuthService
   ) {}
 
   ngOnInit() {
@@ -36,6 +39,8 @@ export class AppComponent implements OnInit {
       map((uistate) => uistate.addingDocument || uistate.editDocument)
     );
     setTimeout(() => this.cytostate.setCytocoreId('cy'), 500);
+
+    this.authService.authState.subscribe((auth) => (this.user = auth.email));
   }
 
   edgeCreationMode(): boolean {
@@ -63,5 +68,9 @@ export class AppComponent implements OnInit {
 
   newDocumentClicked() {
     this.appstate.openNewDocument(!!this.appstate.documentState.bibliography);
+  }
+
+  signInWithGoogle() {
+    this.authService.signIn(GoogleLoginProvider.PROVIDER_ID);
   }
 }
