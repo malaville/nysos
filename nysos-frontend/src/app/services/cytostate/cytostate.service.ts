@@ -39,12 +39,12 @@ export class CytostateService {
       this.saveData();
     });
 
-    this.cytocore.on('click', 'node', (e) => {
+    this.cytocore.on('click touchend', 'node', (e) => {
       const id = e.target.id();
       this.selectContent(id);
     });
 
-    this.cytocore.on('click', 'edge', (e) => {
+    this.cytocore.on('click touchend', 'edge', (e) => {
       const id = e.target.id();
       this.selectContent(id);
     });
