@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { debounceTime, map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of, ReplaySubject } from 'rxjs';
+import { debounceTime, map, tap } from 'rxjs/operators';
 import {
   AppstateService,
   DocumentDataStateInterface,
@@ -16,10 +16,10 @@ import { BibliographyItemLink } from '../source-manager/bibliography-item';
 export class DocumentViewerComponent {
   public bibliography: Observable<BibliographyItemLink[]> = of([]);
   documentStateObs: Observable<DocumentDataStateInterface>;
-  contentBS = new BehaviorSubject<{ contentId: string; content: string }>({
-    contentId: undefined,
-    content: '',
-  });
+  contentBS = new ReplaySubject<{ contentId: string; content: string }>(1);
+  loading = false;
+  saved = true;
+  writing = false;
 
   @Input() large: boolean;
 
@@ -31,13 +31,30 @@ export class DocumentViewerComponent {
   ngOnInit() {
     this.documentStateObs = this.appState.documentStateObservable;
     this.bibliography = this.documentStateObs.pipe(
+      tap(() => {
+        this.saved = true;
+      }),
       map((doc) => this.cytostate.findBibliographyAbout(doc.contentId) || [])
     );
     this.contentBS
       .asObservable()
-      .pipe(debounceTime(4000))
+      .pipe(
+        tap(() => {
+          this.loading = false;
+          this.saved = false;
+          this.writing = true;
+        }),
+        debounceTime(1000)
+      )
       .subscribe((content) => {
-        this.appState.saveContentOf(content.contentId, content.content);
+        this.writing = false;
+        this.loading = true;
+        this.appState
+          .saveContentOf(content.contentId, content.content)
+          .then(() => {
+            this.loading = false;
+            this.saved = true;
+          });
       });
   }
 

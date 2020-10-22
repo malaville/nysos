@@ -42,3 +42,7 @@ div:focus {
   transform: rotate(90deg);
   transition: transform 0.5s;
 }
+
+.green-icon {
+  color: green;
+}

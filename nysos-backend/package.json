@@ -1,0 +1,27 @@
+{
+  "name": "nysos-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "mongodb": "^3.6.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.8",
+    "@types/mongodb": "^3.5.29",
+    "@types/node": "^14.11.11",
+    "nodemon": "^2.0.6",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsc && node build/index.js",
+    "build": "rm -rf build/ && tsc && node build/index.js",
+    "start:dev": "nodemon"
+  },
+  "author": "",
+  "license": "ISC"
+}

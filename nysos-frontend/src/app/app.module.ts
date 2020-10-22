@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 // Components
 import { AppRoutingModule } from './app-routing.module';
@@ -27,6 +28,7 @@ import {
   SocialLoginModule,
 } from 'angularx-social-login';
 const config = new SocialAuthService({
+  autoLogin: true,
   providers: [
     {
       id: GoogleLoginProvider.PROVIDER_ID,
@@ -63,6 +65,7 @@ export function provideConfig() {
     MatIconModule,
     MatInputModule,
     SocialLoginModule,
+    MatProgressSpinnerModule,
   ],
   providers: [
     {

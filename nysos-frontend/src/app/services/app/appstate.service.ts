@@ -74,8 +74,8 @@ export class AppstateService {
     this.cytoDb.saveContentOf(this.documentState.contentId, content);
   }
 
-  saveContentOf(id: string, content: string) {
-    this.cytoDb.saveContentOf(id, content);
+  saveContentOf(id: string, content: string): Promise<boolean> {
+    return this.cytoDb.saveContentOf(id, content);
   }
 
   openNewDocument(editDocument = false) {

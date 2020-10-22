@@ -34,7 +34,8 @@
   <button type="button" mat-button (click)="addThemeClicked()">
     Add Theme
   </button>
-  <button (click)="signInWithGoogle()">Login {{ user }}</button>
+  <button (click)="signInWithGoogle()">Login</button>{{ auth | async | json }}
+  <button (click)="testToken()">Test</button>
   <div id="cy"></div>
 </mat-sidenav-container>
 <router-outlet></router-outlet>
