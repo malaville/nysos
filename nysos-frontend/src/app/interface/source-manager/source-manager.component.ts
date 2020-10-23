@@ -76,6 +76,7 @@ export class SourceManagerComponent implements OnChanges, OnInit {
       acronym: LOREM[randint - 1].slice(0, 7).toUpperCase(),
       author: 'Lorem Author',
       link: 'https://google.com',
+      year: 2022,
     });
     this.myForm.markAsDirty();
   }

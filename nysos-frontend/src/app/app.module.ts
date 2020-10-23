@@ -27,6 +27,7 @@ import {
   GoogleLoginProvider,
   SocialLoginModule,
 } from 'angularx-social-login';
+import { ContentSaveStateIndicatorComponent } from './interface/content-save-state-indicator/content-save-state-indicator/content-save-state-indicator.component';
 const config = new SocialAuthService({
   autoLogin: true,
   providers: [
@@ -52,6 +53,7 @@ export function provideConfig() {
     DocumentTitleComponent,
     BibliographyLinkComponent,
     UrlValidatorDirective,
+    ContentSaveStateIndicatorComponent,
   ],
   imports: [
     BrowserModule,

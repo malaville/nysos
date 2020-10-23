@@ -18,6 +18,8 @@ export class BibliographyLinkComponent implements OnInit, AfterViewInit {
   @Input() bib: BibliographyItemLink;
   @Input() linkDescriptionChange: (id: string, desc: string) => void;
   @ViewChild('doclinkdesc') div: ElementRef;
+
+  // private contentBS =
   constructor(private cytostate: CytostateService) {}
 
   ngAfterViewInit() {

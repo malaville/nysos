@@ -27,13 +27,7 @@
 </div>
 
 <app-document-title *ngIf="!(documentStateObs | async).bibliography">
-  <img
-    *ngIf="this.writing"
-    style="width: 25px; border-radius: 50%"
-    src="/assets/loader.svg"
-  />
-  <mat-spinner *ngIf="loading" [diameter]="20"></mat-spinner>
-  <mat-icon class="green-icon" *ngIf="saved">check_circle</mat-icon>
+  <app-content-save-state-indicator></app-content-save-state-indicator>
 </app-document-title>
 
 <app-bibliography-details

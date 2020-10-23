@@ -74,10 +74,6 @@ export class AppstateService {
     this.cytoDb.saveContentOf(this.documentState.contentId, content);
   }
 
-  saveContentOf(id: string, content: string): Promise<boolean> {
-    return this.cytoDb.saveContentOf(id, content);
-  }
-
   openNewDocument(editDocument = false) {
     if (this.UIstate.editDocument || this.UIstate.addingDocument) {
       this.UIstate.editDocument = false;

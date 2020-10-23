@@ -36,8 +36,10 @@ export class CytostateService {
     });
 
     this.cytocore.on('data', (e) => {
-      this.saveData();
+      this.saveData(e.target.data());
     });
+
+    // this.cytocore.on('drag', (e) => console.log('move', e.target.data()));
 
     this.cytocore.on('click touchend', 'node', (e) => {
       const id = e.target.id();
@@ -74,7 +76,8 @@ export class CytostateService {
     this.addedgemode ? this.edgehandles.enable() : this.edgehandles.disable();
   }
 
-  saveData() {
+  saveData(data?: any) {
+    data && this.cyDb.saveDataOf(data.id, data);
     this.cyDb.saveNodesAndEdges(this.cytocore.elements());
   }
 
@@ -103,21 +106,21 @@ export class CytostateService {
 
   addBibliography(biblioItem: BibliographyItem) {
     const { contentId } = this.appstate.documentState;
-    const documentId = this.cytocore
-      .add({
-        group: 'nodes',
-        classes: NODE_TYPES.DOCUMENT_NODE,
-        data: {
-          name: biblioItem.acronym,
-          type: NODE_TYPES.DOCUMENT_NODE,
-          title: biblioItem.title,
-          author: biblioItem.author,
-          year: biblioItem.year,
-          link: biblioItem.link,
-        },
-      })
-      .id();
-    this.addBibliographyLink(documentId, contentId);
+    const documentData = this.cytocore.add({
+      group: 'nodes',
+      classes: NODE_TYPES.DOCUMENT_NODE,
+      data: {
+        name: biblioItem.acronym,
+        type: NODE_TYPES.DOCUMENT_NODE,
+        title: biblioItem.title,
+        author: biblioItem.author,
+        year: biblioItem.year,
+        link: biblioItem.link,
+      },
+    });
+    this.saveData(documentData.data());
+    this.addBibliographyLink(documentData.id(), contentId);
+
     this.appstate.refreshDocummentState();
     this.appstate.closeNewDocument();
   }
@@ -132,7 +135,7 @@ export class CytostateService {
       edge_type = EDGE_TYPES.DOCUMENT_ON_THEME;
     }
 
-    this.cytocore.add({
+    const bibliographyObject = this.cytocore.add({
       group: 'edges',
       classes: edge_type,
       data: {
@@ -142,7 +145,8 @@ export class CytostateService {
         type: edge_type,
       },
     });
-    this.appstate.closeNewDocument();
+
+    this.saveData(bibliographyObject.data());
   }
 
   modifyBibliography(id: string, biblioItem: BibliographyItem) {

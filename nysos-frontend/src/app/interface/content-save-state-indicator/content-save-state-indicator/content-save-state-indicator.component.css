@@ -1,0 +1,13 @@
+.loaders-container {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+.green-icon {
+  color: green;
+}
+.red-icon {
+  color: red;
+}

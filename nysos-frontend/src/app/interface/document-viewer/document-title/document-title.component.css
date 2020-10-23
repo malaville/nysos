@@ -21,11 +21,3 @@ h1 {
   padding-right: 10px;
   justify-content: space-between;
 }
-
-.loaders-container {
-  width: 30px;
-  height: 30px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-}
