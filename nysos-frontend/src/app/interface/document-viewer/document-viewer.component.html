@@ -19,6 +19,7 @@
     *ngIf="(documentStateObs | async).bibliography"
     mat-mini-fab
     color="primary"
+    target="_blank"
     [disabled]="!(documentStateObs | async).bibliography?.link"
     [href]="(documentStateObs | async).bibliography?.link"
   >
@@ -33,6 +34,7 @@
 <app-bibliography-details
   [bibliography]="(documentStateObs | async).bibliography"
 >
+  <app-content-save-state-indicator></app-content-save-state-indicator>
 </app-bibliography-details>
 
 <div

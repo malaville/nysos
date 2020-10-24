@@ -38,5 +38,8 @@
     Login {{ (auth | async) ? "🟢" : "🟥" }}
   </button>
   <div id="cy"></div>
+  <div class="left-bottom-state">
+    <app-content-save-state-indicator></app-content-save-state-indicator>
+  </div>
 </mat-sidenav-container>
 <router-outlet></router-outlet>
