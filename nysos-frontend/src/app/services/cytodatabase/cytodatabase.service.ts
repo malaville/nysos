@@ -148,7 +148,6 @@ export class CytodatabaseService {
         } else {
           throw { name: 'MongoDbNotASuccess', jsonRes };
         }
-        return false;
       });
   }
 
@@ -199,7 +198,32 @@ export class CytodatabaseService {
       });
   }
 
-  loadContentOf(id: string) {
+  loadContentOf(id: string): string {
+    const remoteContent = fetch(
+      `http://localhost:3000/content/${id}?token=${this.authToken}`,
+      {
+        method: 'GET',
+        mode: 'cors',
+        cache: 'default',
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
+      .then((resp) => {
+        if (resp.status != 200) throw { name: 'GettingContentFailed' };
+        return resp.json();
+      })
+      .then((respJson: { content: string }) => respJson.content)
+      .then((content) => {
+        console.log('Content was found ', content);
+        return content;
+      })
+      .catch(
+        (err) =>
+          err.name == 'GettingContentFailed' &&
+          console.warn(
+            'Content was not found, probably the document is empty'
+          ) + ''
+      );
     return localStorage.getItem(`${id}:content`) || '';
   }
 }

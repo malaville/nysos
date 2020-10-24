@@ -1,6 +1,7 @@
 import { saveOneDocument, saveOneObjectData } from "./mongowrite";
 import { Request, Response } from "express";
 import { identifyGoogleUser } from "./identifyUser";
+import { getOneDocument } from "./mongoread";
 const bodyParser = require("body-parser");
 var cors = require("cors");
 const express = require("express");
@@ -50,18 +51,26 @@ app.post("/data/:id", async function (req: Request, res: Response) {
     res.send({ err });
   }
 });
-app.post("/savecontent", async function (req: Request, res: Response) {
+
+app.get("/content/:contentId", async function (req: Request, res: Response) {
   let token = "" + req.query.token;
-  const id = await identifyGoogleUser(token);
+  let uid = undefined;
   try {
-    const success = await saveOneDocument(
-      req.body.contentId,
-      req.body.content,
-      id
-    );
-    res.send({ success, id });
+    uid = await identifyGoogleUser(token);
   } catch (err) {
-    console.log("index.ts err", err);
+    console.log("identifyUser failed", err.name);
+    res.statusCode = 401;
+    res.send(err);
+    return;
+  }
+  try {
+    const document = await getOneDocument(req.params.contentId, uid);
+    const { _id, content } = document;
+    res.send({ id: _id, content });
+  } catch (err) {
+    console.log("getOneDocument failed", err.name);
+    res.statusCode = 404;
+    res.send({ err });
   }
 });
 
