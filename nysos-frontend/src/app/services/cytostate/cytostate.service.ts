@@ -89,7 +89,7 @@ export class CytostateService {
   addNode(params: { parent?: string; x?: number; y?: number } = {}) {
     this.cytocore.add({
       group: 'nodes',
-      data: { name: '', parent: params.parent },
+      data: { name: '', parent: params.parent, type: NODE_TYPES.THEME_NODE },
       position: { x: params.x || 50, y: params.y || 50 },
     });
   }

@@ -129,8 +129,8 @@ export class CytodatabaseService {
     contentId: string,
     content: string
   ): Promise<boolean> {
-    const success = await fetch(
-      `http://localhost:3000/savecontent?token=${this.authToken}`,
+    return fetch(
+      `http://localhost:3000/content/${contentId}?token=${this.authToken}`,
       {
         method: 'POST',
         mode: 'cors',
@@ -145,40 +145,58 @@ export class CytodatabaseService {
           this.contentChanges.contentsToUpdate.delete(contentId);
           delete this.contentChanges.contents[contentId];
           return true;
+        } else {
+          throw { name: 'MongoDbNotASuccess', jsonRes };
         }
         return false;
       });
-    return success;
   }
 
   saveAllContentsAndDataToDatabase(
     contentChanges: ContentChangesInterface
   ): Promise<boolean[]> {
-    return Promise.all(
-      Array.from(contentChanges.objectDataToUpdate)
-        .map((objectId) =>
-          this.saveOneObjectDataToDatabase(
-            objectId,
-            contentChanges.datas[objectId]
-          )
+    return Promise.all([
+      ...Array.from(contentChanges.objectDataToUpdate).map((objectId) =>
+        this.saveOneObjectDataToDatabase(
+          objectId,
+          contentChanges.datas[objectId]
         )
-        .concat(
-          Array.from(contentChanges.contentsToUpdate).map((contentId) =>
-            this.saveOneContentToDatabase(
-              contentId,
-              contentChanges.contents[contentId]
-            )
-          )
+      ),
+      ...Array.from(contentChanges.contentsToUpdate).map((contentId) =>
+        this.saveOneContentToDatabase(
+          contentId,
+          contentChanges.contents[contentId]
         )
-    );
+      ),
+    ]);
   }
 
   saveOneObjectDataToDatabase(objectId: string, data: any): Promise<boolean> {
-    return new Promise((resolve, reject) => resolve(true)).then(() => {
-      this.contentChanges.objectDataToUpdate.delete(objectId);
-      delete this.contentChanges.datas[objectId];
-      return true;
-    });
+    return fetch(
+      `http://localhost:3000/data/${objectId}?token=${this.authToken}`,
+      {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'default',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ objectId, data }),
+      }
+    )
+      .then((res: Response) => {
+        if (res.status != 200) {
+          throw { name: `FailedStatus[${res.status}]` };
+        }
+        return res.json();
+      })
+      .then((jsonRes: any) => {
+        if (jsonRes.success) {
+          this.contentChanges.objectDataToUpdate.delete(objectId);
+          delete this.contentChanges.datas[objectId];
+          return true;
+        } else {
+          throw { name: 'MongoDbNotASuccess', jsonRes };
+        }
+      });
   }
 
   loadContentOf(id: string) {
