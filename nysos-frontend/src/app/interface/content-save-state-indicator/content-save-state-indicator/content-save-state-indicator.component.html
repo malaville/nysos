@@ -4,7 +4,11 @@
     style="width: 25px; border-radius: 50%"
     src="/assets/loader.svg"
   />
-  <mat-icon *ngIf="(contentSaveState | async).error" class="red-icon"
+  <mat-icon
+    *ngIf="
+      !(contentSaveState | async).writing && (contentSaveState | async).error
+    "
+    class="red-icon"
     >cancel</mat-icon
   >
   <mat-spinner

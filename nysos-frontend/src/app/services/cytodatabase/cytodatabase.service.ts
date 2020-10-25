@@ -47,21 +47,26 @@ export class CytodatabaseService {
     this.contentChangesObs
       .pipe(debounceTime(1000))
       .subscribe((contentChanges: ContentChangesInterface) => {
-        this.updateContentSaveState({ writing: false, saving: true });
-
-        this.saveAllContentsAndDataToDatabase(contentChanges)
-          .then(() => {
-            this.updateContentSaveState({ saving: false, saved: true });
-          })
-          .catch(() => {
-            this.updateContentSaveState({ saving: false, error: true });
-            console.warn('Content was not saved', this.contentChanges.contents);
-            console.warn(
-              'Data was not saved for : ',
-              this.contentChanges.datas
-            );
-          })
-          .finally(() => this.contentChanges.saveContentChangesLocally());
+        this.updateContentSaveState({ writing: false });
+        if (!this.contentSaveState.error) {
+          this.updateContentSaveState({ saving: true });
+          this.saveAllContentsAndDataToDatabase(contentChanges)
+            .then(() => {
+              this.updateContentSaveState({ saving: false, saved: true });
+            })
+            .catch(() => {
+              this.updateContentSaveState({ saving: false, error: true });
+              console.warn(
+                'Content was not saved',
+                this.contentChanges.contents
+              );
+              console.warn(
+                'Data was not saved for : ',
+                this.contentChanges.datas
+              );
+            })
+            .finally(() => this.contentChanges.saveContentChangesLocally());
+        }
       });
   }
 
@@ -141,7 +146,6 @@ export class CytodatabaseService {
       writing: true,
       saved: false,
       saving: false,
-      error: false,
     });
   }
 
@@ -221,6 +225,8 @@ export class CytodatabaseService {
   }
 
   loadRemoteContentOf(id: string): AsyncContent {
-    return new AsyncContent(id).attemptFetching(this.authToken);
+    if (!this.contentSaveState.error)
+      return new AsyncContent(id).attemptFetching(this.authToken);
+    return new AsyncContent(id).forcedFail();
   }
 }

@@ -51,4 +51,10 @@ export class AsyncContent {
     })();
     return this;
   }
+
+  forcedFail(): AsyncContent {
+    console.log('ForcedFail');
+    this.updateState({ resolving: false, failed: true });
+    return this;
+  }
 }
