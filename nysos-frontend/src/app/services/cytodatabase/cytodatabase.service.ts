@@ -255,8 +255,6 @@ export class CytodatabaseService {
   }
 
   loadRemoteContentOf(id: string): AsyncContent {
-    const remoteContent = new AsyncContent(id);
-    remoteContent.attemptFetching(this.authToken);
-    return remoteContent;
+    return new AsyncContent(id).attemptFetching(this.authToken);
   }
 }

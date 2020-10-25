@@ -29,23 +29,26 @@ export class AsyncContent {
     this.asyncContentStateBS.next(this._asyncContentState);
   }
 
-  async attemptFetching(authToken: string) {
+  attemptFetching(authToken: string): AsyncContent {
     this.updateState({ resolving: true });
-    try {
-      const resp = await fetch(
-        `http://localhost:3000/content/${this.contentId}?token=${authToken}`,
-        {
-          method: 'GET',
-          mode: 'cors',
-          cache: 'default',
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
-      const respJson = await resp.json();
-      const content = respJson.content;
-      this.updateState({ resolving: false, resolved: true, content });
-    } catch (err) {
-      this.updateState({ resolving: false, failed: true });
-    }
+    (async () => {
+      try {
+        const resp = await fetch(
+          `http://localhost:3000/content/${this.contentId}?token=${authToken}`,
+          {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'default',
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
+        const respJson = await resp.json();
+        const content = respJson.content;
+        this.updateState({ resolving: false, resolved: true, content });
+      } catch (err) {
+        this.updateState({ resolving: false, failed: true });
+      }
+    })();
+    return this;
   }
 }
