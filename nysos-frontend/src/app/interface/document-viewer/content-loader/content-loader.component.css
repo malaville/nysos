@@ -28,6 +28,12 @@
   height: 96px;
   position: relative;
 }
+
+.animated-background.small {
+  height: 8px;
+  margin-left: 40px;
+  top: -4px;
+}
 .background-masker {
   background: rgb(255, 255, 255);
   position: absolute;
@@ -46,6 +52,9 @@
   left: 0px;
   height: 8px;
   width: 10px;
+}
+.background-masker.header-right.small {
+  top: 0px;
 }
 .background-masker.header-right,
 .background-masker.subheader-right {

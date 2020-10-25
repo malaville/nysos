@@ -1,6 +1,6 @@
 <div class="loaders-container">
   <img
-    *ngIf="(contentSaveState | async).writing"
+    [hidden]="!(contentSaveState | async).writing"
     style="width: 25px; border-radius: 50%"
     src="/assets/loader.svg"
   />

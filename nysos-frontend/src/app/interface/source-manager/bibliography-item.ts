@@ -1,4 +1,5 @@
 import { FormGroup, Validators } from '@angular/forms';
+import { AsyncContent } from 'src/app/services/cytodatabase/asyncContent';
 
 export class BibliographyItem {
   id: string;
@@ -64,7 +65,8 @@ export class BibliographyItemLink extends BibliographyItem {
   constructor(
     bib: BibliographyItem,
     public description = '',
-    public linkid = ''
+    public linkid = '',
+    readonly asyncDescription: AsyncContent
   ) {
     super(
       bib.title,

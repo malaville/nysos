@@ -186,10 +186,12 @@ export class CytostateService {
         .edges(`[target = "${id}"][type != "${EDGE_TYPES.IDEA_LINK}"]`)
         .map((documentLinkTargetingX) => {
           const sourceDocument = documentLinkTargetingX.source();
+          const linkId = documentLinkTargetingX.id();
           return new BibliographyItemLink(
             BibliographyItem.fromNode(sourceDocument),
-            this.cyDb.loadContentOf(documentLinkTargetingX.id()),
-            documentLinkTargetingX.id()
+            this.cyDb.loadContentOf(linkId),
+            linkId,
+            this.cyDb.loadRemoteContentOf(linkId)
           );
         });
     } else {

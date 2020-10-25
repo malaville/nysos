@@ -11,7 +11,7 @@ export interface AsyncContentStateInterface {
 export class AsyncContent {
   private _asyncContentState: AsyncContentStateInterface;
   private asyncContentStateBS: BehaviorSubject<AsyncContentStateInterface>;
-  public asyncContentState: Observable<AsyncContentStateInterface>;
+  readonly asyncContentState: Observable<AsyncContentStateInterface>;
 
   constructor(public contentId: string) {
     this._asyncContentState = {
