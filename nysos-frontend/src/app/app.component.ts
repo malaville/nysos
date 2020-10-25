@@ -12,6 +12,8 @@ import {
   AppstateService,
   DocumentDataStateInterface,
 } from './services/app/appstate.service';
+import { ContentChangesInterface } from './services/cytodatabase/contentChanges';
+import { CytodatabaseService } from './services/cytodatabase/cytodatabase.service';
 import { CytostateService } from './services/cytostate/cytostate.service';
 
 @Component({
@@ -26,6 +28,7 @@ export class AppComponent implements OnInit {
   large: Observable<boolean> = scheduled([false], null);
   auth: Observable<SocialUser>;
   token: string;
+  contentChangesObs: Observable<ContentChangesInterface>;
 
   @ViewChild(MatSidenav)
   set sidenav(s: MatSidenav) {
@@ -35,11 +38,13 @@ export class AppComponent implements OnInit {
   constructor(
     private cytostate: CytostateService,
     private appstate: AppstateService,
-    private authService: SocialAuthService
+    private authService: SocialAuthService,
+    private cytoDb: CytodatabaseService
   ) {}
 
   ngOnInit() {
     this.documentStateObs = this.appstate.documentStateObservable;
+    this.contentChangesObs = this.cytoDb.contentChangesObs;
     this.large = this.appstate.UIstateObservable.pipe(
       map((uistate) => uistate.addingDocument || uistate.editDocument)
     );

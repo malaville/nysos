@@ -86,7 +86,7 @@ export class CytostateService {
   }
 
   saveData(data?: any) {
-    data && this.cyDb.saveDataOf(data.id, data);
+    data && this.cyDb.saveContentOf(data.id, data);
     this.cyDb.saveNodesAndEdges(this.cytocore.elements());
   }
 

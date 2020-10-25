@@ -2,24 +2,12 @@ import { state } from '@angular/animations';
 import { Injectable, OnInit } from '@angular/core';
 import { SocialAuthService } from 'angularx-social-login';
 import { CollectionReturnValue, Core } from 'cytoscape';
-import { BehaviorSubject, ReplaySubject } from 'rxjs';
+import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
 import { debounceTime, map, take, tap } from 'rxjs/operators';
 import { AsyncContent } from './asyncContent';
+import { ContentChanges, ContentChangesInterface } from './contentChanges';
 const CYTOSAVE_KEY = 'cytosave';
-
-interface ContentChangesInterface {
-  contentsToUpdate: Set<string>;
-  contents: { [id: string]: string };
-  objectDataToUpdate: Set<string>;
-  datas: { [id: string]: any };
-}
-
-const defaultContentChanges = {
-  contentsToUpdate: new Set<string>(),
-  objectDataToUpdate: new Set<string>(),
-  datas: {},
-  contents: {},
-};
+const CONTENTCHANGESSAVE_KEY = 'contentchangessave';
 
 export interface ContentSaveStateInterface {
   writing: boolean;
@@ -28,17 +16,10 @@ export interface ContentSaveStateInterface {
   error: boolean;
 }
 
-interface contentSaveStateUpdateInterface {
-  writing?: boolean;
-  saving?: boolean;
-  saved?: boolean;
-  error?: boolean;
-}
-
 const defaultContentSaveState = {
   writing: false,
   saving: false,
-  saved: true,
+  saved: false,
   error: false,
 };
 
@@ -48,9 +29,8 @@ const defaultContentSaveState = {
 export class CytodatabaseService {
   authToken: string;
 
-  private contentChanges = defaultContentChanges;
-  private contentChangesBS = new ReplaySubject<ContentChangesInterface>(1);
-  private contentChangesObs = this.contentChangesBS.asObservable();
+  private contentChanges: ContentChanges;
+  readonly contentChangesObs: Observable<ContentChangesInterface>;
 
   private contentSaveState = defaultContentSaveState;
   private contentSaveStateBS = new BehaviorSubject<ContentSaveStateInterface>(
@@ -59,6 +39,8 @@ export class CytodatabaseService {
   readonly contentSaveStateObs = this.contentSaveStateBS.asObservable();
 
   constructor(private authService: SocialAuthService) {
+    this.contentChanges = ContentChanges.loadFromLocalStorage();
+    this.contentChangesObs = this.contentChanges.contentChangesObs;
     this.authService.authState.subscribe(
       (st) => (this.authToken = st?.authToken)
     );
@@ -78,11 +60,12 @@ export class CytodatabaseService {
               'Data was not saved for : ',
               this.contentChanges.datas
             );
-          });
+          })
+          .finally(() => this.contentChanges.saveContentChangesLocally());
       });
   }
 
-  updateContentSaveState(update: contentSaveStateUpdateInterface) {
+  updateContentSaveState(update: Partial<ContentSaveStateInterface>) {
     this.contentSaveState = { ...this.contentSaveState, ...update };
     this.contentSaveStateBS.next(this.contentSaveState);
   }
@@ -151,28 +134,13 @@ export class CytodatabaseService {
     return false;
   }
 
-  saveContentOf(contentId: string, content: string) {
-    localStorage.setItem(`${contentId}:content`, content);
-    this.contentChanges.contentsToUpdate.add(contentId);
-    this.contentChanges.contents[contentId] = content;
-    this.contentChangesBS.next(this.contentChanges);
+  saveContentOf(id: string, dataOrContent: string | object) {
+    !id && console.error('Data or content without objectId', dataOrContent);
+    this.contentChanges.addChanges(id, dataOrContent);
     this.updateContentSaveState({
       writing: true,
       saved: false,
       saving: false,
-      error: false,
-    });
-  }
-
-  saveDataOf(objectId: string, data: any) {
-    !objectId && console.error('Data was provided without objectId', data);
-    this.contentChanges.objectDataToUpdate.add(objectId);
-    this.contentChanges.datas[objectId] = data;
-    this.contentChangesBS.next(this.contentChanges);
-    this.updateContentSaveState({
-      writing: false,
-      saved: false,
-      saving: true,
       error: false,
     });
   }
@@ -194,8 +162,7 @@ export class CytodatabaseService {
       .then((res: Response) => res.json())
       .then((jsonRes: any) => {
         if (jsonRes.success) {
-          this.contentChanges.contentsToUpdate.delete(contentId);
-          delete this.contentChanges.contents[contentId];
+          this.contentChanges.savedContentSuccessful(contentId);
           return true;
         } else {
           throw { name: 'MongoDbNotASuccess', jsonRes };
@@ -241,8 +208,7 @@ export class CytodatabaseService {
       })
       .then((jsonRes: any) => {
         if (jsonRes.success) {
-          this.contentChanges.objectDataToUpdate.delete(objectId);
-          delete this.contentChanges.datas[objectId];
+          this.contentChanges.savedDataSuccessful(objectId);
           return true;
         } else {
           throw { name: 'MongoDbNotASuccess', jsonRes };
