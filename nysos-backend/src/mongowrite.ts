@@ -65,6 +65,10 @@ export const saveOneObjectData = async (
     }
 
     delete data.id;
+    if ("position" in data) {
+      data.position.x = Math.floor(data.position.x);
+      data.position.y = Math.floor(data.position.y);
+    }
 
     const collection = client.db("nysos").collection(`${uid}:data`);
     collection

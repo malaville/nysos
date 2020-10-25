@@ -36,7 +36,10 @@ export class CytostateService {
     });
 
     this.cytocore.on('data', (e) => {
-      this.saveData(e.target.data());
+      this.saveData({
+        ...e.target.data(),
+        position: (e.target.isNode() && e.target.position()) || undefined,
+      });
     });
 
     // this.cytocore.on('drag', (e) => console.log('move', e.target.data()));
