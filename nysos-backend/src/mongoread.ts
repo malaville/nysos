@@ -1,4 +1,4 @@
-import { client, ContentInterface } from "./mongodefs";
+import { client, ContentInterface, ObjectDataInterface } from "./mongodefs";
 
 export const getOneDocument = async (contentId: string, uid: number) => {
   return new Promise<ContentInterface>(async (resolve, reject) => {
@@ -22,8 +22,43 @@ export const getOneDocument = async (contentId: string, uid: number) => {
       reject({ name: "DocumentNotFound" });
       return;
     }
-
+    console.log(
+      `${new Date().toISOString()} getOneDocument ${contentId} >>>>>>> ${document.content.slice(
+        0,
+        40
+      )} ...`
+    );
     resolve(document);
     return;
+  });
+};
+
+export const getAllData = async (uid: number) => {
+  return new Promise<ObjectDataInterface[]>(async (resolve, reject) => {
+    if (!client.isConnected()) {
+      try {
+        await client.connect();
+      } catch (err) {
+        reject(err);
+        return;
+      }
+    }
+    const collection = client.db("nysos").collection(`${uid}:data`);
+    const allData = await collection.find<ObjectDataInterface>();
+    if (!allData) {
+      reject({ name: "GetAllDataRejected" });
+      return;
+    }
+    allData
+      .toArray()
+      .then((array) => {
+        console.log(
+          `${new Date().toISOString()} getAllData ${array.length} elements ...`
+        );
+        resolve(array);
+      })
+      .catch((err) => {
+        reject(err);
+      });
   });
 };

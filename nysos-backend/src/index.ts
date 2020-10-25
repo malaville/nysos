@@ -1,7 +1,7 @@
 import { saveOneDocument, saveOneObjectData } from "./mongowrite";
 import { Request, Response } from "express";
 import { identifyGoogleUser } from "./identifyUser";
-import { getOneDocument } from "./mongoread";
+import { getAllData, getOneDocument } from "./mongoread";
 const bodyParser = require("body-parser");
 var cors = require("cors");
 const express = require("express");
@@ -69,6 +69,34 @@ app.get("/content/:contentId", async function (req: Request, res: Response) {
     res.send({ id: _id, content });
   } catch (err) {
     console.log("getOneDocument failed", err.name);
+    res.statusCode = 404;
+    res.send({ err });
+  }
+});
+
+app.get("/data", async function (req: Request, res: Response) {
+  let token = "" + req.query.token;
+  let uid = undefined;
+  try {
+    uid = await identifyGoogleUser(token);
+  } catch (err) {
+    console.log("identifyUser failed", err.name);
+    res.statusCode = 401;
+    res.send(err);
+    return;
+  }
+  try {
+    const allData = await getAllData(uid);
+
+    res.send(
+      allData.map((dt) => {
+        const dt_: any = { ...dt, id: dt._id };
+        delete dt_._id;
+        return dt_;
+      })
+    );
+  } catch (err) {
+    console.log("getAllData failed", err.name);
     res.statusCode = 404;
     res.send({ err });
   }

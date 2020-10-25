@@ -1,8 +1,9 @@
+import { state } from '@angular/animations';
 import { Injectable, OnInit } from '@angular/core';
 import { SocialAuthService } from 'angularx-social-login';
 import { CollectionReturnValue, Core } from 'cytoscape';
 import { BehaviorSubject, ReplaySubject } from 'rxjs';
-import { debounceTime, tap } from 'rxjs/operators';
+import { debounceTime, map, take, tap } from 'rxjs/operators';
 const CYTOSAVE_KEY = 'cytosave';
 
 interface ContentChangesInterface {
@@ -90,6 +91,35 @@ export class CytodatabaseService {
   }
 
   loadFromLocalStorage(cytocore: Core): boolean {
+    const remoteContent = this.authService.authState
+      .pipe(
+        map((state) => state.authToken),
+        take(1)
+      )
+      .subscribe(() =>
+        fetch(`http://localhost:3000/data?token=${this.authToken}`, {
+          method: 'GET',
+          mode: 'cors',
+          cache: 'default',
+          headers: { 'Content-Type': 'application/json' },
+        })
+          .then((resp) => {
+            if (resp.status != 200) throw { name: 'GettingDataFailed' };
+            return resp.json();
+          })
+          .then((respJson: { content: string }) => respJson)
+          .then((respJson) => {
+            console.log('Content was found ', respJson);
+            return respJson;
+          })
+          .catch(
+            (err) =>
+              err.name == 'GettingContentFailed' &&
+              console.warn(
+                'Content was not found, probably the document is empty'
+              ) + ''
+          )
+      );
     const cytosave = localStorage.getItem(CYTOSAVE_KEY);
     if (cytosave) {
       cytocore.elements().remove();
