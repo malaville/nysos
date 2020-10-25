@@ -1,10 +1,11 @@
 import { Component, Input } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { concatAll, map } from 'rxjs/operators';
 import {
   AppstateService,
   DocumentDataStateInterface,
 } from 'src/app/services/app/appstate.service';
+import { AsyncContentStateInterface } from 'src/app/services/cytodatabase/asyncContent';
 import { CytodatabaseService } from 'src/app/services/cytodatabase/cytodatabase.service';
 import { CytostateService } from 'src/app/services/cytostate/cytostate.service';
 import { BibliographyItemLink } from '../source-manager/bibliography-item';
@@ -17,6 +18,7 @@ import { BibliographyItemLink } from '../source-manager/bibliography-item';
 export class DocumentViewerComponent {
   public bibliography: Observable<BibliographyItemLink[]> = of([]);
   documentStateObs: Observable<DocumentDataStateInterface>;
+  asyncContentState: Observable<AsyncContentStateInterface>;
   @Input() large: boolean;
 
   constructor(
@@ -27,6 +29,10 @@ export class DocumentViewerComponent {
 
   ngOnInit() {
     this.documentStateObs = this.appState.documentStateObservable;
+    this.appState.documentStateObservable.subscribe((state) => {
+      this.asyncContentState = state.asyncContent?.asyncContentState;
+    });
+
     this.bibliography = this.documentStateObs.pipe(
       map((doc) => this.cytostate.findBibliographyAbout(doc.contentId) || [])
     );

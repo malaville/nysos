@@ -36,14 +36,41 @@
 >
   <app-content-save-state-indicator></app-content-save-state-indicator>
 </app-bibliography-details>
-
-<div
-  #contentdiv
-  id="content-of-document"
-  contenteditable="true"
-  (input)="onDescriptionChange($event.target.innerHTML)"
-  [innerHTML]="(documentStateObs | async).content"
-></div>
+<ng-container *ngIf="this.asyncContentState">
+  <app-content-loader
+    *ngIf="(asyncContentState | async)?.resolving"
+  ></app-content-loader>
+  <div>
+    <button
+      mat-stroked-button
+      disabled
+      *ngIf="(asyncContentState | async)?.failed"
+    >
+      Local Content
+      <!-- <button click="refreshContentClicked()"><mat-icon>refresh</mat-icon></button> -->
+    </button>
+  </div>
+  <div
+    *ngIf="(asyncContentState | async)?.resolved"
+    #contentdiv
+    id="content-of-document"
+    contenteditable="true"
+    (input)="onDescriptionChange($event.target.innerHTML)"
+    [innerHTML]="(asyncContentState | async)?.content"
+  ></div>
+  <div
+    *ngIf="(asyncContentState | async)?.failed"
+    #contentdiv
+    id="content-of-document"
+    contenteditable="true"
+    (input)="onDescriptionChange($event.target.innerHTML)"
+    [innerHTML]="(documentStateObs | async).content"
+  ></div>
+  <div
+    *ngIf="!(asyncContentState | async)?.resolved"
+    id="content-of-document"
+  ></div>
+</ng-container>
 <div>
   <span *ngFor="let bib of bibliography | async">
     <app-bibliography-link

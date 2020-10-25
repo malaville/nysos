@@ -4,6 +4,7 @@ import { SocialAuthService } from 'angularx-social-login';
 import { CollectionReturnValue, Core } from 'cytoscape';
 import { BehaviorSubject, ReplaySubject } from 'rxjs';
 import { debounceTime, map, take, tap } from 'rxjs/operators';
+import { AsyncContent } from './asyncContent';
 const CYTOSAVE_KEY = 'cytosave';
 
 interface ContentChangesInterface {
@@ -250,30 +251,12 @@ export class CytodatabaseService {
   }
 
   loadContentOf(id: string): string {
-    const remoteContent = fetch(
-      `http://localhost:3000/content/${id}?token=${this.authToken}`,
-      {
-        method: 'GET',
-        mode: 'cors',
-        cache: 'default',
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
-      .then((resp) => {
-        if (resp.status != 200) throw { name: 'GettingContentFailed' };
-        return resp.json();
-      })
-      .then((respJson: { content: string }) => respJson.content)
-      .then((content) => {
-        return content;
-      })
-      .catch(
-        (err) =>
-          err.name == 'GettingContentFailed' &&
-          console.warn(
-            'Content was not found, probably the document is empty'
-          ) + ''
-      );
     return localStorage.getItem(`${id}:content`) || '';
+  }
+
+  loadRemoteContentOf(id: string): AsyncContent {
+    const remoteContent = new AsyncContent(id);
+    remoteContent.attemptFetching(this.authToken);
+    return remoteContent;
   }
 }
