@@ -27,9 +27,7 @@ export class BibliographyItem {
     );
   }
 
-  static fromNode(
-    cyNode: cytoscape.CollectionReturnValue | cytoscape.SingularElementArgument
-  ) {
+  static fromNode(cyNode: cytoscape.NodeSingular) {
     const data = cyNode.data();
     const id = cyNode.id();
     return new BibliographyItem(

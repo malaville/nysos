@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Core, EdgeHandlesApi, Ext } from 'cytoscape';
+import { Core, EdgeHandlesApi, Ext, NodeSingular } from 'cytoscape';
 import { defaults } from './edgehandlesdefault';
 import cytoscape from 'cytoscape';
 import edgehandles from 'cytoscape-edgehandles';
@@ -178,46 +178,22 @@ export class CytostateService {
 
   findBibliographyAbout(id: string) {
     if (this.cytocore) {
-      if (this.cytocore.getElementById(id).isNode()) {
-        const bibsLinked = this.cytocore
-          .getElementById(id)
-          .incomers()
-          .filter(
-            (ele) => ele.isNode() && ele.data().type == NODE_TYPES.DOCUMENT_NODE
-          )
-          .map((edge) => {
-            return BibliographyItem.fromNode(edge);
-          });
-        return bibsLinked.map((bib) => {
-          const linkBetweenBibAndObject = this.cytocore.elements(
-            `edge[target = "${id}"][source = "${bib.contentId}"]`
-          );
-
-          const idOfLinkBetweenBibAndObject = linkBetweenBibAndObject.id();
-          const description = this.cyDb.loadContentOf(
-            idOfLinkBetweenBibAndObject
-          );
+      // BibliographyOfElement(X : Theme or Theme_link)
+      // Take all Edges -> X, that are a DOCUMENT_LINK
+      // For all those edges, the description is contained by the edge itself
+      // And the father document is in the source of the edge.
+      return this.cytocore
+        .edges(`[target = "${id}"][type != "${EDGE_TYPES.IDEA_LINK}"]`)
+        .map((documentLinkTargetingX) => {
+          const sourceDocument = documentLinkTargetingX.source();
           return new BibliographyItemLink(
-            bib,
-            description,
-            idOfLinkBetweenBibAndObject
+            BibliographyItem.fromNode(sourceDocument),
+            this.cyDb.loadContentOf(documentLinkTargetingX.id()),
+            documentLinkTargetingX.id()
           );
         });
-      } else {
-        const bibs = this.cytocore
-          .elements(`edge[target = "${id}"]`)
-          .sources()
-          .map(
-            (ele) =>
-              new BibliographyItemLink(
-                BibliographyItem.fromNode(ele),
-                this.cyDb.loadContentOf(ele.id()),
-                ele.id()
-              )
-          );
-
-        return bibs;
-      }
+    } else {
+      return [];
     }
   }
 
