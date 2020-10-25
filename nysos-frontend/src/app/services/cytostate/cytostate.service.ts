@@ -13,6 +13,8 @@ import {
   BibliographyItemLink,
 } from 'src/app/interface/source-manager/bibliography-item';
 
+const NEW_NAME = 'New Theme';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -68,10 +70,14 @@ export class CytostateService {
     this.cytocore.on(
       'mouseup',
       'node',
-      (edge) => !edge.target.data().name && this.selectContent(edge.target.id())
+      (edge) =>
+        edge.target.data().name == NEW_NAME &&
+        this.selectContent(edge.target.id())
     );
 
-    this.cyDb.loadFromLocalStorage(this.cytocore);
+    this.cyDb
+      .loadFromRemote(this.cytocore)
+      .catch(() => this.cyDb.loadFromLocalStorage(this.cytocore));
   }
 
   edgeCreationMode() {
@@ -92,8 +98,14 @@ export class CytostateService {
   addNode(params: { parent?: string; x?: number; y?: number } = {}) {
     this.cytocore.add({
       group: 'nodes',
-      data: { name: '', parent: params.parent, type: NODE_TYPES.THEME_NODE },
-      position: { x: params.x || 50, y: params.y || 50 },
+      data: {
+        name: NEW_NAME,
+        parent: params.parent,
+        type: NODE_TYPES.THEME_NODE,
+      },
+      position: params.parent
+        ? { x: params.x + 10, y: params.y + 20 }
+        : { x: 50, y: 50 },
     });
   }
 

@@ -24,4 +24,5 @@ export interface ObjectDataInterface {
   link?: string;
   title?: string;
   author?: string;
+  position?: { x: number; y: number };
 }

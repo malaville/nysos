@@ -88,13 +88,7 @@ app.get("/data", async function (req: Request, res: Response) {
   try {
     const allData = await getAllData(uid);
 
-    res.send(
-      allData.map((dt) => {
-        const dt_: any = { ...dt, id: dt._id };
-        delete dt_._id;
-        return dt_;
-      })
-    );
+    res.send(allData);
   } catch (err) {
     console.log("getAllData failed", err.name);
     res.statusCode = 404;

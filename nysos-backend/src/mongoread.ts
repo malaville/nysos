@@ -1,3 +1,7 @@
+import {
+  CytoscapeJsObjectInterface,
+  fromDatabaseToCytoscapeObj,
+} from "./cytoscapemodel";
 import { client, ContentInterface, ObjectDataInterface } from "./mongodefs";
 
 export const getOneDocument = async (contentId: string, uid: number) => {
@@ -34,7 +38,7 @@ export const getOneDocument = async (contentId: string, uid: number) => {
 };
 
 export const getAllData = async (uid: number) => {
-  return new Promise<ObjectDataInterface[]>(async (resolve, reject) => {
+  return new Promise<CytoscapeJsObjectInterface[]>(async (resolve, reject) => {
     if (!client.isConnected()) {
       try {
         await client.connect();
@@ -55,7 +59,7 @@ export const getAllData = async (uid: number) => {
         console.log(
           `${new Date().toISOString()} getAllData ${array.length} elements ...`
         );
-        resolve(array);
+        resolve(array.map((data) => fromDatabaseToCytoscapeObj(data)));
       })
       .catch((err) => {
         reject(err);

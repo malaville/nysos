@@ -59,7 +59,7 @@ export class CytodatabaseService {
 
   constructor(private authService: SocialAuthService) {
     this.authService.authState.subscribe(
-      (st) => (this.authToken = st.authToken)
+      (st) => (this.authToken = st?.authToken)
     );
     this.contentChangesObs
       .pipe(debounceTime(1000))
@@ -90,40 +90,61 @@ export class CytodatabaseService {
     localStorage.setItem(CYTOSAVE_KEY, JSON.stringify(elements.jsons()));
   }
 
-  loadFromLocalStorage(cytocore: Core): boolean {
-    const remoteContent = this.authService.authState
-      .pipe(
-        map((state) => state.authToken),
-        take(1)
-      )
-      .subscribe(() =>
-        fetch(`http://localhost:3000/data?token=${this.authToken}`, {
-          method: 'GET',
-          mode: 'cors',
-          cache: 'default',
-          headers: { 'Content-Type': 'application/json' },
-        })
-          .then((resp) => {
-            if (resp.status != 200) throw { name: 'GettingDataFailed' };
-            return resp.json();
-          })
-          .then((respJson: { content: string }) => respJson)
-          .then((respJson) => {
-            console.log('Content was found ', respJson);
-            return respJson;
-          })
-          .catch(
-            (err) =>
-              err.name == 'GettingContentFailed' &&
-              console.warn(
-                'Content was not found, probably the document is empty'
-              ) + ''
-          )
+  loadFromLocalStorage(cytocore: Core) {
+    console.log('From Local Storage');
+    const cytosave = JSON.parse(localStorage.getItem(CYTOSAVE_KEY));
+    this.loadCytocoreWithSave(cytocore, cytosave);
+  }
+
+  tryFetchFromRemote(authToken: string): Promise<any> {
+    return fetch(`http://localhost:3000/data?token=${authToken}`, {
+      method: 'GET',
+      mode: 'cors',
+      cache: 'default',
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then((resp) => {
+        if (resp.status != 200) throw { name: 'GettingDataFailed' };
+        return resp.json();
+      })
+      .then((respJson: { content: string }) => respJson)
+      .then((respJson) => {
+        return respJson;
+      })
+      .catch(
+        (err) =>
+          err.name == 'GettingContentFailed' &&
+          console.warn(
+            'Content was not found, probably the document is empty'
+          ) + ''
       );
-    const cytosave = localStorage.getItem(CYTOSAVE_KEY);
+  }
+
+  async loadFromRemote(cytocore: Core) {
+    let attempts = 0;
+    let MAX_ATTEMPTS = 3;
+    let data = undefined;
+    while (attempts < MAX_ATTEMPTS && !data) {
+      try {
+        data = await this.tryFetchFromRemote(this.authToken);
+        if (!data) throw { name: 'DataUndefined' };
+      } catch (err) {
+        attempts += 1;
+      }
+    }
+    if (data) {
+      this.loadCytocoreWithSave(cytocore, data);
+      cytocore.fit(undefined, 100);
+      return true;
+    } else {
+      throw { name: `MaxAttemptsReached${MAX_ATTEMPTS}` };
+    }
+  }
+
+  loadCytocoreWithSave(cytocore: Core, cytosave: any) {
     if (cytosave) {
       cytocore.elements().remove();
-      cytocore.add(JSON.parse(cytosave));
+      cytocore.add(cytosave);
       return true;
     }
     return false;
@@ -244,7 +265,6 @@ export class CytodatabaseService {
       })
       .then((respJson: { content: string }) => respJson.content)
       .then((content) => {
-        console.log('Content was found ', content);
         return content;
       })
       .catch(
