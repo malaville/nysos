@@ -44,8 +44,6 @@ export class CytostateService {
       });
     });
 
-    // this.cytocore.on('drag', (e) => console.log('move', e.target.data()));
-
     this.cytocore.on('click touchend', 'node', (e) => {
       const id = e.target.id();
       this.selectContent(id);
@@ -114,12 +112,15 @@ export class CytostateService {
 
   changeNodeName(newName: string) {
     const id = this.appstate.documentState.contentId;
-    this.cytocore.getElementById(id).data({ name: newName });
-    this.appstate.contentSelected(
-      id,
-      newName,
-      this.cytocore.getElementById(id).data()
-    );
+    const valid =
+      this.cytocore.getElementById(id).data({ name: newName }).data().name ==
+      newName;
+    !valid &&
+      this.appstate.contentSelected(
+        id,
+        newName,
+        this.cytocore.getElementById(id).data()
+      );
   }
 
   addBibliography(biblioItem: BibliographyItem) {
