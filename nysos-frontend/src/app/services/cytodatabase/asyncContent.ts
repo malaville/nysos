@@ -1,4 +1,5 @@
 import { BehaviorSubject, Observable } from 'rxjs';
+import { fetchContent } from './fetchNysosBackend';
 
 export interface AsyncContentStateInterface {
   resolved: boolean;
@@ -32,16 +33,7 @@ export class AsyncContent {
     this.updateState({ resolving: true });
     (async () => {
       try {
-        const resp = await fetch(
-          `http://localhost:3000/content/${this.contentId}?token=${authToken}`,
-          {
-            method: 'GET',
-            mode: 'cors',
-            cache: 'default',
-            headers: { 'Content-Type': 'application/json' },
-          }
-        );
-        const respJson = await resp.json();
+        const respJson = await fetchContent(authToken, this.contentId);
         const content = respJson.content;
         this.updateState({ resolving: false, resolved: true, content });
       } catch (err) {

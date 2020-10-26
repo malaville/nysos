@@ -1,14 +1,13 @@
-import { state } from '@angular/animations';
 import { Injectable, OnInit } from '@angular/core';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { SocialAuthService } from 'angularx-social-login';
 import { CollectionReturnValue, Core } from 'cytoscape';
-import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
-import { debounceTime, map, take, tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { AsyncContent } from './asyncContent';
 import { ContentChanges, ContentChangesInterface } from './contentChanges';
+import { fetchAllData, postContent, postData } from './fetchNysosBackend';
 const CYTOSAVE_KEY = 'cytosave';
-const CONTENTCHANGESSAVE_KEY = 'contentchangessave';
 
 export interface ContentSaveStateInterface {
   writing: boolean;
@@ -90,12 +89,7 @@ export class CytodatabaseService {
   }
 
   tryFetchFromRemote(authToken: string): Promise<any> {
-    return fetch(`http://localhost:3000/data?token=${authToken}`, {
-      method: 'GET',
-      mode: 'cors',
-      cache: 'default',
-      headers: { 'Content-Type': 'application/json' },
-    })
+    return fetchAllData(authToken)
       .then((resp) => {
         if (resp.status != 200) throw { name: 'GettingDataFailed' };
         return resp.json();
@@ -175,25 +169,16 @@ export class CytodatabaseService {
     contentId: string,
     content: string
   ): Promise<boolean> {
-    return fetch(
-      `http://localhost:3000/content/${contentId}?token=${this.authToken}`,
-      {
-        method: 'POST',
-        mode: 'cors',
-        cache: 'default',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contentId, content }),
-      }
-    )
-      .then((res: Response) => res.json())
-      .then((jsonRes: any) => {
+    return postContent(this.authToken, contentId, content).then(
+      (jsonRes: { success: boolean }) => {
         if (jsonRes.success) {
           this.contentChanges.savedContentSuccessful(contentId);
           return true;
         } else {
           throw { name: 'MongoDbNotASuccess', jsonRes };
         }
-      });
+      }
+    );
   }
 
   saveAllContentsAndDataToDatabase(
@@ -216,16 +201,7 @@ export class CytodatabaseService {
   }
 
   saveOneObjectDataToDatabase(objectId: string, data: any): Promise<boolean> {
-    return fetch(
-      `http://localhost:3000/data/${objectId}?token=${this.authToken}`,
-      {
-        method: 'POST',
-        mode: 'cors',
-        cache: 'default',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ objectId, data }),
-      }
-    )
+    return postData(this.authToken, objectId, data)
       .then((res: Response) => {
         if (res.status != 200) {
           throw { name: `FailedStatus[${res.status}]` };

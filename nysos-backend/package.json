@@ -2,13 +2,14 @@
   "name": "nysos-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "build/index.js",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "mongodb": "^3.6.2"
   },
   "devDependencies": {
+    "@google-cloud/functions-framework": "^1.7.1",
     "@types/express": "^4.17.8",
     "@types/mongodb": "^3.5.29",
     "@types/node": "^14.11.11",
@@ -20,7 +21,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "tsc && node build/index.js",
     "build": "rm -rf build/ && tsc && node build/index.js",
-    "start:dev": "nodemon"
+    "start:dev": "nodemon",
+    "start:function": "functions-framework",
+    "stage": "tsc && zip -r nysos-backend.zip package.json build/ && gsutil cp nysos-backend.zip gs://nysos/nysos-backend.zip  && gcloud functions deploy nysos-backend --trigger-http --runtime nodejs10 --source=gs://nysos/nysos-backend.zip --allow-unauthenticated --region=europe-west1 "
   },
   "author": "",
   "license": "ISC"

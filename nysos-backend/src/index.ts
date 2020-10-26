@@ -97,3 +97,5 @@ app.get("/data", async function (req: Request, res: Response) {
 });
 
 app.listen(3000);
+
+exports.function = app;
