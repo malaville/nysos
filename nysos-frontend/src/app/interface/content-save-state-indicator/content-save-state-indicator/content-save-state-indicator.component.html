@@ -5,20 +5,26 @@
     src="/assets/loader.svg"
     width="25px;"
   />
-  <mat-icon
-    *ngIf="
-      !(contentSaveState | async).writing && (contentSaveState | async).error
-    "
-    class="red-icon"
-    >cancel</mat-icon
-  >
-  <mat-spinner
-    *ngIf="(contentSaveState | async).saving"
-    [diameter]="20"
-  ></mat-spinner>
-  <mat-icon class="green-icon" *ngIf="(contentSaveState | async).saved"
-    >check_circle</mat-icon
-  >
+  <ng-container *ngIf="!(contentSaveState | async).writing">
+    <mat-spinner
+      *ngIf="(contentSaveState | async).saving"
+      [diameter]="20"
+    ></mat-spinner>
+    <ng-container *ngIf="!(contentSaveState | async).saving">
+      <mat-icon *ngIf="(contentSaveState | async).error" class="red-icon"
+        >cancel</mat-icon
+      >
+      <mat-icon class="green-icon" *ngIf="(contentSaveState | async).saved"
+        >check_circle</mat-icon
+      >
+      <mat-icon
+        (click)="retryClicked()"
+        *ngIf="(contentSaveState | async).offline"
+        >cloud_off</mat-icon
+      >
+    </ng-container>
+  </ng-container>
+
   <ng-container *ngIf="showProgress">
     <span class="show-progress" *ngIf="(contentSaveState | async).progress">
       {{ (contentSaveState | async).progress.success }} /

@@ -2,6 +2,7 @@ import { saveOneDocument, saveOneObjectData } from "./mongowrite";
 import { Request, Response } from "express";
 import { identifyGoogleUser } from "./identifyUser";
 import { getAllData, getOneDocument } from "./mongoread";
+import { deleteAllMyData } from "./mongodelete";
 const bodyParser = require("body-parser");
 var cors = require("cors");
 const express = require("express");
@@ -92,6 +93,28 @@ app.get("/data", async function (req: Request, res: Response) {
   } catch (err) {
     console.log("getAllData failed", err.name);
     res.statusCode = 404;
+    res.send({ err });
+  }
+});
+
+app.delete("/", async function (req: Request, res: Response) {
+  let token = "" + req.query.token;
+  let uid = undefined;
+  try {
+    uid = await identifyGoogleUser(token);
+  } catch (err) {
+    console.log("identifyUser failed", err.name);
+    res.statusCode = 401;
+    res.send(err);
+    return;
+  }
+  try {
+    const [delContent, delData] = await deleteAllMyData(uid);
+
+    res.send({ delContent, delData });
+  } catch (err) {
+    console.log("deleteAllMyData failed", err.name);
+    res.statusCode = 400;
     res.send({ err });
   }
 });

@@ -6,7 +6,12 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { AsyncContent } from './asyncContent';
 import { ContentChanges, ContentChangesInterface } from './contentChanges';
-import { fetchAllData, postContent, postData } from './fetchNysosBackend';
+import {
+  deleteAllMyData,
+  fetchAllData,
+  postContent,
+  postData,
+} from './fetchNysosBackend';
 const CYTOSAVE_KEY = 'cytosave';
 
 export interface ContentSaveStateInterface {
@@ -14,6 +19,7 @@ export interface ContentSaveStateInterface {
   saving: boolean;
   saved: boolean;
   error: boolean;
+  offline: boolean;
   progress: { total: number; success: number; failed: number };
 }
 
@@ -22,6 +28,7 @@ const defaultContentSaveState = {
   saving: false,
   saved: false,
   error: false,
+  offline: true,
   progress: undefined,
 };
 
@@ -48,41 +55,95 @@ export class CytodatabaseService {
     this.contentChangesObs = this.contentChanges.contentChangesObs;
     this.authService.authState.subscribe((st) => {
       this.authToken = st?.authToken;
-      this.updateContentSaveState({ error: false });
-      this.contentChanges.updateBS();
     });
     this.contentChangesObs
       .pipe(debounceTime(2000))
       .subscribe((contentChanges: ContentChangesInterface) => {
-        this.updateContentSaveState({ writing: false });
-        if (!this.contentSaveState.error) {
-          this.updateContentSaveState({ saving: true });
-          this.saveAllContentsAndDataToDatabase(contentChanges)
-            .then(() => {
-              this.updateContentSaveState({
-                saving: false,
-                saved: true,
-                progress: undefined,
-              });
-            })
-            .catch(() => {
-              this.updateContentSaveState({
-                saving: false,
-                error: true,
-                progress: undefined,
-              });
-              console.warn(
-                'Content was not saved',
-                this.contentChanges.contents
-              );
-              console.warn(
-                'Data was not saved for : ',
-                this.contentChanges.datas
-              );
-            })
-            .finally(() => this.contentChanges.saveContentChangesLocally());
+        this.handleAfterContentChanges(this.contentSaveState, contentChanges);
+        if (this.contentSaveState.error) {
+          console.warn('Content was not saved', this.contentChanges.contents);
+          console.warn('Data was not saved for : ', this.contentChanges.datas);
+        }
+        if (this.contentSaveState.offline) {
+          console.warn(
+            `There are ${this.contentChanges.getNumberOfUpdates()} contents or data updates stored locally`
+          );
         }
       });
+  }
+
+  deleteAllMyData() {
+    return deleteAllMyData(this.authToken);
+  }
+  changesAreWaiting() {
+    return this.contentChanges.getNumberOfUpdates() > 0;
+  }
+
+  async handleAfterContentChanges(
+    state: ContentSaveStateInterface,
+    contentChanges: ContentChangesInterface
+  ) {
+    this.updateContentSaveState({ writing: false });
+    if (state.offline) {
+      // Do Nothing
+    }
+    if (!state.offline) {
+      // Show saving loader
+      this.updateContentSaveState({ saving: true });
+      if (state.error) {
+        // tryToSave
+        // If fails go offline, erase error
+        // If success error = false, saved = true All good :)
+        try {
+          await this.saveAllContentsAndDataToDatabase(contentChanges);
+          this.updateContentSaveState({ error: false, saved: true });
+        } catch (err) {
+          this.updateContentSaveState({ offline: true, error: false });
+          this._snackBar.open(
+            'Going offline, click on cloud icon to retry...',
+            undefined,
+            { duration: 2000 }
+          );
+        }
+      } else {
+        // tryToSave
+        // If fails set an error
+        try {
+          await this.saveAllContentsAndDataToDatabase(contentChanges);
+          this.updateContentSaveState({ saved: true });
+        } catch (err) {
+          this.updateContentSaveState({ error: true });
+        }
+      }
+      this.updateContentSaveState({ saving: false });
+    }
+  }
+
+  async trySaveLocalContentChanges(): Promise<void> {
+    const contentChanges = this.contentChanges.toContentChangesJson();
+    this.updateContentSaveState({ saving: true });
+    this._snackBar.open(
+      "Local changes were detected, we're uploading them ...",
+      undefined,
+      { duration: 2000 }
+    );
+    try {
+      await this.saveAllContentsAndDataToDatabase(contentChanges);
+      this.updateContentSaveState({
+        saving: false,
+        saved: true,
+      });
+    } catch (err) {
+      this.updateContentSaveState({
+        saving: false,
+        error: true,
+      });
+      throw err;
+    }
+  }
+
+  setOnline() {
+    this.updateContentSaveState({ offline: false });
   }
 
   updateContentSaveState(update: Partial<ContentSaveStateInterface>) {
@@ -105,8 +166,8 @@ export class CytodatabaseService {
     this.loadCytocoreWithSave(cytocore, cytosave);
   }
 
-  tryFetchFromRemote(authToken: string): Promise<any> {
-    return fetchAllData(authToken)
+  tryFetchFromRemote(): Promise<any> {
+    return fetchAllData(this.authToken)
       .then((resp) => {
         if (resp.status != 200) throw { name: 'GettingDataFailed' };
         return resp.json();
@@ -128,12 +189,19 @@ export class CytodatabaseService {
     let attempts = 0;
     let MAX_ATTEMPTS = 10;
     let data = undefined;
-    this._snackBar.open('Loading from remote ...', undefined, {
+    const snackMessage = this.contentSaveState.error
+      ? "There was an error, we're still going to try getting data from remote ..."
+      : 'Loading from remote ...';
+    this._snackBar.open(snackMessage, undefined, {
       duration: 2000,
     });
-    while (attempts < MAX_ATTEMPTS && !data) {
+
+    // Loop on trying to fetch
+    let timeoutReached = false;
+    setTimeout(() => (timeoutReached = true), 1000);
+    while (!timeoutReached && attempts < MAX_ATTEMPTS && !data) {
       try {
-        data = await this.tryFetchFromRemote(this.authToken);
+        data = await this.tryFetchFromRemote();
         if (!data) throw { name: 'DataUndefined' };
       } catch (err) {
         attempts += 1;
@@ -141,12 +209,18 @@ export class CytodatabaseService {
     }
     if (!this.authToken) {
       this._snackBar.open(
-        "Authentication failed... you're working offline",
+        "Authentication failed... you're working offline 🔘",
         'GOT IT',
         { duration: 5000 }
       );
       throw { name: 'NoAuthentication' };
     }
+    //////////////////
+    //  After the loop :
+    // - data not defined => throw
+    // - data defined but empty => throw {saveAll:true
+    //  -data defined and not empty => return :)
+
     if (data) {
       if (data.length == 0) {
         this._snackBar.open(
@@ -156,7 +230,7 @@ export class CytodatabaseService {
             duration: 5000,
           }
         );
-        throw { name: 'DataEmpty', saveAll: true };
+        throw { name: 'DataEmpty', empty: true };
       }
       this.loadCytocoreWithSave(cytocore, data);
       cytocore.fit(undefined, 100);
@@ -261,7 +335,7 @@ export class CytodatabaseService {
   }
 
   loadRemoteContentOf(id: string): AsyncContent {
-    if (!this.contentSaveState.error)
+    if (!this.contentSaveState.offline)
       return new AsyncContent(id).attemptFetching(this.authToken);
     return new AsyncContent(id).forcedFail();
   }

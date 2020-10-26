@@ -1,4 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import {
   GoogleLoginProvider,
@@ -21,19 +27,21 @@ import { CytostateService } from './services/cytostate/cytostate.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit {
   title = 'nysos-frontend';
-  cy: cytoscape.Core;
   documentStateObs: Observable<DocumentDataStateInterface>;
   large: Observable<boolean> = scheduled([false], null);
   auth: Observable<SocialUser>;
   token: string;
   contentChangesObs: Observable<ContentChangesInterface>;
+  authServiceInitialized: Observable<boolean>;
 
   @ViewChild(MatSidenav)
   set sidenav(s: MatSidenav) {
     this.appstate.setSidenavRef(s);
   }
+
+  @ViewChild('cy') cy: ElementRef;
 
   constructor(
     private cytostate: CytostateService,
@@ -45,12 +53,16 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.documentStateObs = this.appstate.documentStateObservable;
     this.contentChangesObs = this.cytoDb.contentChangesObs;
+    this.authServiceInitialized = this.authService.initState;
     this.large = this.appstate.UIstateObservable.pipe(
       map((uistate) => uistate.addingDocument || uistate.editDocument)
     );
-    setTimeout(() => this.cytostate.setCytocoreId('cy'), 500);
 
     this.auth = this.authService.authState;
+  }
+
+  ngAfterViewInit() {
+    this.cytostate.setCytocoreId('cy');
   }
 
   edgeCreationMode(): boolean {
@@ -60,6 +72,9 @@ export class AppComponent implements OnInit {
     this.cytostate.edgeCreationMode();
   }
 
+  deleteAllMyDataClicked() {
+    this.cytoDb.deleteAllMyData();
+  }
   saveClicked() {
     this.cytostate.saveData();
   }

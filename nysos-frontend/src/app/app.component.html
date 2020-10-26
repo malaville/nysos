@@ -29,15 +29,23 @@
   <button type="button" mat-button (click)="openSideNav()">
     Toggle sidenav
   </button>
+  <button
+    type="button"
+    mat-button
+    color="warn"
+    (click)="deleteAllMyDataClicked()"
+  >
+    Delete all my data
+  </button>
   <button type="button" mat-button (click)="saveClicked()">Save</button>
   <button type="button" mat-button (click)="resetClicked()">Reset</button>
   <button type="button" mat-button (click)="addThemeClicked()">
     Add Theme
   </button>
-  <button (click)="signInWithGoogle()">
+  <button *ngIf="authServiceInitialized | async" (click)="signInWithGoogle()">
     Login {{ (auth | async) ? "🟢" : "🟥" }}
   </button>
-  <div id="cy"></div>
+  <div #cy id="cy"></div>
   <div class="left-bottom-state">
     <app-content-save-state-indicator
       [showProgress]="true"

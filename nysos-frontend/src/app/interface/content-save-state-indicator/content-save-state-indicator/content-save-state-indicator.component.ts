@@ -20,4 +20,8 @@ export class ContentSaveStateIndicatorComponent implements OnInit {
   ngOnInit(): void {
     this.contentSaveState = this.cytoDb.contentSaveStateObs;
   }
+
+  retryClicked() {
+    this.cytoDb.setOnline();
+  }
 }

@@ -12,8 +12,9 @@ import {
   BibliographyItem,
   BibliographyItemLink,
 } from 'src/app/interface/source-manager/bibliography-item';
+import { SocialAuthService } from 'angularx-social-login';
 
-const NEW_NAME = 'New Theme';
+const NEW_NAME = '';
 
 @Injectable({
   providedIn: 'root',
@@ -26,7 +27,8 @@ export class CytostateService {
 
   constructor(
     private cyDb: CytodatabaseService,
-    private appstate: AppstateService
+    private appstate: AppstateService,
+    private authState: SocialAuthService
   ) {}
 
   setCytocoreId(id: string) {
@@ -55,7 +57,9 @@ export class CytostateService {
     });
 
     const complete = (x, y, addedEles) => {
-      addedEles.forEach((ele) => this.saveData(ele.data()));
+      addedEles.forEach((ele) =>
+        this.saveData(ele.data({ type: EDGE_TYPES.IDEA_LINK }).data())
+      );
       this.edgeCreationMode();
     };
     this.edgehandles = this.cytocore.edgehandles({ ...defaults, complete });
@@ -72,17 +76,46 @@ export class CytostateService {
     this.cytocore.on(
       'mouseup',
       'node',
-      (edge) =>
-        edge.target.data().name == NEW_NAME &&
-        this.selectContent(edge.target.id())
+      (node) =>
+        node.target.data().name == NEW_NAME &&
+        this.selectContent(node.target.id())
     );
-
-    this.cyDb.loadFromRemote(this.cytocore).catch((err) => {
-      this.cyDb.loadFromLocalStorage(this.cytocore);
-      if (err.saveAll) {
-        this.cyDb.saveAllToRemote(this.cytocore);
-      }
+    const timeoutId = setTimeout(
+      () => this.cyDb.loadFromLocalStorage(this.cytocore),
+      1000
+    );
+    this.authState.authState.subscribe((socialUser) => {
+      clearTimeout(timeoutId);
+      this.startUpProcessWhenAuthenticated(this.cytocore, socialUser);
     });
+  }
+
+  async startUpProcessWhenAuthenticated(cytocore: Core, socialUser) {
+    console.log('startUpProcessWhenAuthenticated', socialUser);
+    const changesAreWaiting = this.cyDb.changesAreWaiting();
+    if (socialUser) {
+      // isLogged in
+      const authToken = socialUser.authToken;
+      this.cyDb.setOnline();
+      if (changesAreWaiting) {
+        const saved = await this.cyDb
+          .trySaveLocalContentChanges()
+          .then(() => console.log('TrySaveAll was a success'))
+          .catch((err) => {
+            console.log('TrySaveAll failed', err);
+          });
+      }
+      try {
+        await this.cyDb.loadFromRemote(cytocore);
+      } catch (err) {
+        this.cyDb.loadFromLocalStorage(this.cytocore);
+        if (err.empty) {
+          this.cyDb.saveAllToRemote(this.cytocore);
+        }
+      }
+    } else {
+      this.cyDb.loadFromLocalStorage(this.cytocore);
+    }
   }
 
   edgeCreationMode() {
@@ -196,6 +229,7 @@ export class CytostateService {
         .map((documentLinkTargetingX) => {
           const sourceDocument = documentLinkTargetingX.source();
           const linkId = documentLinkTargetingX.id();
+          console.log(documentLinkTargetingX.data());
           return new BibliographyItemLink(
             BibliographyItem.fromNode(sourceDocument),
             this.cyDb.loadContentOf(linkId),

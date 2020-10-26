@@ -43,12 +43,14 @@ export class ContentChanges implements ContentChangesInterface {
   savedDataSuccessful(objectId: string) {
     this.objectDataToUpdate.delete(objectId);
     delete this.datas[objectId];
+    this.saveContentChangesLocally();
   }
 
   savedContentSuccessful(contentId: string) {
     this.contentsToUpdate.delete(contentId);
     delete this.contents[contentId];
     AsyncContent.contentWasPosted(contentId);
+    this.saveContentChangesLocally();
   }
 
   addChanges(id: string, dataOrContent: string | object, update = true) {
@@ -61,6 +63,7 @@ export class ContentChanges implements ContentChangesInterface {
       this.datas[id] = dataOrContent;
       this.objectDataToUpdate.add(id);
     }
+    this.saveContentChangesLocally();
     update && this.updateBS();
   }
 

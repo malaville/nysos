@@ -23,7 +23,7 @@ export const getOneDocument = async (contentId: string, uid: number) => {
       _id: contentId,
     });
     if (!document) {
-      reject({ name: "DocumentNotFound" });
+      resolve({ content: "", _id: contentId });
       return;
     }
     console.log(
