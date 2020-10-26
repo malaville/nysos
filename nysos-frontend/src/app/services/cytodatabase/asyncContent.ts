@@ -53,6 +53,7 @@ export class AsyncContent {
         const content = respJson.content;
         this.updateState({ resolving: false, resolved: true, content });
         AsyncContent.contentStore[this.contentId] = content;
+        localStorage.setItem(`${this.contentId}:content`, content);
       } catch (err) {
         this.updateState({ resolving: false, failed: true });
       }

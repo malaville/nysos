@@ -72,8 +72,18 @@ export class CytodatabaseService {
       });
   }
 
-  deleteAllMyData() {
-    return deleteAllMyData(this.authToken);
+  deleteAllMyRemoteData() {
+    return deleteAllMyData(this.authToken).then(() =>
+      this._snackBar.open(
+        'All data was deleted on remote. To erase everything, also erase local data.',
+        undefined,
+        { duration: 2000 }
+      )
+    );
+  }
+
+  deleteAllMyLocalData() {
+    return localStorage.clear();
   }
   changesAreWaiting() {
     return this.contentChanges.getNumberOfUpdates() > 0;
@@ -136,7 +146,6 @@ export class CytodatabaseService {
     } catch (err) {
       this.updateContentSaveState({
         saving: false,
-        error: true,
       });
       throw err;
     }
@@ -157,7 +166,7 @@ export class CytodatabaseService {
     this.contentSaveStateBS.next(this.contentSaveState);
   }
 
-  saveNodesAndEdges(elements: CollectionReturnValue) {
+  saveNodesAndEdgesLocally(elements: CollectionReturnValue) {
     localStorage.setItem(CYTOSAVE_KEY, JSON.stringify(elements.jsons()));
   }
 
@@ -243,6 +252,7 @@ export class CytodatabaseService {
           duration: 2000,
         }
       );
+      this.updateContentSaveState({ offline: true });
       throw { name: `MaxAttemptsReached${MAX_ATTEMPTS}` };
     }
   }
@@ -251,6 +261,7 @@ export class CytodatabaseService {
     if (cytosave) {
       cytocore.elements().remove();
       cytocore.add(cytosave);
+
       return true;
     }
     return false;

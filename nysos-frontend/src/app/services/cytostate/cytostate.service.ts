@@ -90,8 +90,11 @@ export class CytostateService {
     });
   }
 
+  restartStartUp() {
+    this.startUpProcessWhenAuthenticated(this.cytocore, true);
+  }
+
   async startUpProcessWhenAuthenticated(cytocore: Core, socialUser) {
-    console.log('startUpProcessWhenAuthenticated', socialUser);
     const changesAreWaiting = this.cyDb.changesAreWaiting();
     if (socialUser) {
       // isLogged in
@@ -100,13 +103,13 @@ export class CytostateService {
       if (changesAreWaiting) {
         const saved = await this.cyDb
           .trySaveLocalContentChanges()
-          .then(() => console.log('TrySaveAll was a success'))
           .catch((err) => {
             console.log('TrySaveAll failed', err);
           });
       }
       try {
         await this.cyDb.loadFromRemote(cytocore);
+        this.cyDb.saveNodesAndEdgesLocally(cytocore.elements());
       } catch (err) {
         this.cyDb.loadFromLocalStorage(this.cytocore);
         if (err.empty) {
@@ -125,7 +128,7 @@ export class CytostateService {
 
   saveData(data?: any) {
     data && this.cyDb.saveContentOf(data.id, data);
-    this.cyDb.saveNodesAndEdges(this.cytocore.elements());
+    this.cyDb.saveNodesAndEdgesLocally(this.cytocore.elements());
   }
 
   loadFromLocalStorage() {

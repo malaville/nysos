@@ -33,9 +33,17 @@
     type="button"
     mat-button
     color="warn"
-    (click)="deleteAllMyDataClicked()"
+    (click)="deleteAllMyRemoteDataClicked()"
   >
-    Delete all my data
+    Clear Remote Data
+  </button>
+  <button
+    type="button"
+    mat-button
+    color="accent"
+    (click)="deleteAllMyLocalClicked()"
+  >
+    Clear Local Data
   </button>
   <button type="button" mat-button (click)="saveClicked()">Save</button>
   <button type="button" mat-button (click)="resetClicked()">Reset</button>

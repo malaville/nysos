@@ -72,8 +72,12 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.cytostate.edgeCreationMode();
   }
 
-  deleteAllMyDataClicked() {
-    this.cytoDb.deleteAllMyData();
+  deleteAllMyRemoteDataClicked() {
+    confirm('Are you sure ?') && this.cytoDb.deleteAllMyRemoteData();
+  }
+
+  deleteAllMyLocalClicked() {
+    confirm('Are you sure ?') && this.cytoDb.deleteAllMyLocalData();
   }
   saveClicked() {
     this.cytostate.saveData();
