@@ -75,9 +75,12 @@ export class CytostateService {
         this.selectContent(edge.target.id())
     );
 
-    this.cyDb
-      .loadFromRemote(this.cytocore)
-      .catch(() => this.cyDb.loadFromLocalStorage(this.cytocore));
+    this.cyDb.loadFromRemote(this.cytocore).catch((err) => {
+      this.cyDb.loadFromLocalStorage(this.cytocore);
+      if (err.saveAll) {
+        this.cyDb.saveAllToRemote(this.cytocore);
+      }
+    });
   }
 
   edgeCreationMode() {

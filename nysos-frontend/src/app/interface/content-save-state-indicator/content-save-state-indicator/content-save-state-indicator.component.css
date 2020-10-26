@@ -11,3 +11,8 @@
 .red-icon {
   color: red;
 }
+.show-progress {
+  position: absolute;
+  margin-left: 30px;
+  width: 100px;
+}

@@ -13,7 +13,7 @@ import {
 export class ContentSaveStateIndicatorComponent implements OnInit {
   public contentSaveState: Observable<ContentSaveStateInterface>;
 
-  // @Input() explain: boolean = false;
+  @Input() showProgress: boolean = false;
 
   constructor(private cytoDb: CytodatabaseService) {}
 

@@ -12,6 +12,7 @@ const CONTENTCHANGESSAVE_KEY = 'contentchangessave';
 export class ContentChanges implements ContentChangesInterface {
   private contentChangesBS: ReplaySubject<ContentChangesInterface>;
   readonly contentChangesObs: Observable<ContentChangesInterface>;
+
   constructor(
     readonly datas = {},
     readonly contents = {},
@@ -49,7 +50,7 @@ export class ContentChanges implements ContentChangesInterface {
     delete this.contents[contentId];
   }
 
-  addChanges(id: string, dataOrContent: string | object) {
+  addChanges(id: string, dataOrContent: string | object, update = true) {
     if (typeof dataOrContent == 'string') {
       this.contents[id] = dataOrContent;
       this.contentsToUpdate.add(id);
@@ -59,7 +60,7 @@ export class ContentChanges implements ContentChangesInterface {
       this.datas[id] = dataOrContent;
       this.objectDataToUpdate.add(id);
     }
-    this.updateBS();
+    update && this.updateBS();
   }
 
   updateBS = () => this.contentChangesBS.next(this.toContentChangesJson());
@@ -71,5 +72,9 @@ export class ContentChanges implements ContentChangesInterface {
       contents: this.contents,
       datas: this.datas,
     };
+  }
+
+  getNumberOfUpdates() {
+    return this.contentsToUpdate.size + this.objectDataToUpdate.size;
   }
 }

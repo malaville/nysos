@@ -14,6 +14,7 @@ export interface ContentSaveStateInterface {
   saving: boolean;
   saved: boolean;
   error: boolean;
+  progress: { total: number; success: number; failed: number };
 }
 
 const defaultContentSaveState = {
@@ -21,6 +22,7 @@ const defaultContentSaveState = {
   saving: false,
   saved: false,
   error: false,
+  progress: undefined,
 };
 
 @Injectable({
@@ -32,7 +34,7 @@ export class CytodatabaseService {
   private contentChanges: ContentChanges;
   readonly contentChangesObs: Observable<ContentChangesInterface>;
 
-  private contentSaveState = defaultContentSaveState;
+  private contentSaveState: ContentSaveStateInterface = defaultContentSaveState;
   private contentSaveStateBS = new BehaviorSubject<ContentSaveStateInterface>(
     this.contentSaveState
   );
@@ -55,7 +57,11 @@ export class CytodatabaseService {
           this.updateContentSaveState({ saving: true });
           this.saveAllContentsAndDataToDatabase(contentChanges)
             .then(() => {
-              this.updateContentSaveState({ saving: false, saved: true });
+              this.updateContentSaveState({
+                saving: false,
+                saved: true,
+                progress: undefined,
+              });
             })
             .catch(() => {
               this.updateContentSaveState({ saving: false, error: true });
@@ -75,6 +81,12 @@ export class CytodatabaseService {
 
   updateContentSaveState(update: Partial<ContentSaveStateInterface>) {
     this.contentSaveState = { ...this.contentSaveState, ...update };
+    this.contentSaveStateBS.next(this.contentSaveState);
+  }
+
+  updateProgress(success: number, failed: number) {
+    this.contentSaveState.progress.success += success;
+    this.contentSaveState.progress.failed += failed;
     this.contentSaveStateBS.next(this.contentSaveState);
   }
 
@@ -131,6 +143,16 @@ export class CytodatabaseService {
       throw { name: 'NoAuthentication' };
     }
     if (data) {
+      if (data.length == 0) {
+        this._snackBar.open(
+          "Remote Data was empty, we're saving your local data online",
+          'GOT IT',
+          {
+            duration: 5000,
+          }
+        );
+        throw { name: 'DataEmpty', saveAll: true };
+      }
       this.loadCytocoreWithSave(cytocore, data);
       cytocore.fit(undefined, 100);
       return true;
@@ -173,8 +195,10 @@ export class CytodatabaseService {
       (jsonRes: { success: boolean }) => {
         if (jsonRes.success) {
           this.contentChanges.savedContentSuccessful(contentId);
+          this.updateProgress(1, 0);
           return true;
         } else {
+          this.updateProgress(0, 1);
           throw { name: 'MongoDbNotASuccess', jsonRes };
         }
       }
@@ -184,6 +208,13 @@ export class CytodatabaseService {
   saveAllContentsAndDataToDatabase(
     contentChanges: ContentChangesInterface
   ): Promise<boolean[]> {
+    this.updateContentSaveState({
+      progress: {
+        success: 0,
+        failed: 0,
+        total: this.contentChanges.getNumberOfUpdates(),
+      },
+    });
     return Promise.all([
       ...Array.from(contentChanges.objectDataToUpdate).map((objectId) =>
         this.saveOneObjectDataToDatabase(
@@ -211,8 +242,10 @@ export class CytodatabaseService {
       .then((jsonRes: any) => {
         if (jsonRes.success) {
           this.contentChanges.savedDataSuccessful(objectId);
+          this.updateProgress(1, 0);
           return true;
         } else {
+          this.updateProgress(0, 1);
           throw { name: 'MongoDbNotASuccess', jsonRes };
         }
       });
@@ -226,5 +259,23 @@ export class CytodatabaseService {
     if (!this.contentSaveState.error)
       return new AsyncContent(id).attemptFetching(this.authToken);
     return new AsyncContent(id).forcedFail();
+  }
+
+  saveAllToRemote(cytocore: Core) {
+    cytocore.nodes().map((node) => {
+      this.contentChanges.addChanges(
+        node.id(),
+        { ...node.data(), position: node.position() },
+        false
+      );
+      const content = this.loadContentOf(node.id());
+      content && this.contentChanges.addChanges(node.id(), content, false);
+    });
+    cytocore.edges().map((edge) => {
+      this.contentChanges.addChanges(edge.id(), edge.data(), false);
+      const content = this.loadContentOf(edge.id());
+      content && this.contentChanges.addChanges(edge.id(), content, false);
+    });
+    this.contentChanges.updateBS();
   }
 }

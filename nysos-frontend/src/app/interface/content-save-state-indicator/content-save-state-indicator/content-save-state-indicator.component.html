@@ -18,4 +18,10 @@
   <mat-icon class="green-icon" *ngIf="(contentSaveState | async).saved"
     >check_circle</mat-icon
   >
+  <ng-container *ngIf="showProgress">
+    <span class="show-progress" *ngIf="(contentSaveState | async).progress">
+      {{ (contentSaveState | async).progress.success }} /
+      {{ (contentSaveState | async).progress.total }}
+    </span>
+  </ng-container>
 </div>
