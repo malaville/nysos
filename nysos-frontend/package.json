@@ -9,7 +9,9 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "build+": "ng build --aot --output-hashing=all && cp app.yaml ./dist/app.yaml && cd dist && yes | gcloud app deploy --project=nysos-289715 && cd ..",
-    "build-": "ng build --aot --output-hashing=all && cp app.yaml ./dist/app.yaml && cd dist && yes | gcloud app deploy --project=nysos-289715 --no-promote && cd .."
+    "build-": "ng build --aot --prod --output-hashing=all && cp app.yaml ./dist/app.yaml && cd dist && yes | gcloud app deploy --project=nysos-289715 --no-promote && cd ..",
+    "analyze": "ng run nysos-frontend:build:production --stats-json=true --statsJson=true",
+    "webpack-analyzer": "webpack-bundle-analyzer dist/nysos-frontend/stats-es2015.json"
   },
   "private": true,
   "dependencies": {
@@ -50,6 +52,7 @@
     "protractor": "~7.0.0",
     "ts-node": "~8.3.0",
     "tslint": "~6.1.0",
-    "typescript": "~3.8.3"
+    "typescript": "~3.8.3",
+    "webpack-bundle-analyzer": "^3.9.0"
   }
 }
