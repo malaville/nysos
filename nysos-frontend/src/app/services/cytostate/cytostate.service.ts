@@ -54,7 +54,11 @@ export class CytostateService {
       this.selectContent(id);
     });
 
-    this.edgehandles = this.cytocore.edgehandles(defaults);
+    const complete = (x, y, addedEles) => {
+      addedEles.forEach((ele) => this.saveData(ele.data()));
+      this.edgeCreationMode();
+    };
+    this.edgehandles = this.cytocore.edgehandles({ ...defaults, complete });
     this.edgehandles.disable();
 
     this.cytocore.on('mouseover', 'node', (edge) => {
@@ -97,7 +101,7 @@ export class CytostateService {
   }
 
   addNode(params: { parent?: string; x?: number; y?: number } = {}) {
-    this.cytocore.add({
+    const newNode = this.cytocore.add({
       group: 'nodes',
       data: {
         name: NEW_NAME,
@@ -108,6 +112,7 @@ export class CytostateService {
         ? { x: params.x + 10, y: params.y + 20 }
         : { x: 50, y: 50 },
     });
+    this.saveData({ ...newNode.data(), position: newNode.position() });
   }
 
   changeNodeName(newName: string) {
