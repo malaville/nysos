@@ -51,7 +51,7 @@ export class AppComponent implements OnInit {
     setTimeout(() => this.cytostate.setCytocoreId('cy'), 500);
 
     this.auth = this.authService.authState.pipe(
-      tap((auth) => (this.token = auth.authToken))
+      tap((auth) => (this.token = auth?.authToken))
     );
   }
 
