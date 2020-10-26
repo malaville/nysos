@@ -46,9 +46,11 @@ export class CytodatabaseService {
   ) {
     this.contentChanges = ContentChanges.loadFromLocalStorage();
     this.contentChangesObs = this.contentChanges.contentChangesObs;
-    this.authService.authState.subscribe(
-      (st) => (this.authToken = st?.authToken)
-    );
+    this.authService.authState.subscribe((st) => {
+      this.authToken = st?.authToken;
+      this.updateContentSaveState({ error: false });
+      this.contentChanges.updateBS();
+    });
     this.contentChangesObs
       .pipe(debounceTime(2000))
       .subscribe((contentChanges: ContentChangesInterface) => {
