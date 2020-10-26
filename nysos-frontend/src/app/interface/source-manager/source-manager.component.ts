@@ -63,7 +63,6 @@ export class SourceManagerComponent implements OnChanges, OnInit {
       } else {
         this.cytostate.addBibliography(bib);
       }
-      console.log(bib.acronym);
     } else {
       this.myForm.controls.title.markAsTouched();
     }
