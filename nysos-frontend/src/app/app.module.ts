@@ -10,6 +10,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 // Components
 import { AppRoutingModule } from './app-routing.module';
@@ -70,6 +71,7 @@ export function provideConfig() {
     MatInputModule,
     SocialLoginModule,
     MatProgressSpinnerModule,
+    MatSnackBarModule,
   ],
   providers: [
     {

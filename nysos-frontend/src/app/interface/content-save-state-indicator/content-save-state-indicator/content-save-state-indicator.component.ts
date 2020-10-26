@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
   ContentSaveStateInterface,
@@ -12,6 +12,9 @@ import {
 })
 export class ContentSaveStateIndicatorComponent implements OnInit {
   public contentSaveState: Observable<ContentSaveStateInterface>;
+
+  // @Input() explain: boolean = false;
+
   constructor(private cytoDb: CytodatabaseService) {}
 
   ngOnInit(): void {

@@ -1,4 +1,3 @@
-import { SocialAuthService } from 'angularx-social-login';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 export interface AsyncContentStateInterface {

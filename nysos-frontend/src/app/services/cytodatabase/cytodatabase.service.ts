@@ -1,5 +1,6 @@
 import { state } from '@angular/animations';
 import { Injectable, OnInit } from '@angular/core';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { SocialAuthService } from 'angularx-social-login';
 import { CollectionReturnValue, Core } from 'cytoscape';
 import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
@@ -38,7 +39,10 @@ export class CytodatabaseService {
   );
   readonly contentSaveStateObs = this.contentSaveStateBS.asObservable();
 
-  constructor(private authService: SocialAuthService) {
+  constructor(
+    private authService: SocialAuthService,
+    private _snackBar: MatSnackBar
+  ) {
     this.contentChanges = ContentChanges.loadFromLocalStorage();
     this.contentChangesObs = this.contentChanges.contentChangesObs;
     this.authService.authState.subscribe(
@@ -111,8 +115,11 @@ export class CytodatabaseService {
 
   async loadFromRemote(cytocore: Core) {
     let attempts = 0;
-    let MAX_ATTEMPTS = 3;
+    let MAX_ATTEMPTS = 2;
     let data = undefined;
+    this._snackBar.open('Loading from remote ...', undefined, {
+      duration: 2000,
+    });
     while (attempts < MAX_ATTEMPTS && !data) {
       try {
         data = await this.tryFetchFromRemote(this.authToken);
@@ -121,11 +128,26 @@ export class CytodatabaseService {
         attempts += 1;
       }
     }
+    if (!this.authToken) {
+      this._snackBar.open(
+        "Authentication failed... you're working offline",
+        'GOT IT',
+        { duration: 5000 }
+      );
+      throw { name: 'NoAuthentication' };
+    }
     if (data) {
       this.loadCytocoreWithSave(cytocore, data);
       cytocore.fit(undefined, 100);
       return true;
     } else {
+      this._snackBar.open(
+        "Remote unreachable... you're working offline",
+        undefined,
+        {
+          duration: 2000,
+        }
+      );
       throw { name: `MaxAttemptsReached${MAX_ATTEMPTS}` };
     }
   }
