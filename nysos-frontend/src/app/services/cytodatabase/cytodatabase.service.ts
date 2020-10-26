@@ -126,7 +126,7 @@ export class CytodatabaseService {
 
   async loadFromRemote(cytocore: Core) {
     let attempts = 0;
-    let MAX_ATTEMPTS = 2;
+    let MAX_ATTEMPTS = 10;
     let data = undefined;
     this._snackBar.open('Loading from remote ...', undefined, {
       duration: 2000,

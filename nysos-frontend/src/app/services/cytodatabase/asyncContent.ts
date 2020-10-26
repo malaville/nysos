@@ -61,7 +61,6 @@ export class AsyncContent {
   }
 
   forcedFail(): AsyncContent {
-    console.log('ForcedFail');
     this.updateState({ resolving: false, failed: true });
     return this;
   }
