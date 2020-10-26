@@ -50,7 +50,7 @@ export class CytodatabaseService {
       (st) => (this.authToken = st?.authToken)
     );
     this.contentChangesObs
-      .pipe(debounceTime(1000))
+      .pipe(debounceTime(2000))
       .subscribe((contentChanges: ContentChangesInterface) => {
         this.updateContentSaveState({ writing: false });
         if (!this.contentSaveState.error) {
@@ -64,7 +64,11 @@ export class CytodatabaseService {
               });
             })
             .catch(() => {
-              this.updateContentSaveState({ saving: false, error: true });
+              this.updateContentSaveState({
+                saving: false,
+                error: true,
+                progress: undefined,
+              });
               console.warn(
                 'Content was not saved',
                 this.contentChanges.contents
@@ -95,7 +99,6 @@ export class CytodatabaseService {
   }
 
   loadFromLocalStorage(cytocore: Core) {
-    console.log('From Local Storage');
     const cytosave = JSON.parse(localStorage.getItem(CYTOSAVE_KEY));
     this.loadCytocoreWithSave(cytocore, cytosave);
   }

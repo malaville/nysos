@@ -1,4 +1,5 @@
 import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
+import { AsyncContent } from './asyncContent';
 
 export interface ContentChangesInterface {
   contentsToUpdate: Set<string>;
@@ -33,7 +34,6 @@ export class ContentChanges implements ContentChangesInterface {
   }
 
   saveContentChangesLocally() {
-    console.log('Saved locally');
     localStorage.setItem(
       CONTENTCHANGESSAVE_KEY,
       JSON.stringify(this.toContentChangesJson())
@@ -48,6 +48,7 @@ export class ContentChanges implements ContentChangesInterface {
   savedContentSuccessful(contentId: string) {
     this.contentsToUpdate.delete(contentId);
     delete this.contents[contentId];
+    AsyncContent.contentWasPosted(contentId);
   }
 
   addChanges(id: string, dataOrContent: string | object, update = true) {
