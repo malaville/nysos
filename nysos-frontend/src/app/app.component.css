@@ -48,3 +48,10 @@ mat-sidenav.large app-source-manager {
   opacity: 1;
   transition: width 0.5s, margin 0.5s, opacity 0.2s;
 }
+
+.left-bottom-state {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  margin: 10px;
+}

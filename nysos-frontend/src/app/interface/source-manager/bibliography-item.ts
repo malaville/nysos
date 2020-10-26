@@ -1,4 +1,5 @@
 import { FormGroup, Validators } from '@angular/forms';
+import { AsyncContent } from 'src/app/services/cytodatabase/asyncContent';
 
 export class BibliographyItem {
   id: string;
@@ -27,9 +28,7 @@ export class BibliographyItem {
     );
   }
 
-  static fromNode(
-    cyNode: cytoscape.CollectionReturnValue | cytoscape.SingularElementArgument
-  ) {
+  static fromNode(cyNode: cytoscape.NodeSingular) {
     const data = cyNode.data();
     const id = cyNode.id();
     return new BibliographyItem(
@@ -66,7 +65,8 @@ export class BibliographyItemLink extends BibliographyItem {
   constructor(
     bib: BibliographyItem,
     public description = '',
-    public linkid = ''
+    public linkid = '',
+    readonly asyncDescription: AsyncContent
   ) {
     super(
       bib.title,

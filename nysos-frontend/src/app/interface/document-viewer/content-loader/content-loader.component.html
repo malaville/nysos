@@ -1,0 +1,15 @@
+<div class="animated-background" [class.small]="small">
+  <div *ngIf="!small" class="background-masker header-top"></div>
+  <div class="background-masker header-right" [class.small]="small"></div>
+  <ng-container *ngIf="!small">
+    <div class="background-masker header-bottom"></div>
+    <div class="background-masker subheader-right"></div>
+    <div class="background-masker subheader-bottom"></div>
+    <div class="background-masker content-top"></div>
+    <div class="background-masker content-first-end"></div>
+    <div class="background-masker content-second-line"></div>
+    <div class="background-masker content-second-end"></div>
+    <div class="background-masker content-third-line"></div>
+    <div class="background-masker content-third-end"></div>
+  </ng-container>
+</div>

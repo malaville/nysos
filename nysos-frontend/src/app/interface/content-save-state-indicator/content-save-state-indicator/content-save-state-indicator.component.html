@@ -1,0 +1,27 @@
+<div class="loaders-container">
+  <img
+    [hidden]="!(contentSaveState | async).writing"
+    style="width: 25px; border-radius: 50%"
+    src="/assets/loader.svg"
+  />
+  <mat-icon
+    *ngIf="
+      !(contentSaveState | async).writing && (contentSaveState | async).error
+    "
+    class="red-icon"
+    >cancel</mat-icon
+  >
+  <mat-spinner
+    *ngIf="(contentSaveState | async).saving"
+    [diameter]="20"
+  ></mat-spinner>
+  <mat-icon class="green-icon" *ngIf="(contentSaveState | async).saved"
+    >check_circle</mat-icon
+  >
+  <ng-container *ngIf="showProgress">
+    <span class="show-progress" *ngIf="(contentSaveState | async).progress">
+      {{ (contentSaveState | async).progress.success }} /
+      {{ (contentSaveState | async).progress.total }}
+    </span>
+  </ng-container>
+</div>

@@ -1,0 +1,9 @@
+.loader-and-acronym-container {
+  display: flex;
+  align-items: center;
+}
+
+h3 {
+  display: inline-block;
+  margin: 0;
+}

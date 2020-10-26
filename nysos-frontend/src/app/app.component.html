@@ -34,6 +34,14 @@
   <button type="button" mat-button (click)="addThemeClicked()">
     Add Theme
   </button>
+  <button (click)="signInWithGoogle()">
+    Login {{ (auth | async) ? "🟢" : "🟥" }}
+  </button>
   <div id="cy"></div>
+  <div class="left-bottom-state">
+    <app-content-save-state-indicator
+      [showProgress]="true"
+    ></app-content-save-state-indicator>
+  </div>
 </mat-sidenav-container>
 <router-outlet></router-outlet>

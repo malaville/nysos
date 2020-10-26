@@ -19,6 +19,7 @@
     *ngIf="(documentStateObs | async).bibliography"
     mat-mini-fab
     color="primary"
+    target="_blank"
     [disabled]="!(documentStateObs | async).bibliography?.link"
     [href]="(documentStateObs | async).bibliography?.link"
   >
@@ -26,22 +27,52 @@
   </a>
 </div>
 
-<app-document-title
-  *ngIf="!(documentStateObs | async).bibliography"
-></app-document-title>
+<app-document-title *ngIf="!(documentStateObs | async).bibliography">
+  <app-content-save-state-indicator></app-content-save-state-indicator>
+</app-document-title>
 
 <app-bibliography-details
   [bibliography]="(documentStateObs | async).bibliography"
 >
+  <app-content-save-state-indicator></app-content-save-state-indicator>
 </app-bibliography-details>
-
-<div
-  #contentdiv
-  id="content-of-document"
-  contenteditable="true"
-  (input)="onDescriptionChange($event.target.innerHTML)"
-  [innerHTML]="(documentStateObs | async).content"
-></div>
+<ng-container *ngIf="this.asyncContentState">
+  <app-content-loader
+    *ngIf="(asyncContentState | async)?.resolving"
+  ></app-content-loader>
+  <div>
+    <button
+      mat-stroked-button
+      disabled
+      *ngIf="(asyncContentState | async)?.failed"
+    >
+      Local Content
+      <!-- <button (click)="resfreshButtonClicked()">
+        <mat-icon>refresh</mat-icon>
+      </button> -->
+    </button>
+  </div>
+  <div
+    *ngIf="(asyncContentState | async)?.resolved"
+    #contentdiv
+    id="content-of-document"
+    contenteditable="true"
+    (input)="onDescriptionChange($event.target.innerHTML)"
+    [innerHTML]="(asyncContentState | async)?.content"
+  ></div>
+  <div
+    *ngIf="(asyncContentState | async)?.failed"
+    #contentdiv
+    id="content-of-document"
+    contenteditable="true"
+    (input)="onDescriptionChange($event.target.innerHTML)"
+    [innerHTML]="(documentStateObs | async).content"
+  ></div>
+  <div
+    *ngIf="!(asyncContentState | async)?.resolved"
+    id="content-of-document"
+  ></div>
+</ng-container>
 <div>
   <span *ngFor="let bib of bibliography | async">
     <app-bibliography-link

@@ -1,5 +1,8 @@
 <ng-container *ngIf="bibliography">
-  <small>{{ bibliography.acronym }}</small>
+  <div class="loader-and-acronym-container">
+    <ng-content></ng-content>
+    <h3>{{ bibliography.acronym }}</h3>
+  </div>
 
   <h2>
     <small>{{ bibliography.author }} ({{ bibliography.year }})</small>

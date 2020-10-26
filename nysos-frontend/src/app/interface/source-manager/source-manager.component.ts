@@ -63,7 +63,6 @@ export class SourceManagerComponent implements OnChanges, OnInit {
       } else {
         this.cytostate.addBibliography(bib);
       }
-      console.log(bib.acronym);
     } else {
       this.myForm.controls.title.markAsTouched();
     }
@@ -76,6 +75,7 @@ export class SourceManagerComponent implements OnChanges, OnInit {
       acronym: LOREM[randint - 1].slice(0, 7).toUpperCase(),
       author: 'Lorem Author',
       link: 'https://google.com',
+      year: 2022,
     });
     this.myForm.markAsDirty();
   }

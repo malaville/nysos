@@ -6,10 +6,26 @@
   <mat-icon>article</mat-icon>
 </button>
 {{ bib.acronym }} - {{ bib.title }}<br />
+<app-content-loader
+  [small]="true"
+  *ngIf="(bib.asyncDescription.asyncContentState | async).resolving"
+>
+</app-content-loader>
 <div
   #doclinkdesc
+  *ngIf="(bib.asyncDescription.asyncContentState | async).resolved"
   class="document-link-description"
   contenteditable="plaintext-only"
   (keydown.enter)="onEnter()"
+  [innerHTML]="(bib.asyncDescription.asyncContentState | async).content"
+  (input)="onBiblioLinkDescriptionChange($event.target.innerHTML)"
+></div>
+<div
+  #doclinkdesc
+  *ngIf="(bib.asyncDescription.asyncContentState | async).failed"
+  class="document-link-description"
+  contenteditable="plaintext-only"
+  (keydown.enter)="onEnter()"
+  [innerHTML]="bib.description"
   (input)="onBiblioLinkDescriptionChange($event.target.innerHTML)"
 ></div>

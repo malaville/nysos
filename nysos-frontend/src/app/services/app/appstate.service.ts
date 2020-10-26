@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { BibliographyItem } from 'src/app/interface/source-manager/bibliography-item';
+import { AsyncContent } from '../cytodatabase/asyncContent';
 import { CytodatabaseService } from '../cytodatabase/cytodatabase.service';
 
 export interface DocumentDataStateInterface {
@@ -12,6 +13,7 @@ export interface DocumentDataStateInterface {
   edgeSourceId?: string;
   bibliography: BibliographyItem;
   title?: string;
+  asyncContent: AsyncContent;
 }
 
 export interface UIStateInterface {
@@ -31,6 +33,7 @@ export class AppstateService {
     content: LOREM_IPSUMS,
     bibliography: undefined,
     name: undefined,
+    asyncContent: undefined,
   };
   private documentStateBS = new BehaviorSubject(this.documentState);
   readonly documentStateObservable = this.documentStateBS.asObservable();
@@ -57,6 +60,7 @@ export class AppstateService {
     this.documentState.name = name;
     this.documentState.contentId = id;
     this.documentState.content = this.cytoDb.loadContentOf(id);
+    this.documentState.asyncContent = this.cytoDb.loadRemoteContentOf(id);
     const { source, target } = edgeInfos;
     this.documentState.edgeSourceId = source || undefined;
     this.documentState.edgeTargetId = target || undefined;
@@ -72,10 +76,6 @@ export class AppstateService {
 
   saveContent(content: string) {
     this.cytoDb.saveContentOf(this.documentState.contentId, content);
-  }
-
-  saveContentOf(id: string, content: string) {
-    this.cytoDb.saveContentOf(id, content);
   }
 
   openNewDocument(editDocument = false) {

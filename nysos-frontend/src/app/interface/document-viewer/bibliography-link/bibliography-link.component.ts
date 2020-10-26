@@ -14,15 +14,17 @@ import { BibliographyItemLink } from '../../source-manager/bibliography-item';
   templateUrl: './bibliography-link.component.html',
   styleUrls: ['./bibliography-link.component.css'],
 })
-export class BibliographyLinkComponent implements OnInit, AfterViewInit {
+export class BibliographyLinkComponent implements OnInit {
   @Input() bib: BibliographyItemLink;
   @Input() linkDescriptionChange: (id: string, desc: string) => void;
   @ViewChild('doclinkdesc') div: ElementRef;
+
+  // private contentBS =
   constructor(private cytostate: CytostateService) {}
 
-  ngAfterViewInit() {
-    this.div.nativeElement.innerHTML = this.bib.description;
-  }
+  // ngAfterViewInit() {
+  //   this.div.nativeElement.innerHTML = this.bib.description;
+  // }
 
   onDocumentClicked(documentId: string) {
     this.cytostate.selectContent(documentId);

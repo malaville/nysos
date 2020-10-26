@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Core, EdgeHandlesApi, Ext } from 'cytoscape';
+import { Core, EdgeHandlesApi, Ext, NodeSingular } from 'cytoscape';
 import { defaults } from './edgehandlesdefault';
 import cytoscape from 'cytoscape';
 import edgehandles from 'cytoscape-edgehandles';
@@ -12,6 +12,8 @@ import {
   BibliographyItem,
   BibliographyItemLink,
 } from 'src/app/interface/source-manager/bibliography-item';
+
+const NEW_NAME = 'New Theme';
 
 @Injectable({
   providedIn: 'root',
@@ -36,7 +38,10 @@ export class CytostateService {
     });
 
     this.cytocore.on('data', (e) => {
-      this.saveData();
+      this.saveData({
+        ...e.target.data(),
+        position: (e.target.isNode() && e.target.position()) || undefined,
+      });
     });
 
     this.cytocore.on('click touchend', 'node', (e) => {
@@ -63,10 +68,17 @@ export class CytostateService {
     this.cytocore.on(
       'mouseup',
       'node',
-      (edge) => !edge.target.data().name && this.selectContent(edge.target.id())
+      (edge) =>
+        edge.target.data().name == NEW_NAME &&
+        this.selectContent(edge.target.id())
     );
 
-    this.cyDb.loadFromLocalStorage(this.cytocore);
+    this.cyDb.loadFromRemote(this.cytocore).catch((err) => {
+      this.cyDb.loadFromLocalStorage(this.cytocore);
+      if (err.saveAll) {
+        this.cyDb.saveAllToRemote(this.cytocore);
+      }
+    });
   }
 
   edgeCreationMode() {
@@ -74,7 +86,8 @@ export class CytostateService {
     this.addedgemode ? this.edgehandles.enable() : this.edgehandles.disable();
   }
 
-  saveData() {
+  saveData(data?: any) {
+    data && this.cyDb.saveContentOf(data.id, data);
     this.cyDb.saveNodesAndEdges(this.cytocore.elements());
   }
 
@@ -86,38 +99,47 @@ export class CytostateService {
   addNode(params: { parent?: string; x?: number; y?: number } = {}) {
     this.cytocore.add({
       group: 'nodes',
-      data: { name: '', parent: params.parent },
-      position: { x: params.x || 50, y: params.y || 50 },
+      data: {
+        name: NEW_NAME,
+        parent: params.parent,
+        type: NODE_TYPES.THEME_NODE,
+      },
+      position: params.parent
+        ? { x: params.x + 10, y: params.y + 20 }
+        : { x: 50, y: 50 },
     });
   }
 
   changeNodeName(newName: string) {
     const id = this.appstate.documentState.contentId;
-    this.cytocore.getElementById(id).data({ name: newName });
-    this.appstate.contentSelected(
-      id,
-      newName,
-      this.cytocore.getElementById(id).data()
-    );
+    const valid =
+      this.cytocore.getElementById(id).data({ name: newName }).data().name ==
+      newName;
+    !valid &&
+      this.appstate.contentSelected(
+        id,
+        newName,
+        this.cytocore.getElementById(id).data()
+      );
   }
 
   addBibliography(biblioItem: BibliographyItem) {
     const { contentId } = this.appstate.documentState;
-    const documentId = this.cytocore
-      .add({
-        group: 'nodes',
-        classes: NODE_TYPES.DOCUMENT_NODE,
-        data: {
-          name: biblioItem.acronym,
-          type: NODE_TYPES.DOCUMENT_NODE,
-          title: biblioItem.title,
-          author: biblioItem.author,
-          year: biblioItem.year,
-          link: biblioItem.link,
-        },
-      })
-      .id();
-    this.addBibliographyLink(documentId, contentId);
+    const documentData = this.cytocore.add({
+      group: 'nodes',
+      classes: NODE_TYPES.DOCUMENT_NODE,
+      data: {
+        name: biblioItem.acronym,
+        type: NODE_TYPES.DOCUMENT_NODE,
+        title: biblioItem.title,
+        author: biblioItem.author,
+        year: biblioItem.year,
+        link: biblioItem.link,
+      },
+    });
+    this.saveData(documentData.data());
+    this.addBibliographyLink(documentData.id(), contentId);
+
     this.appstate.refreshDocummentState();
     this.appstate.closeNewDocument();
   }
@@ -132,7 +154,7 @@ export class CytostateService {
       edge_type = EDGE_TYPES.DOCUMENT_ON_THEME;
     }
 
-    this.cytocore.add({
+    const bibliographyObject = this.cytocore.add({
       group: 'edges',
       classes: edge_type,
       data: {
@@ -142,7 +164,8 @@ export class CytostateService {
         type: edge_type,
       },
     });
-    this.appstate.closeNewDocument();
+
+    this.saveData(bibliographyObject.data());
   }
 
   modifyBibliography(id: string, biblioItem: BibliographyItem) {
@@ -159,46 +182,24 @@ export class CytostateService {
 
   findBibliographyAbout(id: string) {
     if (this.cytocore) {
-      if (this.cytocore.getElementById(id).isNode()) {
-        const bibsLinked = this.cytocore
-          .getElementById(id)
-          .incomers()
-          .filter(
-            (ele) => ele.isNode() && ele.data().type == NODE_TYPES.DOCUMENT_NODE
-          )
-          .map((edge) => {
-            return BibliographyItem.fromNode(edge);
-          });
-        return bibsLinked.map((bib) => {
-          const linkBetweenBibAndObject = this.cytocore.elements(
-            `edge[target = "${id}"][source = "${bib.contentId}"]`
-          );
-
-          const idOfLinkBetweenBibAndObject = linkBetweenBibAndObject.id();
-          const description = this.cyDb.loadContentOf(
-            idOfLinkBetweenBibAndObject
-          );
+      // BibliographyOfElement(X : Theme or Theme_link)
+      // Take all Edges -> X, that are a DOCUMENT_LINK
+      // For all those edges, the description is contained by the edge itself
+      // And the father document is in the source of the edge.
+      return this.cytocore
+        .edges(`[target = "${id}"][type != "${EDGE_TYPES.IDEA_LINK}"]`)
+        .map((documentLinkTargetingX) => {
+          const sourceDocument = documentLinkTargetingX.source();
+          const linkId = documentLinkTargetingX.id();
           return new BibliographyItemLink(
-            bib,
-            description,
-            idOfLinkBetweenBibAndObject
+            BibliographyItem.fromNode(sourceDocument),
+            this.cyDb.loadContentOf(linkId),
+            linkId,
+            this.cyDb.loadRemoteContentOf(linkId)
           );
         });
-      } else {
-        const bibs = this.cytocore
-          .elements(`edge[target = "${id}"]`)
-          .sources()
-          .map(
-            (ele) =>
-              new BibliographyItemLink(
-                BibliographyItem.fromNode(ele),
-                this.cyDb.loadContentOf(ele.id()),
-                ele.id()
-              )
-          );
-
-        return bibs;
-      }
+    } else {
+      return [];
     }
   }
 

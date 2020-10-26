@@ -9,6 +9,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 // Components
 import { AppRoutingModule } from './app-routing.module';
@@ -20,6 +22,30 @@ import { DocumentTitleComponent } from './interface/document-viewer/document-tit
 import { BibliographyLinkComponent } from './interface/document-viewer/bibliography-link/bibliography-link.component';
 import { UrlValidatorDirective } from './interface/source-manager/url-validator.directive';
 
+// Login
+import {
+  SocialAuthService,
+  GoogleLoginProvider,
+  SocialLoginModule,
+} from 'angularx-social-login';
+import { ContentSaveStateIndicatorComponent } from './interface/content-save-state-indicator/content-save-state-indicator/content-save-state-indicator.component';
+import { ContentLoaderComponent } from './interface/document-viewer/content-loader/content-loader.component';
+const config = new SocialAuthService({
+  autoLogin: true,
+  providers: [
+    {
+      id: GoogleLoginProvider.PROVIDER_ID,
+      provider: new GoogleLoginProvider(
+        '474297745605-buejhpmh7r2hpl9mf40l8o519ropn9no.apps.googleusercontent.com'
+      ),
+    },
+  ],
+});
+
+export function provideConfig() {
+  return config;
+}
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -29,6 +55,8 @@ import { UrlValidatorDirective } from './interface/source-manager/url-validator.
     DocumentTitleComponent,
     BibliographyLinkComponent,
     UrlValidatorDirective,
+    ContentSaveStateIndicatorComponent,
+    ContentLoaderComponent,
   ],
   imports: [
     BrowserModule,
@@ -41,8 +69,16 @@ import { UrlValidatorDirective } from './interface/source-manager/url-validator.
     ReactiveFormsModule,
     MatIconModule,
     MatInputModule,
+    SocialLoginModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
   ],
-  providers: [],
+  providers: [
+    {
+      provide: SocialAuthService,
+      useFactory: provideConfig,
+    },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
