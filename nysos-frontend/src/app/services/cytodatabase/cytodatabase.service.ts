@@ -261,7 +261,7 @@ export class CytodatabaseService {
     if (cytosave) {
       cytocore.elements().remove();
       cytocore.add(cytosave);
-
+      cytocore.fit(undefined, 200);
       return true;
     }
     return false;
