@@ -1,9 +1,11 @@
 #cy {
   display: block;
-  height: 70%;
-  width: 70%;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.1);
-  margin: 5% auto;
   z-index: -1;
 }
 mat-sidenav-container {
