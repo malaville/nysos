@@ -228,7 +228,9 @@ export class CytostateService {
       // For all those edges, the description is contained by the edge itself
       // And the father document is in the source of the edge.
       return this.cytocore
-        .edges(`[target = "${id}"][type != "${EDGE_TYPES.IDEA_LINK}"]`)
+        .edges(
+          `[target = "${id}"][type = "${EDGE_TYPES.DOCUMENT_ON_RELATION}"], [target = "${id}"][type = "${EDGE_TYPES.DOCUMENT_ON_THEME}"]`
+        )
         .map((documentLinkTargetingX) => {
           const sourceDocument = documentLinkTargetingX.source();
           const linkId = documentLinkTargetingX.id();
