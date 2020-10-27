@@ -42,7 +42,7 @@ export class AsyncContent {
   }
 
   attemptFetching(authToken: string): AsyncContent {
-    if (this.loadFromStore()) {
+    if (this.loadFromStore() !== undefined) {
       this.updateState({ resolved: true, content: this.loadFromStore() });
       return this;
     }
@@ -55,6 +55,7 @@ export class AsyncContent {
         AsyncContent.contentStore[this.contentId] = content;
         localStorage.setItem(`${this.contentId}:content`, content);
       } catch (err) {
+        console.log('Failed asyncontent');
         this.updateState({ resolving: false, failed: true });
       }
     })();
