@@ -49,6 +49,7 @@ export class CytostateService {
     this.cytocore.on('click touchend', 'node', (e) => {
       const id = e.target.id();
       this.selectContent(id);
+      this.deleteNode(id);
     });
 
     this.cytocore.on('click touchend', 'edge', (e) => {
@@ -275,5 +276,22 @@ export class CytostateService {
     const { x, y } = this.cytocore.getElementById(currentId).position();
     this.addNode({ parent: currentId, x, y });
     this.appstate.sidenavref.close();
+  }
+
+  deleteNode(nodeId: string) {
+    const node = this.cytocore.getElementById(nodeId);
+    const isNode = node.isNode();
+    const neighbourEdges = node.neighborhood().filter((ele) => ele.isEdge());
+    const idNeighbourEdges = neighbourEdges.map((ele) => ele.id());
+    const linksOnEdges = this.cytocore
+      .edges()
+      .filter((edge) => idNeighbourEdges.includes(edge.target().id()));
+    console.log(
+      'Neighbour : ',
+      idNeighbourEdges.length,
+      ' Links on edges : ',
+      linksOnEdges.length
+    );
+    const elementsToDelete = neighbourEdges.union(linksOnEdges);
   }
 }
