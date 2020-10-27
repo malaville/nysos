@@ -1,6 +1,6 @@
 import { Injectable, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { SocialAuthService } from 'angularx-social-login';
+import { GoogleLoginProvider, SocialAuthService } from 'angularx-social-login';
 import { CollectionReturnValue, Core } from 'cytoscape';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -198,6 +198,15 @@ export class CytodatabaseService {
     let attempts = 0;
     let MAX_ATTEMPTS = 10;
     let data = undefined;
+
+    if (!this.authToken) {
+      try {
+        await this.authService.signIn(GoogleLoginProvider.PROVIDER_ID);
+      } catch (err) {
+        throw { name: 'NoAuthentication' };
+      }
+    }
+
     const snackMessage = this.contentSaveState.error
       ? "There was an error, we're still going to try getting data from remote ..."
       : 'Loading from remote ...';
@@ -216,14 +225,7 @@ export class CytodatabaseService {
         attempts += 1;
       }
     }
-    if (!this.authToken) {
-      this._snackBar.open(
-        "Authentication failed... you're working offline 🔘",
-        'GOT IT',
-        { duration: 5000 }
-      );
-      throw { name: 'NoAuthentication' };
-    }
+
     //////////////////
     //  After the loop :
     // - data not defined => throw
