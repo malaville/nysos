@@ -254,7 +254,7 @@ export class CytodatabaseService {
           duration: 2000,
         }
       );
-      this.updateContentSaveState({ offline: true });
+      this.updateContentSaveState({ offline: true, saved: false });
       throw { name: `MaxAttemptsReached${MAX_ATTEMPTS}` };
     }
   }

@@ -11,6 +11,6 @@
   </button>
   <ng-container *ngIf="auth | async">
     <!-- <span>{{ (auth | async).firstName }}</span> -->
-    <img class="google-photo" [src]="(auth | async).photoUrl"
-  /></ng-container>
+    <img class="google-photo" [src]="(auth | async).photoUrl" />
+  </ng-container>
 </ng-container>

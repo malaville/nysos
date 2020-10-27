@@ -31,6 +31,8 @@ import {
 import { ContentSaveStateIndicatorComponent } from './interface/content-save-state-indicator/content-save-state-indicator/content-save-state-indicator.component';
 import { ContentLoaderComponent } from './interface/document-viewer/content-loader/content-loader.component';
 import { GoogleAuthenticationComponent } from './interface/google-authentication/google-authentication.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 const config = new SocialAuthService({
   autoLogin: true,
   providers: [
@@ -74,6 +76,7 @@ export function provideConfig() {
     SocialLoginModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
   ],
   providers: [
     {

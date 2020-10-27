@@ -1,6 +1,6 @@
-// const url =
-//   'https://europe-west1-nysos-289715.cloudfunctions.net/nysos-backend';
-const url = 'http://localhost:3000';
+const url =
+  'https://europe-west1-nysos-289715.cloudfunctions.net/nysos-backend';
+// const url = 'http://localhost:3000';
 export const fetchAllData = (authToken: string) =>
   fetch(`${url}/data?token=${authToken}`, {
     method: 'GET',
