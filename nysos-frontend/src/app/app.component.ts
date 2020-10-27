@@ -6,14 +6,8 @@ import {
   ViewChild,
 } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
-import {
-  GoogleLoginProvider,
-  SocialAuthService,
-  SocialUser,
-} from 'angularx-social-login';
-import cytoscape from 'cytoscape';
 import { Observable, scheduled } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import {
   AppstateService,
   DocumentDataStateInterface,
@@ -31,10 +25,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   title = 'nysos-frontend';
   documentStateObs: Observable<DocumentDataStateInterface>;
   large: Observable<boolean> = scheduled([false], null);
-  auth: Observable<SocialUser>;
-  token: string;
+
   contentChangesObs: Observable<ContentChangesInterface>;
-  authServiceInitialized: Observable<boolean>;
 
   @ViewChild(MatSidenav)
   set sidenav(s: MatSidenav) {
@@ -46,19 +38,15 @@ export class AppComponent implements OnInit, AfterViewInit {
   constructor(
     private cytostate: CytostateService,
     private appstate: AppstateService,
-    private authService: SocialAuthService,
     private cytoDb: CytodatabaseService
   ) {}
 
   ngOnInit() {
     this.documentStateObs = this.appstate.documentStateObservable;
     this.contentChangesObs = this.cytoDb.contentChangesObs;
-    this.authServiceInitialized = this.authService.initState;
     this.large = this.appstate.UIstateObservable.pipe(
       map((uistate) => uistate.addingDocument || uistate.editDocument)
     );
-
-    this.auth = this.authService.authState;
   }
 
   ngAfterViewInit() {
@@ -79,27 +67,12 @@ export class AppComponent implements OnInit, AfterViewInit {
   deleteAllMyLocalClicked() {
     confirm('Are you sure ?') && this.cytoDb.deleteAllMyLocalData();
   }
-  saveClicked() {
-    this.cytostate.saveData();
-  }
-
-  resetClicked() {
-    this.cytostate.loadFromLocalStorage();
-  }
 
   addThemeClicked() {
     this.cytostate.addNode();
   }
 
-  openSideNav() {
-    this.appstate.sidenavref.open();
-  }
-
-  newDocumentClicked() {
-    this.appstate.openNewDocument(!!this.appstate.documentState.bibliography);
-  }
-
-  signInWithGoogle() {
-    this.authService.signIn(GoogleLoginProvider.PROVIDER_ID);
+  fitToScreenClicked() {
+    this.cytostate.cytocore.fit(undefined, 100);
   }
 }
