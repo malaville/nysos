@@ -53,3 +53,13 @@ export const deleteAllMyData = (authToken: string) =>
     if (res.status == 401) throw { name: 'NotLoggedIn' };
     if (res.status == 400) throw { name: 'Failed' };
   });
+
+export const apiIsReachable = (): Promise<boolean> => {
+  return new Promise((resolve) => {
+    const timeout = setTimeout(() => resolve(false), 3000);
+    fetch(`${url}/`, { mode: 'no-cors' }).then((res) => {
+      resolve(res.status === 0);
+      clearTimeout(timeout);
+    });
+  });
+};
