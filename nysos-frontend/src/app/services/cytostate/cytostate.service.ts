@@ -84,7 +84,7 @@ export class CytostateService {
       () => this.cyDb.loadFromLocalStorage(this.cytocore),
       1000
     );
-    this.authState.authState.subscribe((socialUser) => {
+    this.authState.authState.pipe(take(1)).subscribe((socialUser) => {
       clearTimeout(timeoutId);
       this.startUpProcessWhenAuthenticated(this.cytocore, socialUser);
     });
