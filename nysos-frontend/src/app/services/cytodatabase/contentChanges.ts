@@ -81,4 +81,11 @@ export class ContentChanges implements ContentChangesInterface {
   getNumberOfUpdates() {
     return this.contentsToUpdate.size + this.objectDataToUpdate.size;
   }
+
+  static getNumberOfUpdates(contentChanges: ContentChangesInterface) {
+    return (
+      contentChanges.contentsToUpdate.size +
+      contentChanges.objectDataToUpdate.size
+    );
+  }
 }
