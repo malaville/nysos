@@ -234,7 +234,6 @@ export class CytostateService {
         .map((documentLinkTargetingX) => {
           const sourceDocument = documentLinkTargetingX.source();
           const linkId = documentLinkTargetingX.id();
-          console.log(documentLinkTargetingX.data());
           return new BibliographyItemLink(
             BibliographyItem.fromNode(sourceDocument),
             this.cyDb.loadContentOf(linkId),

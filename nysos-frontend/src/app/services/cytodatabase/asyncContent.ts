@@ -55,7 +55,6 @@ export class AsyncContent {
         AsyncContent.contentStore[this.contentId] = content;
         localStorage.setItem(`${this.contentId}:content`, content);
       } catch (err) {
-        console.log('Failed asyncontent');
         this.updateState({ resolving: false, failed: true });
       }
     })();
