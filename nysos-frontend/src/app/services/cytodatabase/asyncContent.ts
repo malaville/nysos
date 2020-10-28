@@ -42,7 +42,7 @@ export class AsyncContent {
   }
 
   attemptFetching(authToken: string): AsyncContent {
-    if (this.loadFromStore()) {
+    if (this.loadFromStore() !== undefined) {
       this.updateState({ resolved: true, content: this.loadFromStore() });
       return this;
     }

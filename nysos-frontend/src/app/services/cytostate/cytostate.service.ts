@@ -12,7 +12,10 @@ import {
   BibliographyItem,
   BibliographyItemLink,
 } from 'src/app/interface/source-manager/bibliography-item';
-import { SocialAuthService } from 'angularx-social-login';
+import { GoogleLoginProvider, SocialAuthService } from 'angularx-social-login';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { take } from 'rxjs/operators';
+import { apiIsReachable } from '../cytodatabase/fetchNysosBackend';
 
 const NEW_NAME = '';
 
@@ -28,7 +31,8 @@ export class CytostateService {
   constructor(
     private cyDb: CytodatabaseService,
     private appstate: AppstateService,
-    private authState: SocialAuthService
+    private authState: SocialAuthService,
+    private _snackBar: MatSnackBar
   ) {}
 
   setCytocoreId(id: string) {
@@ -85,14 +89,44 @@ export class CytostateService {
       () => this.cyDb.loadFromLocalStorage(this.cytocore),
       1000
     );
-    this.authState.authState.subscribe((socialUser) => {
+    this.authState.authState.pipe(take(1)).subscribe((socialUser) => {
       clearTimeout(timeoutId);
       this.startUpProcessWhenAuthenticated(this.cytocore, socialUser);
     });
   }
 
-  restartStartUp() {
-    this.startUpProcessWhenAuthenticated(this.cytocore, true);
+  async isAuthStateResolved(): Promise<boolean> {
+    return new Promise((resolve) => {
+      const timeout = setTimeout(() => resolve(false), 10);
+      this.authState.authState.toPromise().then(() => {
+        clearTimeout(timeout);
+        resolve(true);
+      });
+    });
+  }
+
+  async restartStartUp() {
+    let resolved = await this.isAuthStateResolved();
+    if (!resolved) {
+      const online = await apiIsReachable();
+      if (online) {
+        try {
+          resolved = await !!this.authState.signIn(
+            GoogleLoginProvider.PROVIDER_ID
+          );
+        } catch (err) {
+          this._snackBar.open('Login failed ...', 'Ok', { duration: 1000 });
+          return;
+        }
+      } else {
+        this._snackBar.open("You're not online, retry later ...", 'Ok', {
+          duration: 1000,
+        });
+      }
+    }
+
+    resolved && this.startUpProcessWhenAuthenticated(this.cytocore, true);
+    return;
   }
 
   async startUpProcessWhenAuthenticated(cytocore: Core, socialUser) {
@@ -229,11 +263,12 @@ export class CytostateService {
       // For all those edges, the description is contained by the edge itself
       // And the father document is in the source of the edge.
       return this.cytocore
-        .edges(`[target = "${id}"][type != "${EDGE_TYPES.IDEA_LINK}"]`)
+        .edges(
+          `[target = "${id}"][type = "${EDGE_TYPES.DOCUMENT_ON_RELATION}"], [target = "${id}"][type = "${EDGE_TYPES.DOCUMENT_ON_THEME}"]`
+        )
         .map((documentLinkTargetingX) => {
           const sourceDocument = documentLinkTargetingX.source();
           const linkId = documentLinkTargetingX.id();
-          console.log(documentLinkTargetingX.data());
           return new BibliographyItemLink(
             BibliographyItem.fromNode(sourceDocument),
             this.cyDb.loadContentOf(linkId),

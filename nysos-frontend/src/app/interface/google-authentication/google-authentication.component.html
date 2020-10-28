@@ -1,0 +1,16 @@
+<ng-container *ngIf="authServiceInitialized | async">
+  <button
+    mat-stroked-button
+    *ngIf="!(auth | async)"
+    (click)="signInWithGoogle()"
+  >
+    <div class="login-spinner-wrapper">
+      Login
+      <mat-spinner *ngIf="loginIn" [diameter]="20"></mat-spinner>
+    </div>
+  </button>
+  <ng-container *ngIf="auth | async">
+    <!-- <span>{{ (auth | async).firstName }}</span> -->
+    <img class="google-photo" [src]="(auth | async).photoUrl" />
+  </ng-container>
+</ng-container>

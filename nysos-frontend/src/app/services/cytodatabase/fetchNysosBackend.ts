@@ -1,6 +1,6 @@
-// const url =
-//   'https://europe-west1-nysos-289715.cloudfunctions.net/nysos-backend';
-const url = 'http://localhost:3000';
+const url =
+  'https://europe-west1-nysos-289715.cloudfunctions.net/nysos-backend';
+// const url = 'http://localhost:3000';
 export const fetchAllData = (authToken: string) =>
   fetch(`${url}/data?token=${authToken}`, {
     method: 'GET',
@@ -53,3 +53,13 @@ export const deleteAllMyData = (authToken: string) =>
     if (res.status == 401) throw { name: 'NotLoggedIn' };
     if (res.status == 400) throw { name: 'Failed' };
   });
+
+export const apiIsReachable = (): Promise<boolean> => {
+  return new Promise((resolve) => {
+    const timeout = setTimeout(() => resolve(false), 3000);
+    fetch(`${url}/`, { mode: 'no-cors' }).then((res) => {
+      resolve(res.status === 0);
+      clearTimeout(timeout);
+    });
+  });
+};

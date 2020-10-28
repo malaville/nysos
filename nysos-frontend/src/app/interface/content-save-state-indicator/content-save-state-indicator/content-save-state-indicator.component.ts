@@ -13,6 +13,7 @@ import { CytostateService } from 'src/app/services/cytostate/cytostate.service';
 })
 export class ContentSaveStateIndicatorComponent implements OnInit {
   public contentSaveState: Observable<ContentSaveStateInterface>;
+  public retrying = false;
 
   @Input() showProgress: boolean = false;
 
@@ -26,6 +27,7 @@ export class ContentSaveStateIndicatorComponent implements OnInit {
   }
 
   retryClicked() {
-    this.cytoState.restartStartUp();
+    this.retrying = true;
+    this.cytoState.restartStartUp().then(() => (this.retrying = false));
   }
 }

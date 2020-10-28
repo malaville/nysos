@@ -22,37 +22,82 @@
       ></app-source-manager>
     </div>
   </mat-sidenav>
-
-  <button mat-raised-button color="primary" (click)="activateEdgeCreation()">
-    Create Edges {{ edgeCreationMode() ? "🟢" : "" }}
-  </button>
-  <button type="button" mat-button (click)="openSideNav()">
-    Toggle sidenav
-  </button>
-  <button
-    type="button"
-    mat-button
-    color="warn"
-    (click)="deleteAllMyRemoteDataClicked()"
-  >
-    Clear Remote Data
-  </button>
-  <button
-    type="button"
-    mat-button
-    color="accent"
-    (click)="deleteAllMyLocalClicked()"
-  >
-    Clear Local Data
-  </button>
-  <button type="button" mat-button (click)="saveClicked()">Save</button>
-  <button type="button" mat-button (click)="resetClicked()">Reset</button>
-  <button type="button" mat-button (click)="addThemeClicked()">
-    Add Theme
-  </button>
-  <button *ngIf="authServiceInitialized | async" (click)="signInWithGoogle()">
-    Login {{ (auth | async) ? "🟢" : "🟥" }}
-  </button>
+  <div class="button-container">
+    <div>
+      <button mat-mini-fab color="primary" (click)="activateEdgeCreation()">
+        <div class="show-label-on-hover">
+          <mat-icon>timeline</mat-icon>
+          <span>Create an edge</span>
+        </div>
+      </button>
+    </div>
+    <div>
+      <button
+        type="button"
+        mat-mini-fab
+        color="warn"
+        (click)="deleteAllMyRemoteDataClicked()"
+      >
+        <div class="show-label-on-hover">
+          <mat-icon>not_interested</mat-icon>
+          <span>Clear Remote Data</span>
+        </div>
+      </button>
+    </div>
+    <div>
+      <button
+        type="button"
+        mat-mini-fab
+        color="accent"
+        (click)="deleteAllMyLocalClicked()"
+      >
+        <div class="show-label-on-hover">
+          <mat-icon>no_sim</mat-icon>
+          <span>Clear Local Data</span>
+        </div>
+      </button>
+    </div>
+    <div>
+      <button
+        type="button"
+        mat-mini-fab
+        color="primary"
+        (click)="addThemeClicked()"
+      >
+        <div class="show-label-on-hover">
+          <mat-icon>add_circle_outline</mat-icon>
+          <span>Add a theme node</span>
+        </div>
+      </button>
+    </div>
+    <div>
+      <button
+        type="button"
+        mat-mini-fab
+        color="primary"
+        (click)="fitToScreenClicked()"
+      >
+        <div class="show-label-on-hover">
+          <mat-icon>fullscreen</mat-icon>
+          <span>Fit to screen</span>
+        </div>
+      </button>
+    </div>
+    <div>
+      <button
+        type="button"
+        mat-mini-fab
+        color="primary"
+        (click)="goOfflineClicked()"
+      >
+        <div class="show-label-on-hover">
+          <mat-icon>cloud_off</mat-icon>
+          <span>Go offline</span>
+        </div>
+      </button>
+    </div>
+  </div>
+  <app-google-authentication></app-google-authentication>
   <div #cy id="cy"></div>
   <div class="left-bottom-state">
     <app-content-save-state-indicator

@@ -119,6 +119,12 @@ app.delete("/", async function (req: Request, res: Response) {
   }
 });
 
+app.get("/", async function (req: Request, res: Response) {
+  console.log(`${new Date().toISOString()} get on /`);
+  res.statusCode = 200;
+  res.send("Hi 😀");
+});
+
 app.listen(3000);
 
 exports.function = app;

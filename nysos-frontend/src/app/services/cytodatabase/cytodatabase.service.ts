@@ -1,6 +1,6 @@
 import { Injectable, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { SocialAuthService } from 'angularx-social-login';
+import { GoogleLoginProvider, SocialAuthService } from 'angularx-social-login';
 import { CollectionReturnValue, Core } from 'cytoscape';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -87,6 +87,10 @@ export class CytodatabaseService {
   }
   changesAreWaiting() {
     return this.contentChanges.getNumberOfUpdates() > 0;
+  }
+
+  goOffline() {
+    this.updateContentSaveState({ offline: true, saved: false });
   }
 
   async handleAfterContentChanges(
@@ -198,6 +202,15 @@ export class CytodatabaseService {
     let attempts = 0;
     let MAX_ATTEMPTS = 10;
     let data = undefined;
+
+    if (!this.authToken) {
+      try {
+        await this.authService.signIn(GoogleLoginProvider.PROVIDER_ID);
+      } catch (err) {
+        throw { name: 'NoAuthentication' };
+      }
+    }
+
     const snackMessage = this.contentSaveState.error
       ? "There was an error, we're still going to try getting data from remote ..."
       : 'Loading from remote ...';
@@ -216,14 +229,7 @@ export class CytodatabaseService {
         attempts += 1;
       }
     }
-    if (!this.authToken) {
-      this._snackBar.open(
-        "Authentication failed... you're working offline 🔘",
-        'GOT IT',
-        { duration: 5000 }
-      );
-      throw { name: 'NoAuthentication' };
-    }
+
     //////////////////
     //  After the loop :
     // - data not defined => throw
@@ -243,6 +249,7 @@ export class CytodatabaseService {
       }
       this.loadCytocoreWithSave(cytocore, data);
       cytocore.fit(undefined, 100);
+      this.updateContentSaveState({ saved: true });
       return true;
     } else {
       this._snackBar.open(
@@ -252,7 +259,7 @@ export class CytodatabaseService {
           duration: 2000,
         }
       );
-      this.updateContentSaveState({ offline: true });
+      this.updateContentSaveState({ offline: true, saved: false });
       throw { name: `MaxAttemptsReached${MAX_ATTEMPTS}` };
     }
   }
@@ -298,11 +305,15 @@ export class CytodatabaseService {
   saveAllContentsAndDataToDatabase(
     contentChanges: ContentChangesInterface
   ): Promise<boolean[]> {
+    const total = ContentChanges.getNumberOfUpdates(contentChanges);
+    if (total == 0) {
+      return Promise.resolve([]);
+    }
     this.updateContentSaveState({
       progress: {
         success: 0,
         failed: 0,
-        total: this.contentChanges.getNumberOfUpdates(),
+        total,
       },
     });
     return Promise.all([
@@ -318,7 +329,13 @@ export class CytodatabaseService {
           contentChanges.contents[contentId]
         )
       ),
-    ]);
+    ]).then((res) => {
+      setTimeout(
+        () => this.updateContentSaveState({ progress: undefined }),
+        5000
+      );
+      return res;
+    });
   }
 
   saveOneObjectDataToDatabase(objectId: string, data: any): Promise<boolean> {

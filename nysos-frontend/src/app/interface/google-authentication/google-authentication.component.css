@@ -1,0 +1,18 @@
+.google-photo {
+  height: 40px;
+  border-radius: 50%;
+}
+:host {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  padding: 20px;
+}
+
+.login-spinner-wrapper {
+  display: flex;
+  align-items: center;
+}
+mat-spinner {
+  left: 5px;
+}
