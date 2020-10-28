@@ -75,4 +75,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   fitToScreenClicked() {
     this.cytostate.cytocore.fit(undefined, 100);
   }
+
+  goOfflineClicked() {
+    this.cytoDb.goOffline();
+  }
 }

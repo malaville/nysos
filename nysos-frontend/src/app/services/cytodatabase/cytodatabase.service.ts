@@ -89,6 +89,10 @@ export class CytodatabaseService {
     return this.contentChanges.getNumberOfUpdates() > 0;
   }
 
+  goOffline() {
+    this.updateContentSaveState({ offline: true, saved: false });
+  }
+
   async handleAfterContentChanges(
     state: ContentSaveStateInterface,
     contentChanges: ContentChangesInterface
@@ -245,6 +249,7 @@ export class CytodatabaseService {
       }
       this.loadCytocoreWithSave(cytocore, data);
       cytocore.fit(undefined, 100);
+      this.updateContentSaveState({ saved: true });
       return true;
     } else {
       this._snackBar.open(
@@ -300,11 +305,15 @@ export class CytodatabaseService {
   saveAllContentsAndDataToDatabase(
     contentChanges: ContentChangesInterface
   ): Promise<boolean[]> {
+    const total = ContentChanges.getNumberOfUpdates(contentChanges);
+    if (total == 0) {
+      return Promise.resolve([]);
+    }
     this.updateContentSaveState({
       progress: {
         success: 0,
         failed: 0,
-        total: this.contentChanges.getNumberOfUpdates(),
+        total,
       },
     });
     return Promise.all([
@@ -320,7 +329,13 @@ export class CytodatabaseService {
           contentChanges.contents[contentId]
         )
       ),
-    ]);
+    ]).then((res) => {
+      setTimeout(
+        () => this.updateContentSaveState({ progress: undefined }),
+        5000
+      );
+      return res;
+    });
   }
 
   saveOneObjectDataToDatabase(objectId: string, data: any): Promise<boolean> {

@@ -83,6 +83,19 @@
         </div>
       </button>
     </div>
+    <div>
+      <button
+        type="button"
+        mat-mini-fab
+        color="primary"
+        (click)="goOfflineClicked()"
+      >
+        <div class="show-label-on-hover">
+          <mat-icon>cloud_off</mat-icon>
+          <span>Go offline</span>
+        </div>
+      </button>
+    </div>
   </div>
   <app-google-authentication></app-google-authentication>
   <div #cy id="cy"></div>
