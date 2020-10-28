@@ -12,7 +12,10 @@ import {
   BibliographyItem,
   BibliographyItemLink,
 } from 'src/app/interface/source-manager/bibliography-item';
-import { SocialAuthService } from 'angularx-social-login';
+import { GoogleLoginProvider, SocialAuthService } from 'angularx-social-login';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { take } from 'rxjs/operators';
+import { apiIsReachable } from '../cytodatabase/fetchNysosBackend';
 
 const NEW_NAME = '';
 
@@ -28,7 +31,8 @@ export class CytostateService {
   constructor(
     private cyDb: CytodatabaseService,
     private appstate: AppstateService,
-    private authState: SocialAuthService
+    private authState: SocialAuthService,
+    private _snackBar: MatSnackBar
   ) {}
 
   setCytocoreId(id: string) {
@@ -90,6 +94,37 @@ export class CytostateService {
     });
   }
 
+  async isAuthStateResolved(): Promise<boolean> {
+    return new Promise((resolve) => {
+      const timeout = setTimeout(() => resolve(false), 10);
+      this.authState.authState.toPromise().then(() => {
+        clearTimeout(timeout);
+        resolve(true);
+      });
+    });
+  }
+
+  async restartStartUp() {
+    let resolved = await this.isAuthStateResolved();
+    if (!resolved) {
+      const online = await apiIsReachable();
+      if (online) {
+        try {
+          resolved = await !!this.authState.signIn(
+            GoogleLoginProvider.PROVIDER_ID
+          );
+        } catch (err) {
+          this._snackBar.open('Login failed ...', 'Ok', { duration: 1000 });
+          return;
+        }
+      } else {
+        this._snackBar.open("You're not online, retry later ...", 'Ok', {
+          duration: 1000,
+        });
+      }
+    }
+
+    resolved && this.startUpProcessWhenAuthenticated(this.cytocore, true);
     return;
   }
 
