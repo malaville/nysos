@@ -6,11 +6,12 @@
     width="25px;"
   />
   <ng-container *ngIf="!(contentSaveState | async).writing">
+    <mat-spinner *ngIf="retrying" [diameter]="20"></mat-spinner>
     <mat-spinner
       *ngIf="(contentSaveState | async).saving"
       [diameter]="20"
     ></mat-spinner>
-    <ng-container *ngIf="!(contentSaveState | async).saving">
+    <ng-container *ngIf="!(contentSaveState | async).saving && !retrying">
       <mat-icon *ngIf="(contentSaveState | async).error" class="red-icon"
         >cancel</mat-icon
       >
@@ -18,6 +19,7 @@
         >check_circle</mat-icon
       >
       <mat-icon
+        style="cursor: pointer"
         (click)="retryClicked()"
         *ngIf="(contentSaveState | async).offline"
         >cloud_off</mat-icon

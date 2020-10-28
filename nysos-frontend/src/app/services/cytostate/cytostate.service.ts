@@ -90,8 +90,7 @@ export class CytostateService {
     });
   }
 
-  restartStartUp() {
-    this.startUpProcessWhenAuthenticated(this.cytocore, true);
+    return;
   }
 
   async startUpProcessWhenAuthenticated(cytocore: Core, socialUser) {
