@@ -1,5 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Core, EdgeHandlesApi, Ext, NodeSingular } from 'cytoscape';
+import {
+  CollectionReturnValue,
+  Core,
+  EdgeHandlesApi,
+  Ext,
+  NodeSingular,
+} from 'cytoscape';
 import { defaults } from './edgehandlesdefault';
 import cytoscape from 'cytoscape';
 import edgehandles from 'cytoscape-edgehandles';
@@ -53,7 +59,6 @@ export class CytostateService {
     this.cytocore.on('click touchend', 'node', (e) => {
       const id = e.target.id();
       this.selectContent(id);
-      this.deleteNode(id);
     });
 
     this.cytocore.on('click touchend', 'edge', (e) => {
@@ -313,20 +318,12 @@ export class CytostateService {
     this.appstate.sidenavref.close();
   }
 
-  deleteNode(nodeId: string) {
-    const node = this.cytocore.getElementById(nodeId);
-    const isNode = node.isNode();
-    const neighbourEdges = node.neighborhood().filter((ele) => ele.isEdge());
-    const idNeighbourEdges = neighbourEdges.map((ele) => ele.id());
-    const linksOnEdges = this.cytocore
+  edgesRelyingOn(elementId: string) {
+    return this.cytocore
       .edges()
-      .filter((edge) => idNeighbourEdges.includes(edge.target().id()));
-    console.log(
-      'Neighbour : ',
-      idNeighbourEdges.length,
-      ' Links on edges : ',
-      linksOnEdges.length
-    );
-    const elementsToDelete = neighbourEdges.union(linksOnEdges);
+      .filter(
+        (edge) =>
+          edge.target().id() == elementId || edge.source().id() == elementId
+      );
   }
 }
