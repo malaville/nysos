@@ -1,9 +1,16 @@
 <button
   mat-icon-button
   aria-label="Article button"
-  (click)="onDocumentClicked(bib.contentId)"
+  (click)="onDocumentClicked()"
 >
   <mat-icon>article</mat-icon>
+</button>
+<button
+  mat-icon-button
+  aria-label="Delete Link Button"
+  (click)="onDeleteDocumentLinkClicked()"
+>
+  <mat-icon>delete</mat-icon>
 </button>
 {{ bib.acronym }} - {{ bib.title }}<br />
 <app-content-loader

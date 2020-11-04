@@ -341,14 +341,44 @@ export class CytostateService {
       });
   }
 
-  deleteFocusedElement() {
-    const elementId = this.appstate.documentState.contentId;
+  private deleteElement(elementId: string) {
+    this.eraseAllParentingRelationsWithAncestor(elementId);
+    this.cytocore.remove(this.cytocore.getElementById(elementId));
+    this.saveDeletionLocallyAndRemote(elementId);
+  }
+
+  private hasADocumentAsASourceThatWillBecomeOrphan(
+    elementId: string
+  ): string | null {
+    const element = this.cytocore.getElementById(elementId);
+    if (
+      !element.isEdge() ||
+      element.source().data().type !== NODE_TYPES.DOCUMENT_NODE ||
+      element.source().degree(false) > 1
+    )
+      return null;
+    else return element.source().id();
+  }
+
+  handleDeleteElement(elementId: string) {
     const elementsRelying = this.getEdgesRelyingOn(elementId).length;
     if (elementsRelying === 0) {
-      this.eraseAllParentingRelationsWithAncestor(elementId);
-      this.cytocore.remove(this.cytocore.getElementById(elementId));
-      this.saveDeletionLocallyAndRemote(elementId);
-      this.appstate.unselectContent();
+      const futureOrphanDocumentSourceDetected = this.hasADocumentAsASourceThatWillBecomeOrphan(
+        elementId
+      );
+      if (futureOrphanDocumentSourceDetected) {
+        this.deleteElement(elementId);
+      }
+      this.deleteElement(elementId);
+
+      if (
+        this.cytocore.getElementById(this.appstate.documentState.contentId)
+          .length
+      ) {
+        this.appstate.refreshDocummentState();
+      } else {
+        this.appstate.unselectContent();
+      }
     } else {
       this._snackBar.open(
         `Sorry but ${elementsRelying} links are relying on this element. Open console (F12) to see their names. You must delete them before`,
@@ -356,5 +386,10 @@ export class CytostateService {
         { duration: 3000 }
       );
     }
+  }
+
+  deleteFocusedElement() {
+    const elementId = this.appstate.documentState.contentId;
+    this.handleDeleteElement(elementId);
   }
 }

@@ -26,8 +26,8 @@ export class BibliographyLinkComponent implements OnInit {
   //   this.div.nativeElement.innerHTML = this.bib.description;
   // }
 
-  onDocumentClicked(documentId: string) {
-    this.cytostate.selectContent(documentId);
+  onDocumentClicked() {
+    this.cytostate.selectContent(this.bib.contentId);
   }
 
   onBiblioLinkDescriptionChange(content) {
@@ -36,6 +36,10 @@ export class BibliographyLinkComponent implements OnInit {
 
   onEnter() {
     this.div.nativeElement.blur();
+  }
+
+  onDeleteDocumentLinkClicked() {
+    this.cytostate.handleDeleteElement(this.bib.linkid);
   }
 
   ngOnInit(): void {}
