@@ -8,6 +8,7 @@ import { AsyncContent } from './asyncContent';
 import { ContentChanges, ContentChangesInterface } from './contentChanges';
 import {
   deleteAllMyData,
+  deleteDataOfElement,
   fetchAllData,
   postContent,
   postData,
@@ -285,7 +286,14 @@ export class CytodatabaseService {
   }
 
   deleteDataAndContentOf(id: string) {
-    // Should add delete the element to the changes
+    this.contentChanges.addChangesForRemoteAndSaveLocally(id, undefined, {
+      delete: true,
+    });
+    this.updateContentSaveState({
+      writing: true,
+      saved: false,
+      saving: false,
+    });
   }
 
   async saveOneContentToDatabase(
@@ -296,6 +304,20 @@ export class CytodatabaseService {
       (jsonRes: { success: boolean }) => {
         if (jsonRes.success) {
           this.contentChanges.savedContentSuccessful(contentId);
+          this.updateProgress(1, 0);
+          return true;
+        } else {
+          this.updateProgress(0, 1);
+          throw { name: 'MongoDbNotASuccess', jsonRes };
+        }
+      }
+    );
+  }
+  async deleteOneContentAndDataInDatabase(elementId: string): Promise<boolean> {
+    return deleteDataOfElement(this.authToken, elementId).then(
+      (jsonRes: { success: boolean }) => {
+        if (jsonRes.success) {
+          this.contentChanges.deleteContentAndDataSuccessful(elementId);
           this.updateProgress(1, 0);
           return true;
         } else {
@@ -332,6 +354,9 @@ export class CytodatabaseService {
           contentId,
           contentChanges.contents[contentId]
         )
+      ),
+      ...Array.from(contentChanges.objectsToDelete).map((elementId) =>
+        this.deleteOneContentAndDataInDatabase(elementId)
       ),
     ]).then((res) => {
       setTimeout(
@@ -377,28 +402,28 @@ export class CytodatabaseService {
       this.contentChanges.addChangesForRemoteAndSaveLocally(
         node.id(),
         { ...node.data(), position: node.position() },
-        false
+        { update: false }
       );
       const content = this.loadContentOf(node.id());
       content &&
         this.contentChanges.addChangesForRemoteAndSaveLocally(
           node.id(),
           content,
-          false
+          { update: false }
         );
     });
     cytocore.edges().map((edge) => {
       this.contentChanges.addChangesForRemoteAndSaveLocally(
         edge.id(),
         edge.data(),
-        false
+        { update: false }
       );
       const content = this.loadContentOf(edge.id());
       content &&
         this.contentChanges.addChangesForRemoteAndSaveLocally(
           edge.id(),
           content,
-          false
+          { update: false }
         );
     });
     this.contentChanges.updateBS();
