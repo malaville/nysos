@@ -53,7 +53,11 @@ export class ContentChanges implements ContentChangesInterface {
     this.saveContentChangesLocally();
   }
 
-  addChanges(id: string, dataOrContent: string | object, update = true) {
+  addChangesForRemoteAndSaveLocally(
+    id: string,
+    dataOrContent: string | object,
+    update = true
+  ) {
     if (typeof dataOrContent == 'string') {
       this.contents[id] = dataOrContent;
       this.contentsToUpdate.add(id);

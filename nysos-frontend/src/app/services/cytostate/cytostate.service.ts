@@ -167,7 +167,12 @@ export class CytostateService {
   }
 
   saveData(data?: any) {
-    data && this.cyDb.saveContentOf(data.id, data);
+    data && this.cyDb.saveDataOrContentOf(data.id, data);
+    this.cyDb.saveNodesAndEdgesLocally(this.cytocore.elements());
+  }
+
+  saveDeletionLocallyAndRemote(elementId: string) {
+    this.cyDb.deleteDataAndContentOf(elementId);
     this.cyDb.saveNodesAndEdgesLocally(this.cytocore.elements());
   }
 
@@ -318,12 +323,38 @@ export class CytostateService {
     this.appstate.sidenavref.close();
   }
 
-  edgesRelyingOn(elementId: string) {
+  private getEdgesRelyingOn(elementId: string) {
     return this.cytocore
       .edges()
       .filter(
         (edge) =>
           edge.target().id() == elementId || edge.source().id() == elementId
       );
+  }
+
+  private eraseAllParentingRelationsWithAncestor(ancestorId: string) {
+    this.cytocore
+      .getElementById(ancestorId)
+      .children()
+      .forEach((childElement) => {
+        childElement.move({ parent: null });
+      });
+  }
+
+  deleteFocusedElement() {
+    const elementId = this.appstate.documentState.contentId;
+    const elementsRelying = this.getEdgesRelyingOn(elementId).length;
+    if (elementsRelying === 0) {
+      this.eraseAllParentingRelationsWithAncestor(elementId);
+      this.cytocore.remove(this.cytocore.getElementById(elementId));
+      this.saveDeletionLocallyAndRemote(elementId);
+      this.appstate.unselectContent();
+    } else {
+      this._snackBar.open(
+        `Sorry but ${elementsRelying} links are relying on this element. Open console (F12) to see their names. You must delete them before`,
+        'Okay',
+        { duration: 3000 }
+      );
+    }
   }
 }

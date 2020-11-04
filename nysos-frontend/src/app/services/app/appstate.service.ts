@@ -16,6 +16,15 @@ export interface DocumentDataStateInterface {
   asyncContent: AsyncContent;
 }
 
+const defaultDocumentState: DocumentDataStateInterface = {
+  title: undefined,
+  contentId: undefined,
+  content: undefined,
+  bibliography: undefined,
+  name: undefined,
+  asyncContent: undefined,
+};
+
 export interface UIStateInterface {
   addingDocument: boolean;
   editDocument: boolean;
@@ -27,14 +36,7 @@ export interface UIStateInterface {
 export class AppstateService {
   sidenavref: MatSidenav;
 
-  readonly documentState: DocumentDataStateInterface = {
-    title: undefined,
-    contentId: undefined,
-    content: LOREM_IPSUMS,
-    bibliography: undefined,
-    name: undefined,
-    asyncContent: undefined,
-  };
+  readonly documentState: DocumentDataStateInterface = defaultDocumentState;
   private documentStateBS = new BehaviorSubject(this.documentState);
   readonly documentStateObservable = this.documentStateBS.asObservable();
 
@@ -49,6 +51,14 @@ export class AppstateService {
 
   setSidenavRef(sidenavref: MatSidenav) {
     this.sidenavref = sidenavref;
+  }
+
+  unselectContent() {
+    for (let key of Object.keys(this.documentState)) {
+      this.documentState[key] = undefined;
+    }
+    this.documentStateBS.next(this.documentState);
+    this.sidenavref.close();
   }
 
   contentSelected(
@@ -75,7 +85,7 @@ export class AppstateService {
   }
 
   saveContent(content: string) {
-    this.cytoDb.saveContentOf(this.documentState.contentId, content);
+    this.cytoDb.saveDataOrContentOf(this.documentState.contentId, content);
   }
 
   openNewDocument(editDocument = false) {

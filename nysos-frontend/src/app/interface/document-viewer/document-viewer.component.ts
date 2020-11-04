@@ -43,7 +43,7 @@ export class DocumentViewerComponent {
   }
 
   onLinkDescriptionChangeCallback = () => (id: string, description: string) => {
-    this.cytoDb.saveContentOf(id, description);
+    this.cytoDb.saveDataOrContentOf(id, description);
   };
 
   newDocumentClicked() {
@@ -52,5 +52,9 @@ export class DocumentViewerComponent {
 
   addAChildClicked = () => {
     this.cytostate.addChildToCurrentNode();
+  };
+
+  deleteElementClicked = () => {
+    const edges = this.cytostate.deleteFocusedElement();
   };
 }

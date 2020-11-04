@@ -274,14 +274,18 @@ export class CytodatabaseService {
     return false;
   }
 
-  saveContentOf(id: string, dataOrContent: string | object) {
+  saveDataOrContentOf(id: string, dataOrContent: string | object) {
     !id && console.error('Data or content without objectId', dataOrContent);
-    this.contentChanges.addChanges(id, dataOrContent);
+    this.contentChanges.addChangesForRemoteAndSaveLocally(id, dataOrContent);
     this.updateContentSaveState({
       writing: true,
       saved: false,
       saving: false,
     });
+  }
+
+  deleteDataAndContentOf(id: string) {
+    // Should add delete the element to the changes
   }
 
   async saveOneContentToDatabase(
@@ -370,18 +374,32 @@ export class CytodatabaseService {
 
   saveAllToRemote(cytocore: Core) {
     cytocore.nodes().map((node) => {
-      this.contentChanges.addChanges(
+      this.contentChanges.addChangesForRemoteAndSaveLocally(
         node.id(),
         { ...node.data(), position: node.position() },
         false
       );
       const content = this.loadContentOf(node.id());
-      content && this.contentChanges.addChanges(node.id(), content, false);
+      content &&
+        this.contentChanges.addChangesForRemoteAndSaveLocally(
+          node.id(),
+          content,
+          false
+        );
     });
     cytocore.edges().map((edge) => {
-      this.contentChanges.addChanges(edge.id(), edge.data(), false);
+      this.contentChanges.addChangesForRemoteAndSaveLocally(
+        edge.id(),
+        edge.data(),
+        false
+      );
       const content = this.loadContentOf(edge.id());
-      content && this.contentChanges.addChanges(edge.id(), content, false);
+      content &&
+        this.contentChanges.addChangesForRemoteAndSaveLocally(
+          edge.id(),
+          content,
+          false
+        );
     });
     this.contentChanges.updateBS();
   }

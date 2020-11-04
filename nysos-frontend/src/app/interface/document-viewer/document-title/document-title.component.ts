@@ -32,7 +32,9 @@ export class DocumentTitleComponent implements OnInit {
     this.appState.documentStateObservable
       .pipe(map((docState) => docState.name))
       .subscribe((name) => {
-        this.h1.nativeElement.innerHTML = name;
+        if (name) {
+          this.h1.nativeElement.innerHTML = name;
+        }
         if (!name) {
           setTimeout(() => this.h1.nativeElement.focus(), 500);
         }
