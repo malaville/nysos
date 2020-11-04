@@ -27,7 +27,7 @@ export const getOneDocument = async (contentId: string, uid: number) => {
       return;
     }
     console.log(
-      `${new Date().toISOString()} getOneDocument ${contentId} >>>>>>> ${document.content.slice(
+      `${new Date().toISOString()} getOneDocument ${contentId} >>>>>>> ${document.content?.slice(
         0,
         40
       )} ...`
