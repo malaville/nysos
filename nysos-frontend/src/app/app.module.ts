@@ -33,6 +33,7 @@ import { ContentLoaderComponent } from './interface/document-viewer/content-load
 import { GoogleAuthenticationComponent } from './interface/google-authentication/google-authentication.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import { GroupingToolComponent } from './interface/grouping-tool/grouping-tool.component';
 const config = new SocialAuthService({
   autoLogin: true,
   providers: [
@@ -61,6 +62,7 @@ export function provideConfig() {
     ContentSaveStateIndicatorComponent,
     ContentLoaderComponent,
     GoogleAuthenticationComponent,
+    GroupingToolComponent,
   ],
   imports: [
     BrowserModule,

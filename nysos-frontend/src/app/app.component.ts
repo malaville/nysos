@@ -81,6 +81,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   groupingModeClicked() {
+    this.appstate.toggleGroupingMode();
     // Activate Grouping Mode
   }
 }

@@ -28,6 +28,7 @@ const defaultDocumentState: DocumentDataStateInterface = {
 export interface UIStateInterface {
   addingDocument: boolean;
   editDocument: boolean;
+  groupingMode: boolean;
 }
 
 @Injectable({
@@ -43,6 +44,7 @@ export class AppstateService {
   readonly UIstate: UIStateInterface = {
     addingDocument: false,
     editDocument: false,
+    groupingMode: true,
   };
   private UIstateBS = new BehaviorSubject(this.UIstate);
   readonly UIstateObservable = this.UIstateBS.asObservable();
@@ -112,6 +114,11 @@ export class AppstateService {
 
   refreshDocummentState() {
     this.documentStateBS.next(this.documentState);
+  }
+
+  toggleGroupingMode() {
+    this.UIstate.groupingMode = !this.UIstate.groupingMode;
+    this.UIstateBS.next(this.UIstate);
   }
 }
 
