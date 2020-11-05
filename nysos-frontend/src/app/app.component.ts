@@ -79,4 +79,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   goOfflineClicked() {
     this.cytoDb.goOffline();
   }
+
+  groupingModeClicked() {
+    // Activate Grouping Mode
+  }
 }

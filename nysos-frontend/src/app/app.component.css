@@ -93,3 +93,7 @@ button:hover .show-label-on-hover span {
 .button-container > div {
   margin: 5px 10px;
 }
+
+.rotate90 {
+  transform: rotate(90deg);
+}

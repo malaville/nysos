@@ -96,6 +96,20 @@
         </div>
       </button>
     </div>
+
+    <div>
+      <button
+        type="button"
+        mat-mini-fab
+        color="primary"
+        (click)="groupingModeClicked()"
+      >
+        <div class="show-label-on-hover">
+          <mat-icon class="rotate90">share</mat-icon>
+          <span>Grouping Mode</span>
+        </div>
+      </button>
+    </div>
   </div>
   <app-google-authentication></app-google-authentication>
   <div #cy id="cy"></div>
