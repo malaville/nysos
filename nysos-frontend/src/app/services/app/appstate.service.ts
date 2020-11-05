@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 import { BehaviorSubject, Observable, of } from 'rxjs';
+import { GroupingToolComponent } from 'src/app/interface/grouping-tool/grouping-tool.component';
 import { BibliographyItem } from 'src/app/interface/source-manager/bibliography-item';
 import { AsyncContent } from '../cytodatabase/asyncContent';
 import { CytodatabaseService } from '../cytodatabase/cytodatabase.service';
@@ -36,6 +38,7 @@ export interface UIStateInterface {
 })
 export class AppstateService {
   sidenavref: MatSidenav;
+  dialogRef: MatDialogRef<GroupingToolComponent>;
 
   readonly documentState: DocumentDataStateInterface = defaultDocumentState;
   private documentStateBS = new BehaviorSubject(this.documentState);
@@ -44,12 +47,12 @@ export class AppstateService {
   readonly UIstate: UIStateInterface = {
     addingDocument: false,
     editDocument: false,
-    groupingMode: true,
+    groupingMode: false,
   };
   private UIstateBS = new BehaviorSubject(this.UIstate);
   readonly UIstateObservable = this.UIstateBS.asObservable();
 
-  constructor(private cytoDb: CytodatabaseService) {}
+  constructor(private cytoDb: CytodatabaseService, public dialog: MatDialog) {}
 
   setSidenavRef(sidenavref: MatSidenav) {
     this.sidenavref = sidenavref;
@@ -119,6 +122,16 @@ export class AppstateService {
   toggleGroupingMode() {
     this.UIstate.groupingMode = !this.UIstate.groupingMode;
     this.UIstateBS.next(this.UIstate);
+    if (this.UIstate.groupingMode) {
+      this.dialogRef = this.dialog.open(GroupingToolComponent, {
+        disableClose: true,
+      });
+      this.dialogRef.componentInstance.config = {
+        closeFunction: () => this.toggleGroupingMode(),
+      };
+    } else {
+      this.dialogRef.close();
+    }
   }
 }
 

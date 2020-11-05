@@ -11,6 +11,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialogModule } from '@angular/material/dialog';
 
 // Components
 import { AppRoutingModule } from './app-routing.module';
@@ -78,7 +79,10 @@ export function provideConfig() {
     SocialLoginModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: environment.production,
+    }),
+    MatDialogModule,
   ],
   providers: [
     {

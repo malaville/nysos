@@ -1,21 +1,27 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { AppstateService } from 'src/app/services/app/appstate.service';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 
+interface GroupingToolComponentConfigInterface {
+  closeFunction();
+}
 @Component({
   selector: 'app-grouping-tool',
   templateUrl: './grouping-tool.component.html',
   styleUrls: ['./grouping-tool.component.css'],
 })
-export class GroupingToolComponent implements OnInit {
-  public groupingMode: Observable<boolean> = of(false);
+export class GroupingToolComponent implements OnInit, OnDestroy {
+  @Input() config: GroupingToolComponentConfigInterface;
 
-  constructor(private appState: AppstateService) {}
+  constructor() {}
 
   ngOnInit(): void {
-    this.groupingMode = this.appState.UIstateObservable.pipe(
-      map((st) => st.groupingMode)
-    );
+    console.log('OnInit');
+  }
+
+  ngOnDestroy(): void {
+    console.log('OnDestroy');
+  }
+
+  onCloseClicked(): void {
+    this.config.closeFunction();
   }
 }
