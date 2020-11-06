@@ -15,6 +15,7 @@ import {
 import { ContentChangesInterface } from './services/cytodatabase/contentChanges';
 import { CytodatabaseService } from './services/cytodatabase/cytodatabase.service';
 import { CytostateService } from './services/cytostate/cytostate.service';
+import { GeneralStateService } from './services/general-state.service';
 
 @Component({
   selector: 'app-root',
@@ -30,21 +31,21 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatSidenav)
   set sidenav(s: MatSidenav) {
-    this.appstate.setSidenavRef(s);
+    this.genState.setSidenavRef(s);
   }
 
   @ViewChild('cy') cy: ElementRef;
 
   constructor(
     private cytostate: CytostateService,
-    private appstate: AppstateService,
-    private cytoDb: CytodatabaseService
+    private cytoDb: CytodatabaseService,
+    private genState: GeneralStateService
   ) {}
 
   ngOnInit() {
-    this.documentStateObs = this.appstate.documentStateObservable;
+    this.documentStateObs = this.genState.documentStateObservable;
     this.contentChangesObs = this.cytoDb.contentChangesObs;
-    this.large = this.appstate.UIstateObservable.pipe(
+    this.large = this.genState.UIStateObservable.pipe(
       map((uistate) => uistate.addingDocument || uistate.editDocument)
     );
   }
@@ -81,7 +82,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   groupingModeClicked() {
-    this.appstate.toggleGroupingMode();
+    this.genState.toggleGroupingMode();
     // Activate Grouping Mode
   }
 }

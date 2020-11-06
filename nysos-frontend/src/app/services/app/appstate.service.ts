@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
+import { NodeCollection } from 'cytoscape';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { GroupingToolComponent } from 'src/app/interface/grouping-tool/grouping-tool.component';
 import { BibliographyItem } from 'src/app/interface/source-manager/bibliography-item';
@@ -52,7 +53,7 @@ export class AppstateService {
   private UIstateBS = new BehaviorSubject(this.UIstate);
   readonly UIstateObservable = this.UIstateBS.asObservable();
 
-  constructor(private cytoDb: CytodatabaseService, public dialog: MatDialog) {}
+  constructor(private cytoDb: CytodatabaseService, private matDialog: MatDialog) {}
 
   setSidenavRef(sidenavref: MatSidenav) {
     this.sidenavref = sidenavref;
@@ -119,20 +120,30 @@ export class AppstateService {
     this.documentStateBS.next(this.documentState);
   }
 
-  toggleGroupingMode() {
-    this.UIstate.groupingMode = !this.UIstate.groupingMode;
+  openGroupingMode(nodes: NodeCollection) {
+    this.UIstate.groupingMode = true;
     this.UIstateBS.next(this.UIstate);
-    if (this.UIstate.groupingMode) {
-      this.dialogRef = this.dialog.open(GroupingToolComponent, {
-        disableClose: true,
-      });
-      this.dialogRef.componentInstance.config = {
-        closeFunction: () => this.toggleGroupingMode(),
-      };
-    } else {
+    if (this.dialogRef) {
       this.dialogRef.close();
+      delete this.dialogRef;
     }
+    this.dialogRef = this.matDialog.open(GroupingToolComponent, {
+      height: '60%',
+      width: '60%',
+      disableClose: true,
+    });
+    this.dialogRef.componentInstance.config = {
+      closeFunction: () => this.closeGroupingMode(),
+      nodes
+    };
+
+
+  }
+
+  private closeGroupingMode(){
+    this.UIstate.groupingMode = false;
+    this.UIstateBS.next(this.UIstate);
+    this.dialogRef.close()
+
   }
 }
-
-const LOREM_IPSUMS = '<p>Hello <b>Bold</b> is amzing</p>';

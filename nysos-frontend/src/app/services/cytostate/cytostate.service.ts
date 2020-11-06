@@ -392,4 +392,10 @@ export class CytostateService {
     const elementId = this.appstate.documentState.contentId;
     this.handleDeleteElement(elementId);
   }
+
+  getThemeNodes() {
+    return this.cytocore
+      .nodes()
+      .filter((node) => node.data().type == NODE_TYPES.THEME_NODE);
+  }
 }
