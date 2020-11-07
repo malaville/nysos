@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {
   CollectionReturnValue,
   Core,
+  EdgeCollection,
   EdgeHandlesApi,
   Ext,
   NodeSingular,
@@ -397,5 +398,42 @@ export class CytostateService {
     return this.cytocore
       .nodes()
       .filter((node) => node.data().type == NODE_TYPES.THEME_NODE);
+  }
+
+  importNewParentingRelations(newRelations: EdgeCollection) {
+    console.log(this.cytocore.nodes().length);
+    // this.cytocore.on('move', (node) => console.log(node.target.id()));
+    this.cytocore.nodes().forEach((node) => {
+      if (node.parent().length > 0) {
+        // check if the parent is still its parent
+        const foundNode = newRelations.filter(
+          (edge) => edge.source().id() == node.id()
+        );
+        if (foundNode.length == 0) {
+          // we didn't find the node in the list, it became an orphan, sorry bro
+          node.move({ parent: null });
+          return;
+        }
+        // We found you, but you may have a new parent
+        if (foundNode.target().id() !== node.parent()[0].id()) {
+          // Sorry you were adopted by a new dude, Brandon. Call him daddy.
+          node.move({ parent: foundNode.target().id() });
+          return;
+        }
+        // Lucky You, nothing happened
+      }
+
+      if (node.parent().length == 0) {
+        // Maybe you were adopted lately
+        const foundNode = newRelations.filter(
+          (edge) => edge.source().id() == node.id()
+        );
+        if (foundNode.length > 0) {
+          // SYou have a new DADDYYYY
+          node.move({ parent: foundNode.target().id() });
+          return;
+        }
+      }
+    });
   }
 }

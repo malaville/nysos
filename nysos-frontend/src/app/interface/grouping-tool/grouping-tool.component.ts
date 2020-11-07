@@ -1,5 +1,9 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import cytoscape, { EdgeHandlesApi, NodeCollection } from 'cytoscape';
+import cytoscape, {
+  EdgeCollection,
+  EdgeHandlesApi,
+  NodeCollection,
+} from 'cytoscape';
 import { Core } from 'cytoscape';
 import dagre from 'cytoscape-dagre';
 import compoundDragAndDrop from 'cytoscape-compound-drag-and-drop';
@@ -35,6 +39,7 @@ const style = [
 interface GroupingToolComponentConfigInterface {
   closeFunction();
   nodes: NodeCollection;
+  newParentingRelationsCallback(edges: EdgeCollection);
 }
 @Component({
   selector: 'app-grouping-tool',
@@ -157,6 +162,7 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
   }
 
   onCloseClicked(): void {
+    this.config.newParentingRelationsCallback(this.cytoHierarchy.edges());
     this.config.closeFunction();
   }
 

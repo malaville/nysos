@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
-import { NodeCollection } from 'cytoscape';
+import { EdgeCollection, NodeCollection } from 'cytoscape';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { GroupingToolComponent } from 'src/app/interface/grouping-tool/grouping-tool.component';
 import { BibliographyItem } from 'src/app/interface/source-manager/bibliography-item';
@@ -53,7 +53,10 @@ export class AppstateService {
   private UIstateBS = new BehaviorSubject(this.UIstate);
   readonly UIstateObservable = this.UIstateBS.asObservable();
 
-  constructor(private cytoDb: CytodatabaseService, private matDialog: MatDialog) {}
+  constructor(
+    private cytoDb: CytodatabaseService,
+    private matDialog: MatDialog
+  ) {}
 
   setSidenavRef(sidenavref: MatSidenav) {
     this.sidenavref = sidenavref;
@@ -120,7 +123,10 @@ export class AppstateService {
     this.documentStateBS.next(this.documentState);
   }
 
-  openGroupingMode(nodes: NodeCollection) {
+  openGroupingMode(
+    nodes: NodeCollection,
+    newParentingRelationsCallback: (edges: EdgeCollection) => void
+  ) {
     this.UIstate.groupingMode = true;
     this.UIstateBS.next(this.UIstate);
     if (this.dialogRef) {
@@ -134,16 +140,14 @@ export class AppstateService {
     });
     this.dialogRef.componentInstance.config = {
       closeFunction: () => this.closeGroupingMode(),
-      nodes
+      newParentingRelationsCallback,
+      nodes,
     };
-
-
   }
 
-  private closeGroupingMode(){
+  private closeGroupingMode() {
     this.UIstate.groupingMode = false;
     this.UIstateBS.next(this.UIstate);
-    this.dialogRef.close()
-
+    this.dialogRef.close();
   }
 }

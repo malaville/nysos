@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
+import { EdgeCollection } from 'cytoscape';
 import { Observable } from 'rxjs';
 import {
   AppstateService,
@@ -29,6 +30,12 @@ export class GeneralStateService {
 
   //
   toggleGroupingMode = () => {
-    this.appState.openGroupingMode(this.cytoState.getThemeNodes());
+    const onNewParentingRelationsArePassed = (edges: EdgeCollection) => {
+      this.cytoState.importNewParentingRelations(edges);
+    };
+    this.appState.openGroupingMode(
+      this.cytoState.getThemeNodes(),
+      onNewParentingRelationsArePassed
+    );
   };
 }
