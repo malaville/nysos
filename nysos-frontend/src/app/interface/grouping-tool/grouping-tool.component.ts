@@ -1,9 +1,11 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import cytoscape, { EdgeCollection, NodeCollection } from 'cytoscape';
+import cytoscape, { EdgeHandlesApi, NodeCollection } from 'cytoscape';
 import { Core } from 'cytoscape';
-import { styles } from 'src/app/services/cytostate/cytostyles';
 import dagre from 'cytoscape-dagre';
+import compoundDragAndDrop from 'cytoscape-compound-drag-and-drop';
+import { edgehandlestyles } from 'src/app/services/cytostate/edgehandlesstyles';
 
+cytoscape.use(compoundDragAndDrop);
 cytoscape.use(dagre);
 
 type NodeDataType = {
@@ -12,6 +14,7 @@ type NodeDataType = {
 type EdgeDataType = { data: { source: string; target: string } };
 
 const style = [
+  ...edgehandlestyles,
   {
     selector: 'node[name]',
     style: {
@@ -41,6 +44,7 @@ interface GroupingToolComponentConfigInterface {
 export class GroupingToolComponent implements OnInit, OnDestroy {
   @Input() config: GroupingToolComponentConfigInterface;
   private cytoHierarchy: Core;
+  private static edgeHandles: EdgeHandlesApi;
   constructor() {}
 
   ngOnInit(): void {
@@ -57,7 +61,7 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
 
     let layout = {
       name: 'dagre',
-      transform: (node, pos) => ({ x: pos.x, y: -pos.y }),
+      transform: (node, pos) => ({ x: pos.x * 1.2, y: -pos.y * 1.4 }),
       padding: 20,
     };
     this.cytoHierarchy = cytoscape({
@@ -68,13 +72,30 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
       },
       layout,
       style,
-    }).on('move', (ele) => {
-      console.log(
-        'Data was accessed on ',
-        ele.target.data().name,
-        ele.target.data()
-      );
     });
+
+    // @ts-ignore
+    const cdnd = this.cytoHierarchy.compoundDragAndDrop({
+      grabbedNode: (node) =>
+        console.log('grabbedNode', node.data().name) + '' || true, // filter function to specify which nodes are valid to grab and drop into other nodes
+      dropTarget: (node) =>
+        console.log('dropTarget', node.data().name) + '' || true, // filter function to specify which parent nodes are valid drop targets
+      dropSibling: (node) =>
+        console.log('dropSibling', node.data().name) + '' || true, // filter function to specify which orphan nodes are valid drop siblings
+      newParentNode: (grabbedNode, dropSibling) => ({}), // specifies element json for parent nodes added by dropping an orphan node on another orphan (a drop sibling)
+      overThreshold: 10, // make dragging over a drop target easier by expanding the hit area by this amount on all sides
+      outThreshold: 10, // make dra
+    });
+    cdnd.enable();
+    // @ts-ignore
+    GroupingToolComponent.edgeHandles = this.cytoHierarchy.edgehandles({
+      show: (node) => {
+        console.log(node.classes());
+        node.hasClass('CONTAINER') &&
+          this.cytoHierarchy.elements('.eh-handle').remove();
+      },
+    });
+    GroupingToolComponent.edgeHandles.enable();
 
     const addedNodesWithHierarchicalStructure = this.cytoHierarchy.nodes();
 
@@ -98,6 +119,47 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
       this.cytoHierarchy
     );
 
+    this.cytoHierarchy.on('move', (ele, ele2) => {
+      console.log('Ele was moved', ele.target.data().name);
+      if (ele.target.isEdge()) return;
+      if (ele.target.parent().length > 0) {
+        // ele was moved in a group
+        console.log('Ele was added to a group');
+        console.log(ele.target.parent().classes());
+        if (ele.target.parent().classes().includes('CONTAINER')) {
+          // Was moved in an EXISTING group
+          console.log('Ele was added to an existing group');
+          const parentId = ele.target.parent().id().split(':')[0];
+          const nodeId = ele.target.id();
+          console.log('Creation of the edge ', {
+            source: nodeId,
+            target: parentId,
+          });
+          this.cytoHierarchy.add({
+            group: 'edges',
+            data: { source: nodeId, target: parentId },
+          });
+        } else {
+          // Was moved in a newly created group
+          console.log('Ele was added to a new container');
+          if (ele.target.outgoers().length > 0) {
+            return;
+          }
+          const brothers = ele.target.parent().children();
+          const parent = brothers.outgoers()?.nodes()[0];
+          if (parent) {
+            console.log('parent', parent);
+            this.cytoHierarchy.add({
+              group: 'edges',
+              data: { source: ele.target.id(), target: parent.id() },
+            });
+          }
+        }
+      } else {
+        // ele was moved "out" of a container
+        ele.target.outgoers()?.edges()[0]?.remove();
+      }
+    });
     this.cytoHierarchy.fit();
   }
 
@@ -139,8 +201,9 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
         root.data().name,
         children.map((node) => node.data().name)
       );
-      if (children.length > 0) {
+      if (children.length > 1) {
         const addedContainer = core.add({
+          classes: 'CONTAINER',
           data: {
             name: `${root.data().name}:group`,
             id: `${root.id()}:children`,
