@@ -9,5 +9,27 @@ h2 {
 }
 
 button {
+  z-index: 100;
+}
+
+.done-button {
   position: absolute;
+  bottom: 0;
+  right: 0;
+}
+.centered-remove-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+:host {
+  display: block;
+  height: 100%;
+  width: 100%;
+  position: relative;
 }
