@@ -183,17 +183,22 @@ export class CytostateService {
   }
 
   addNode(params: { parent?: string; x?: number; y?: number } = {}) {
-    const newNode = this.cytocore.add({
-      group: 'nodes',
-      data: {
-        name: NEW_NAME,
-        parent: params.parent,
-        type: NODE_TYPES.THEME_NODE,
-      },
-      position: params.parent
-        ? { x: params.x + 10, y: params.y + 20 }
-        : { x: 50, y: 50 },
-    });
+    const bb = this.cytocore.nodes().boundingBox({});
+    const center = { x: (bb.x1 + bb.x2) / 2, y: (bb.y1 + bb.y2) / 2 };
+    const newNode = this.cytocore
+      .add({
+        group: 'nodes',
+        data: {
+          name: NEW_NAME,
+          parent: params.parent,
+          type: NODE_TYPES.THEME_NODE,
+        },
+        position: params.parent
+          ? { x: params.x + 10, y: params.y + 20 }
+          : center,
+      })
+      .select();
+
     this.saveData({ ...newNode.data(), position: newNode.position() });
   }
 
