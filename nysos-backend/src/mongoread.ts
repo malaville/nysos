@@ -1,4 +1,4 @@
-import { app, TEST_HOST } from ".";
+import { app, TEST_ORIGIN } from ".";
 import {
   CytoscapeJsObjectInterface,
   fromDatabaseToCytoscapeObj,
@@ -19,8 +19,8 @@ export const getOneDocument = async (contentId: string, uid: number) => {
         return;
       }
     }
-    const testHost = app.get(TEST_HOST);
-    const dbName = `nysos${testHost ? "-test" : ""}`;
+    const testOrigin = app.get(TEST_ORIGIN);
+    const dbName = `nysos${testOrigin ? "-test" : ""}`;
     const collection = client.db(dbName).collection(`${uid}:content`);
     const document: ContentInterface | null = await collection.findOne({
       _id: contentId,
@@ -50,8 +50,8 @@ export const getAllData = async (uid: number) => {
         return;
       }
     }
-    const testHost = app.get(TEST_HOST);
-    const dbName = `nysos${testHost ? "-test" : ""}`;
+    const testOrigin = app.get(TEST_ORIGIN);
+    const dbName = `nysos${testOrigin ? "-test" : ""}`;
     const collection = client.db(dbName).collection(`${uid}:data`);
     const allData = await collection.find<ObjectDataInterface>();
     if (!allData) {

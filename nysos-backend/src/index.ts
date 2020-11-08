@@ -190,9 +190,22 @@ app.get("/synctestandprod", async function (req: Request, res: Response) {
     return;
   }
   try {
-    const [delContent, delData] = await deleteAllMyData(uid);
-    const copied = await copyProdToTest(uid);
-
+    const [delContent, delData] = await deleteAllMyData(uid).catch((err) => {
+      res.statusCode = 400;
+      res.send({
+        success: false,
+        delContent: false,
+        delData: false,
+        copied: "Not Tried",
+      });
+      throw null;
+    });
+    const copied = await copyProdToTest(uid).catch((err) => {
+      res.statusCode = 400;
+      res.send({ success: false, delContent, delData, copied: false });
+      throw null;
+    });
+    res.statusCode = 200;
     res.send({
       success: delContent && delData && copied,
       delContent,

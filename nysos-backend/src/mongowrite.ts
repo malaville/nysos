@@ -1,4 +1,4 @@
-import { app, TEST_HOST } from ".";
+import { app, TEST_ORIGIN } from ".";
 import { client } from "./mongodefs";
 
 export const saveOneDocument = async (
@@ -10,8 +10,8 @@ export const saveOneDocument = async (
     if (!client.isConnected()) {
       await client.connect().catch((err) => reject(err));
     }
-    const testHost = app.get(TEST_HOST);
-    const dbName = `nysos${testHost ? "-test" : ""}`;
+    const testOrigin = app.get(TEST_ORIGIN);
+    const dbName = `nysos${testOrigin ? "-test" : ""}`;
     const collection = client.db(dbName).collection(`${uid}:content`);
     collection
       .updateOne(
@@ -74,8 +74,8 @@ export const saveOneObjectData = async (
       data.position.y = Math.floor(data.position.y);
     }
 
-    const testHost = app.get(TEST_HOST);
-    const dbName = `nysos${testHost ? "-test" : ""}`;
+    const testOrigin = app.get(TEST_ORIGIN);
+    const dbName = `nysos${testOrigin ? "-test" : ""}`;
     const collection = client.db(dbName).collection(`${uid}:data`);
     collection
       .updateOne(
@@ -118,49 +118,59 @@ export const copyProdToTest = async (uid: number) => {
     client
       .db("nysos-test")
       .collection(`${uid}:content`, async (err, targetForContent) => {
-        const batchContent = targetForContent.initializeOrderedBulkOp();
         var sourceOfContent = await client
           .db("nysos")
           .collection(`${uid}:content`)
           .find()
           .toArray();
-        targetForContent
-          .bulkWrite(
-            sourceOfContent.map((content) => ({
-              insertOne: { document: content },
-            }))
-          )
-          .then(() => {
-            console.log(
-              `${new Date().toISOString()} COPIED all content from prod to test`
-            );
-            resolved++;
-            resolved == 2 && resolve(true);
-          });
+        if (sourceOfContent.length > 0) {
+          targetForContent
+            .bulkWrite(
+              sourceOfContent.map((content) => ({
+                insertOne: { document: content },
+              }))
+            )
+            .then(() => {
+              console.log(
+                `${new Date().toISOString()} COPIED all content from prod to test`
+              );
+              resolved++;
+              resolved == 2 && resolve(true);
+            });
+        } else {
+          console.log(`${new Date().toISOString()} COPIED no content to copy`);
+          resolved++;
+          resolved == 2 && resolve(true);
+        }
       });
 
     client
       .db("nysos-test")
       .collection(`${uid}:data`, async (err, targetForData) => {
-        const batchData = targetForData.initializeOrderedBulkOp();
         var sourceOfData = await client
           .db("nysos")
           .collection(`${uid}:data`)
           .find()
           .toArray();
-        targetForData
-          .bulkWrite(
-            sourceOfData.map((data) => ({
-              insertOne: { document: data },
-            }))
-          )
-          .then(() => {
-            console.log(
-              `${new Date().toISOString()} COPIED all data from prod to test`
-            );
-            resolved++;
-            resolved == 2 && resolve(true);
-          });
+        if (sourceOfData.length > 0) {
+          targetForData
+            .bulkWrite(
+              sourceOfData.map((data) => ({
+                insertOne: { document: data },
+              }))
+            )
+            .then(() => {
+              console.log(
+                `${new Date().toISOString()} COPIED all data from prod to test`
+              );
+              resolved++;
+              resolved == 2 && resolve(true);
+            });
+        } else {
+          console.log(`${new Date().toISOString()} COPIED no data to copy`);
+          resolved++;
+          resolved == 2 && resolve(true);
+        }
       });
   });
 };

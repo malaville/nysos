@@ -13,7 +13,7 @@ export const deleteAllMyData = async (
   if (!testOrigin) {
     throw "Not allowed to delete everything on prod";
   }
-  const dbName = `nysos${testHost ? "-test" : ""}`;
+  const dbName = `nysos${testOrigin ? "-test" : ""}`;
   const delData = client
     .db(dbName)
     .dropCollection(`${uid}:data`)
@@ -28,7 +28,9 @@ export const deleteAllMyData = async (
       if (err.codeName == "NamespaceNotFound") return true;
       throw err;
     });
-  console.log(`${new Date().toISOString()} deleteAllMyData of ${uid} `);
+  console.log(
+    `${new Date().toISOString()} deleteAllMyData of ${uid} ${dbName} `
+  );
   return Promise.all([delContent, delData]);
 };
 
@@ -46,8 +48,8 @@ export const deleteOneDocument = async (contentId: string, uid: number) => {
         return;
       }
     }
-    const testHost = app.get(TEST_HOST);
-    const dbName = `nysos${testHost ? "-test" : ""}`;
+    const testOrigin = app.get(TEST_ORIGIN);
+    const dbName = `nysos${testOrigin ? "-test" : ""}`;
     const collection = client.db(dbName).collection(`${uid}:content`);
     try {
       await collection.deleteOne({ _id: contentId }).then((update) => {
@@ -77,8 +79,8 @@ export const deleteOneObjectData = async (contentId: string, uid: number) => {
         return;
       }
     }
-    const testHost = app.get(TEST_HOST);
-    const dbName = `nysos${testHost ? "-test" : ""}`;
+    const testOrigin = app.get(TEST_ORIGIN);
+    const dbName = `nysos${testOrigin ? "-test" : ""}`;
     const collection = client.db(dbName).collection(`${uid}:data`);
     try {
       await collection.deleteOne({ _id: contentId }).then((update) => {
