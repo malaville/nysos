@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  HostListener,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -36,6 +37,16 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   @ViewChild('cy') cy: ElementRef;
+
+  @HostListener('document:keyup.escape', ['$event'])
+  handleEscapeKeyDownEventTriggered(event: KeyboardEvent) {
+    this.genState.escapeKeyDownEventTriggered();
+  }
+
+  @HostListener('document:keyup.g', ['$event'])
+  handleGPressed(event: KeyboardEvent) {
+    this.genState.gKeyPUpEventTriggered();
+  }
 
   constructor(
     private cytostate: CytostateService,

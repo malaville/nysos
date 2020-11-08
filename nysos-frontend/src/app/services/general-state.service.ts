@@ -38,4 +38,14 @@ export class GeneralStateService {
       onNewParentingRelationsArePassed
     );
   };
+
+  escapeKeyDownEventTriggered() {
+    this.appState.unselectContent();
+    this.appState.closeNewDocument();
+    this.appState.closeGroupingMode();
+  }
+  gKeyPUpEventTriggered() {
+    this.appState.unselectContent();
+    !this.appState.UIstate.groupingMode && this.toggleGroupingMode();
+  }
 }

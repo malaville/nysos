@@ -145,7 +145,7 @@ export class AppstateService {
     };
   }
 
-  private closeGroupingMode() {
+  public closeGroupingMode() {
     this.UIstate.groupingMode = false;
     this.UIstateBS.next(this.UIstate);
     this.dialogRef.close();
