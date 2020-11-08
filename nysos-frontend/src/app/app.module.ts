@@ -29,12 +29,17 @@ import {
   GoogleLoginProvider,
   SocialLoginModule,
 } from 'angularx-social-login';
-import { ContentSaveStateIndicatorComponent } from './interface/content-save-state-indicator/content-save-state-indicator/content-save-state-indicator.component';
+import { ContentSaveStateIndicatorComponent } from './interface/common/content-save-state-indicator/content-save-state-indicator.component';
 import { ContentLoaderComponent } from './interface/document-viewer/content-loader/content-loader.component';
 import { GoogleAuthenticationComponent } from './interface/google-authentication/google-authentication.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { GroupingToolComponent } from './interface/grouping-tool/grouping-tool.component';
+import {
+  ExpandingFabButtonComponent,
+  OpenButtonDirective,
+  Rotate90Directive,
+} from './interface/common/expanding-fab-button/expanding-fab-button.component';
 const config = new SocialAuthService({
   autoLogin: true,
   providers: [
@@ -64,6 +69,9 @@ export function provideConfig() {
     ContentLoaderComponent,
     GoogleAuthenticationComponent,
     GroupingToolComponent,
+    ExpandingFabButtonComponent,
+    Rotate90Directive,
+    OpenButtonDirective,
   ],
   imports: [
     BrowserModule,

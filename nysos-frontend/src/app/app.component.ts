@@ -62,37 +62,29 @@ export class AppComponent implements OnInit, AfterViewInit {
   edgeCreationMode(): boolean {
     return this.cytostate.addedgemode;
   }
-  activateEdgeCreation() {
-    this.cytostate.edgeCreationMode();
-  }
+  activateEdgeCreation = () => () => this.cytostate.edgeCreationMode();
 
-  deleteAllMyRemoteDataClicked() {
+  deleteAllMyRemoteDataClicked = () => () => {
     confirm('Are you sure ?') && this.cytoDb.deleteAllMyRemoteData();
-  }
+  };
 
-  deleteAllMyLocalClicked() {
+  deleteAllMyLocalClicked = () => () => {
     confirm('Are you sure ?') && this.cytoDb.deleteAllMyLocalData();
-  }
+  };
 
-  addThemeClicked() {
+  addThemeClicked = () => () => {
     this.cytostate.addNode();
-  }
+  };
 
-  fitToScreenClicked() {
+  fitToScreenClicked = () => () => {
     this.cytostate.cytocore.fit(undefined, 100);
-  }
+  };
 
-  goOfflineClicked() {
+  goOfflineClicked = () => () => {
     this.cytoDb.goOffline();
-  }
+  };
 
-  groupingModeClicked() {
-    this.genState.toggleGroupingMode();
-    // Activate Grouping Mode}
-  }
+  groupingModeClicked = () => () => this.genState.toggleGroupingMode();
 
-  importMyDataClicked() {
-    console.log('Import my data clicked');
-    this.cytoDb.importMyData();
-  }
+  importMyDataClicked = () => () => this.cytoDb.importMyData();
 }

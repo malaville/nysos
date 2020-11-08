@@ -1,0 +1,33 @@
+button {
+  width: auto;
+  border-radius: 20px;
+}
+
+.show-label-on-hover {
+  padding: 0px 8px;
+}
+
+.show-label-on-hover span {
+  margin: 0px 0px;
+  position: relative;
+  display: inline-block;
+  max-width: 0;
+  overflow: hidden;
+
+  transition: max-width 0.1s, margin 0.05s;
+}
+
+button:hover .show-label-on-hover span,
+.show-label-on-hover.open span {
+  max-width: 300px;
+  margin: 0px 10px;
+  transition: max-width 0.3s ease-out 0.1s, margin 0.3s 0.1s;
+}
+
+.rotate90 {
+  transform: rotate(90deg);
+}
+
+:host {
+  margin: 5px 10px;
+}

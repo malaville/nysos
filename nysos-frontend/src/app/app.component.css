@@ -12,10 +12,6 @@ mat-sidenav-container {
   height: 100%;
 }
 
-#enlarge-button {
-  position: absolute;
-}
-
 #mat-sidenav-content {
   height: 100%;
   display: flex;
@@ -58,42 +54,9 @@ mat-sidenav.large app-source-manager {
   margin: 10px;
 }
 
-button {
-  width: auto;
-  border-radius: 20px;
-}
-
-.show-label-on-hover {
-  padding: 0px 8px;
-}
-
-.show-label-on-hover span {
-  margin: 0px 0px;
-  position: relative;
-  display: inline-block;
-  max-width: 0;
-  overflow: hidden;
-
-  transition: max-width 0.1s, margin 0.05s;
-}
-
-button:hover .show-label-on-hover span {
-  max-width: 300px;
-  margin: 0px 10px;
-  transition: max-width 0.3s ease-out 0.1s, margin 0.3s 0.1s;
-}
-
 .button-container {
   display: flex;
   flex-direction: column;
   width: 0;
   padding-top: 5px;
-}
-
-.button-container > div {
-  margin: 5px 10px;
-}
-
-.rotate90 {
-  transform: rotate(90deg);
 }

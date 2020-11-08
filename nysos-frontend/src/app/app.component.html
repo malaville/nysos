@@ -23,107 +23,60 @@
     </div>
   </mat-sidenav>
   <div class="button-container">
-    <div>
-      <button mat-mini-fab color="primary" (click)="activateEdgeCreation()">
-        <div class="show-label-on-hover">
-          <mat-icon>timeline</mat-icon>
-          <span>Create an edge</span>
-        </div>
-      </button>
-    </div>
-    <div>
-      <button
-        *ngIf="isTest"
-        type="button"
-        mat-mini-fab
-        color="warn"
-        (click)="deleteAllMyRemoteDataClicked()"
-      >
-        <div class="show-label-on-hover">
-          <mat-icon>not_interested</mat-icon>
-          <span>Clear Remote Data</span>
-        </div>
-      </button>
-    </div>
-    <div>
-      <button
-        type="button"
-        mat-mini-fab
-        color="accent"
-        (click)="deleteAllMyLocalClicked()"
-      >
-        <div class="show-label-on-hover">
-          <mat-icon>no_sim</mat-icon>
-          <span>Clear Local Data</span>
-        </div>
-      </button>
-    </div>
-    <div>
-      <button
-        type="button"
-        mat-mini-fab
-        color="primary"
-        (click)="addThemeClicked()"
-      >
-        <div class="show-label-on-hover">
-          <mat-icon>add_circle_outline</mat-icon>
-          <span>Add a theme node</span>
-        </div>
-      </button>
-    </div>
-    <div>
-      <button
-        type="button"
-        mat-mini-fab
-        color="primary"
-        (click)="fitToScreenClicked()"
-      >
-        <div class="show-label-on-hover">
-          <mat-icon>fullscreen</mat-icon>
-          <span>Fit to screen</span>
-        </div>
-      </button>
-    </div>
-    <div>
-      <button
-        type="button"
-        mat-mini-fab
-        color="primary"
-        (click)="goOfflineClicked()"
-      >
-        <div class="show-label-on-hover">
-          <mat-icon>cloud_off</mat-icon>
-          <span>Go offline</span>
-        </div>
-      </button>
-    </div>
-
-    <div>
-      <button
-        type="button"
-        mat-mini-fab
-        color="primary"
-        (click)="groupingModeClicked()"
-      >
-        <div class="show-label-on-hover">
-          <mat-icon class="rotate90">share</mat-icon>
-          <span>Grouping Mode</span>
-        </div>
-      </button>
-    </div>
-    <div *ngIf="isTest">
-      <button
-        type="button"
-        mat-mini-fab
-        color="warn"
-        (click)="importMyDataClicked()"
-      >
-        <div class="show-label-on-hover">
-          <mat-icon>refresh</mat-icon>
-          <span>Import my data from real database</span>
-        </div>
-      </button>
-    </div>
+    <app-expanding-fab-button
+      [onClick]="activateEdgeCreation()"
+      [iconName]="'timeline'"
+    >
+      Created an edge
+    </app-expanding-fab-button>
+    <app-expanding-fab-button
+      [onClick]="addThemeClicked()"
+      [iconName]="'add_circle_outline'"
+    >
+      Add a theme node
+    </app-expanding-fab-button>
+    <app-expanding-fab-button
+      [onClick]="fitToScreenClicked()"
+      [iconName]="'fullscreen'"
+    >
+      Fit to screen
+    </app-expanding-fab-button>
+    <app-expanding-fab-button
+      [onClick]="goOfflineClicked()"
+      [iconName]="'cloud_off'"
+    >
+      Go offline
+    </app-expanding-fab-button>
+    <app-expanding-fab-button
+      [onClick]="groupingModeClicked()"
+      [iconName]="'share'"
+      rotate90
+    >
+      Grouping Mode
+    </app-expanding-fab-button>
+    <app-expanding-fab-button
+      *ngIf="isTest"
+      [onClick]="deleteAllMyRemoteDataClicked()"
+      [iconName]="'not_interested'"
+      [color]="'warn'"
+    >
+      Clear Remote Data
+    </app-expanding-fab-button>
+    <app-expanding-fab-button
+      [color]="'accent'"
+      [onClick]="deleteAllMyLocalClicked()"
+      [iconName]="'no_sim'"
+    >
+      Clear Local Data
+    </app-expanding-fab-button>
+    <app-expanding-fab-button
+      *ngIf="isTest"
+      [color]="'warn'"
+      [onClick]="importMyDataClicked()"
+      [iconName]="'refresh'"
+    >
+      Import my data from real database
+    </app-expanding-fab-button>
   </div>
   <app-google-authentication></app-google-authentication>
   <div #cy id="cy"></div>

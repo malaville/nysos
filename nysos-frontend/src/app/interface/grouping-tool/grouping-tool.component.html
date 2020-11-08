@@ -1,14 +1,15 @@
 <div class="centered-remove-button">
-  <button
-    mat-raised-button
-    color="warn"
+  <app-expanding-fab-button
     *ngIf="removeMode"
-    (click)="onRemoveEdgeClicked()"
+    [iconName]="'delete'"
+    [onClick]="onRemoveEdgeClicked()"
+    [color]="'warn'"
+    appOpen
   >
-    <mat-icon>delete</mat-icon>
-    <mat-label>Remove Relation</mat-label>
-  </button>
+    Remove Relation
+  </app-expanding-fab-button>
 </div>
+
 <h2>Grouping Tool</h2>
 <div id="hierarchicalCytoscape"></div>
 <button class="done-button" mat-mini-fab (click)="onCloseClicked()">Ok</button>

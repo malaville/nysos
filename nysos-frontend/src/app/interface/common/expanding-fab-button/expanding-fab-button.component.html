@@ -1,0 +1,10 @@
+<div>
+  <button mat-mini-fab [color]="color" (click)="onClick()">
+    <div class="show-label-on-hover" [class.open]="appOpen">
+      <mat-icon [class.rotate90]="rotate90" *ngIf="iconName">{{
+        iconName
+      }}</mat-icon>
+      <span><ng-content></ng-content></span>
+    </div>
+  </button>
+</div>

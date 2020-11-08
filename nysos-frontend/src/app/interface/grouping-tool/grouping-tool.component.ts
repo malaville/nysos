@@ -277,12 +277,12 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
     }
   }
 
-  onRemoveEdgeClicked() {
+  onRemoveEdgeClicked = () => () => {
     const edgesToRemove = this.cytoHierarchy.edges(':selected');
     edgesToRemove.sources().move({ parent: null });
     edgesToRemove.remove();
     this.removeMode = false;
-  }
+  };
 
   private static createEdgeBetween(
     node1: NodeSingular,

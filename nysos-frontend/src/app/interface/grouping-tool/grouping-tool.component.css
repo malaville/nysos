@@ -8,7 +8,8 @@ h2 {
   position: absolute;
 }
 
-button {
+button,
+.centered-remove-button > * {
   z-index: 100;
 }
 
