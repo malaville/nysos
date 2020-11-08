@@ -81,10 +81,10 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
       layout,
       style,
     });
-    this.cytoHierarchy.on('select', 'edges', (el) => {
+    this.cytoHierarchy.on('select', 'edge', (el) => {
       this.removeMode = true;
     });
-    this.cytoHierarchy.on('unselect', 'edges', (el) => {
+    this.cytoHierarchy.on('unselect', 'edge', (el) => {
       this.cytoHierarchy.elements(':selected').length == 0 &&
         (this.removeMode = false);
     });
@@ -223,7 +223,7 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
         }
       }
     };
-    this.cytoHierarchy.on('move', 'nodes', handleMoveEvent);
+    this.cytoHierarchy.on('move', 'node', handleMoveEvent);
     this.cytoHierarchy.nodes().unselectify();
     this.cytoHierarchy.fit();
   }
