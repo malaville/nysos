@@ -110,6 +110,18 @@
         </div>
       </button>
     </div>
+    <div *ngIf="isTest">
+      <button
+        type="button"
+        mat-mini-fab
+        color="warn"
+        (click)="importMyDataClicked()"
+      >
+        <div class="show-label-on-hover">
+          <mat-icon>refresh</mat-icon>
+          <span>Import my data from real database</span>
+        </div>
+      </button>
   </div>
   <app-google-authentication></app-google-authentication>
   <div #cy id="cy"></div>

@@ -1,3 +1,4 @@
+import { app, TEST_HOST } from ".";
 import {
   CytoscapeJsObjectInterface,
   fromDatabaseToCytoscapeObj,
@@ -18,7 +19,9 @@ export const getOneDocument = async (contentId: string, uid: number) => {
         return;
       }
     }
-    const collection = client.db("nysos").collection(`${uid}:content`);
+    const testHost = app.get(TEST_HOST);
+    const dbName = `nysos${testHost ? "-test" : ""}`;
+    const collection = client.db(dbName).collection(`${uid}:content`);
     const document: ContentInterface | null = await collection.findOne({
       _id: contentId,
     });
@@ -47,7 +50,9 @@ export const getAllData = async (uid: number) => {
         return;
       }
     }
-    const collection = client.db("nysos").collection(`${uid}:data`);
+    const testHost = app.get(TEST_HOST);
+    const dbName = `nysos${testHost ? "-test" : ""}`;
+    const collection = client.db(dbName).collection(`${uid}:data`);
     const allData = await collection.find<ObjectDataInterface>();
     if (!allData) {
       reject({ name: "GetAllDataRejected" });

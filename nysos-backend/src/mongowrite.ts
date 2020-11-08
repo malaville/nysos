@@ -1,4 +1,6 @@
+import { app, TEST_HOST } from ".";
 import { client } from "./mongodefs";
+
 export const saveOneDocument = async (
   contentId: string,
   content: string,
@@ -8,7 +10,9 @@ export const saveOneDocument = async (
     if (!client.isConnected()) {
       await client.connect().catch((err) => reject(err));
     }
-    const collection = client.db("nysos").collection(`${uid}:content`);
+    const testHost = app.get(TEST_HOST);
+    const dbName = `nysos${testHost ? "-test" : ""}`;
+    const collection = client.db(dbName).collection(`${uid}:content`);
     collection
       .updateOne(
         { _id: contentId },
@@ -70,7 +74,9 @@ export const saveOneObjectData = async (
       data.position.y = Math.floor(data.position.y);
     }
 
-    const collection = client.db("nysos").collection(`${uid}:data`);
+    const testHost = app.get(TEST_HOST);
+    const dbName = `nysos${testHost ? "-test" : ""}`;
+    const collection = client.db(dbName).collection(`${uid}:data`);
     collection
       .updateOne(
         { _id: objectId },
@@ -97,6 +103,64 @@ export const saveOneObjectData = async (
       })
       .catch((err) => {
         reject(err);
+      });
+  });
+};
+
+export const copyProdToTest = async (uid: number) => {
+  return new Promise(async (resolve, reject) => {
+    if (!client.isConnected()) {
+      await client.connect().catch((err) => reject(err));
+    }
+
+    let resolved = 0;
+
+    client
+      .db("nysos-test")
+      .collection(`${uid}:content`, async (err, targetForContent) => {
+        const batchContent = targetForContent.initializeOrderedBulkOp();
+        var sourceOfContent = await client
+          .db("nysos")
+          .collection(`${uid}:content`)
+          .find()
+          .toArray();
+        targetForContent
+          .bulkWrite(
+            sourceOfContent.map((content) => ({
+              insertOne: { document: content },
+            }))
+          )
+          .then(() => {
+            console.log(
+              `${new Date().toISOString()} COPIED all content from prod to test`
+            );
+            resolved++;
+            resolved == 2 && resolve(true);
+          });
+      });
+
+    client
+      .db("nysos-test")
+      .collection(`${uid}:data`, async (err, targetForData) => {
+        const batchData = targetForData.initializeOrderedBulkOp();
+        var sourceOfData = await client
+          .db("nysos")
+          .collection(`${uid}:data`)
+          .find()
+          .toArray();
+        targetForData
+          .bulkWrite(
+            sourceOfData.map((data) => ({
+              insertOne: { document: data },
+            }))
+          )
+          .then(() => {
+            console.log(
+              `${new Date().toISOString()} COPIED all data from prod to test`
+            );
+            resolved++;
+            resolved == 2 && resolve(true);
+          });
       });
   });
 };

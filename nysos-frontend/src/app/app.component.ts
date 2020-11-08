@@ -26,6 +26,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   title = 'nysos-frontend';
   documentStateObs: Observable<DocumentDataStateInterface>;
   large: Observable<boolean> = scheduled([false], null);
+  isTest: boolean;
 
   contentChangesObs: Observable<ContentChangesInterface>;
 
@@ -44,6 +45,10 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.documentStateObs = this.genState.documentStateObservable;
+    this.isTest =
+      window.location.hostname.includes('test') ||
+      window.location.hostname.includes('stage') ||
+      window.location.hostname.includes('localhost');
     this.contentChangesObs = this.cytoDb.contentChangesObs;
     this.large = this.genState.UIStateObservable.pipe(
       map((uistate) => uistate.addingDocument || uistate.editDocument)
@@ -83,6 +88,11 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   groupingModeClicked() {
     this.genState.toggleGroupingMode();
-    // Activate Grouping Mode
+    // Activate Grouping Mode}
+  }
+
+  importMyDataClicked() {
+    console.log('Import my data clicked');
+    this.cytoDb.importMyData();
   }
 }

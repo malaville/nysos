@@ -1,3 +1,5 @@
+import { appendFile } from "fs";
+import { app, TEST_HOST } from ".";
 import { client } from "./mongodefs";
 export const deleteAllMyData = async (
   uid: number
@@ -8,15 +10,17 @@ export const deleteAllMyData = async (
       throw err;
     });
   }
+  const testHost = app.get(TEST_HOST);
+  const dbName = `nysos${testHost ? "-test" : ""}`;
   const delData = client
-    .db("nysos")
+    .db(dbName)
     .dropCollection(`${uid}:data`)
     .catch((err) => {
       if (err.codeName == "NamespaceNotFound") return true;
       throw err;
     });
   const delContent = client
-    .db("nysos")
+    .db(dbName)
     .dropCollection(`${uid}:content`)
     .catch((err) => {
       if (err.codeName == "NamespaceNotFound") return true;
@@ -40,7 +44,9 @@ export const deleteOneDocument = async (contentId: string, uid: number) => {
         return;
       }
     }
-    const collection = client.db("nysos").collection(`${uid}:content`);
+    const testHost = app.get(TEST_HOST);
+    const dbName = `nysos${testHost ? "-test" : ""}`;
+    const collection = client.db(dbName).collection(`${uid}:content`);
     try {
       await collection.deleteOne({ _id: contentId }).then((update) => {
         console.log(
@@ -69,7 +75,9 @@ export const deleteOneObjectData = async (contentId: string, uid: number) => {
         return;
       }
     }
-    const collection = client.db("nysos").collection(`${uid}:data`);
+    const testHost = app.get(TEST_HOST);
+    const dbName = `nysos${testHost ? "-test" : ""}`;
+    const collection = client.db(dbName).collection(`${uid}:data`);
     try {
       await collection.deleteOne({ _id: contentId }).then((update) => {
         console.log(

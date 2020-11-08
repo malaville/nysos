@@ -87,3 +87,15 @@ export const apiIsReachable = (): Promise<boolean> => {
     });
   });
 };
+
+export const importAllMyDataToTestEnv = (authToken: string): Promise<boolean> =>
+  fetch(`${url}/synctestandprod?token=${authToken}`, {
+    method: 'GET',
+    mode: 'cors',
+    cache: 'default',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }).then((res) => {
+    if (res.status == 200) return true;
+  });
