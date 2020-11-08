@@ -12,6 +12,14 @@
 >
   <mat-icon>delete</mat-icon>
 </button>
+<a
+  mat-icon-button
+  aria-label="Delete Link Button"
+  [href]="bib.link"
+  target="_blank"
+>
+  <mat-icon>link</mat-icon>
+</a>
 {{ bib.acronym }} - {{ bib.title }}<br />
 <app-content-loader
   [small]="true"
