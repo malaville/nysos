@@ -2,7 +2,10 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import cytoscape, {
   EdgeCollection,
   EdgeHandlesApi,
+  EdgeSingular,
+  EventObjectNode,
   NodeCollection,
+  NodeSingular,
 } from 'cytoscape';
 import { Core } from 'cytoscape';
 import dagre from 'cytoscape-dagre';
@@ -119,15 +122,16 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
       this.cytoHierarchy
     );
 
-    this.cytoHierarchy.on('move', (ele, ele2) => {
+    this.cytoHierarchy.on('move', (ele: EventObjectNode) => {
       if (ele.target.isEdge()) return;
       if (ele.target.parent().length > 0) {
         // ele was moved in a group
 
-        if (ele.target.parent().classes().includes('CONTAINER')) {
+        const newGroupOfTarget = ele.target.parent()[0];
+        if (!!newGroupOfTarget && newGroupOfTarget?.hasClass('CONTAINER')) {
           // Was moved in an EXISTING group
 
-          const parentId = ele.target.parent().id().split(':')[0];
+          const parentId = newGroupOfTarget.id().split(':')[0];
           const nodeId = ele.target.id();
 
           this.cytoHierarchy.add({
@@ -135,22 +139,79 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
             data: { source: nodeId, target: parentId },
           });
         } else {
-          // Was moved in a newly created group
-          if (ele.target.outgoers().length > 0) {
-            return;
-          }
-          const brothers = ele.target.parent().children();
-          const parent = brothers.outgoers()?.nodes()[0];
-          if (parent) {
-            this.cytoHierarchy.add({
-              group: 'edges',
-              data: { source: ele.target.id(), target: parent.id() },
-            });
+          // Was moved in a NEWLY-CREATED group
+          // iNode = incoming Node (moved by the user) and rNode = receiving Node
+          // 4 cases :
+          // 1. iNode with Outgoer, rNode with Outgoer => the iNode should receive the outgoer of rNode
+          // 2. iNode with Outgoer, rNode without Outgoer => the iNode should give its outgoer to rNode
+          // 3. iNode without Outgoer, rNode with Outgoer => the iNode should receive the outgoer of rNode
+          // 4. iNode, rNode without => group them and target the compound node as outgoer
+
+          const iNode: NodeSingular = ele.target;
+          const rNode = ele.target
+            .parent()
+            .children()
+            .filter((node) => node.id() !== iNode.id())[0];
+          if (!rNode) return; // This was the event triggered on the receiving node before it was groupped
+
+          const iNodeHasOutgoer = iNode.outdegree(true) > 0;
+          const rNodeHasOutgoer = rNode.outdegree(true) > 0;
+
+          if (iNodeHasOutgoer) {
+            if (rNodeHasOutgoer) {
+              // Case 1
+              const outgoerOfRNode = rNode.outgoers().nodes()[0];
+              GroupingToolComponent.createEdgeBetween(
+                iNode,
+                outgoerOfRNode,
+                this.cytoHierarchy
+              );
+            } else {
+              // Case 2
+              const outgoerOfINode = iNode.outgoers().nodes()[0];
+              GroupingToolComponent.createEdgeBetween(
+                rNode,
+                outgoerOfINode,
+                this.cytoHierarchy
+              );
+            }
+          } else {
+            if (rNodeHasOutgoer) {
+              // Case 3
+              const outgoerOfRNode = rNode.outgoers().nodes()[0];
+              GroupingToolComponent.createEdgeBetween(
+                iNode,
+                outgoerOfRNode,
+                this.cytoHierarchy
+              );
+            } else {
+              // Case 4
+
+              iNode.parent()[0].data({ name: 'Future Parent' });
+              GroupingToolComponent.createEdgeBetween(
+                rNode,
+                rNode.parent()[0],
+                this.cytoHierarchy
+              );
+              GroupingToolComponent.createEdgeBetween(
+                iNode,
+                iNode.parent()[0],
+                this.cytoHierarchy
+              );
+            }
           }
         }
       } else {
         // ele was moved "out" of a container
+        // The problem of this one is that, if a container is removed (when they are only two).
+        // The other nodes also trigger this event !
+        const previousParent = ele.target.outgoers()?.incomers()?.parent();
+        //
         ele.target.outgoers()?.edges()[0]?.remove();
+        if (previousParent.children().length == 1) {
+          previousParent.children().move({ parent: null });
+          previousParent.remove();
+        }
       }
     });
     this.cytoHierarchy.nodes().unselectify();
@@ -211,5 +272,19 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
     edgesToRemove.sources().move({ parent: null });
     edgesToRemove.remove();
     this.removeMode = false;
+  }
+
+  private static createEdgeBetween(
+    node1: NodeSingular,
+    node2: NodeSingular,
+    core: Core
+  ): EdgeSingular {
+    return core.add({
+      group: 'edges',
+      data: {
+        source: node1.id(),
+        target: node2.id(),
+      },
+    });
   }
 }
