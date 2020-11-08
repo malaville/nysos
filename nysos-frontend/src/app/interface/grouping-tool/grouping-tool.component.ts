@@ -223,7 +223,7 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
         }
       }
     };
-    this.cytoHierarchy.on('move', handleMoveEvent);
+    this.cytoHierarchy.on('move', 'nodes', handleMoveEvent);
     this.cytoHierarchy.nodes().unselectify();
     this.cytoHierarchy.fit();
   }
