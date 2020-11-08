@@ -10,6 +10,7 @@ import {
   deleteAllMyData,
   deleteDataOfElement,
   fetchAllData,
+  importAllMyDataToTestEnv,
   postContent,
   postData,
 } from './fetchNysosBackend';
@@ -81,6 +82,14 @@ export class CytodatabaseService {
         { duration: 2000 }
       )
     );
+  }
+
+  importMyData() {
+    this.updateContentSaveState({ saving: true });
+    return importAllMyDataToTestEnv(this.authToken).then((x) => {
+      this.updateContentSaveState({ saving: false, saved: true });
+      return x;
+    });
   }
 
   deleteAllMyLocalData() {

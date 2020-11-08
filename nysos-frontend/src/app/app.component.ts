@@ -25,6 +25,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   title = 'nysos-frontend';
   documentStateObs: Observable<DocumentDataStateInterface>;
   large: Observable<boolean> = scheduled([false], null);
+  isTest: boolean;
 
   contentChangesObs: Observable<ContentChangesInterface>;
 
@@ -42,6 +43,10 @@ export class AppComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit() {
+    this.isTest =
+      window.location.hostname.includes('test') ||
+      window.location.hostname.includes('stage') ||
+      window.location.hostname.includes('localhost');
     this.documentStateObs = this.appstate.documentStateObservable;
     this.contentChangesObs = this.cytoDb.contentChangesObs;
     this.large = this.appstate.UIstateObservable.pipe(
@@ -78,5 +83,10 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   goOfflineClicked() {
     this.cytoDb.goOffline();
+  }
+
+  importMyDataClicked() {
+    console.log('Import my data clicked');
+    this.cytoDb.importMyData();
   }
 }
