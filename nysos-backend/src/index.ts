@@ -13,7 +13,7 @@ import {
 } from "./mongodelete";
 const bodyParser = require("body-parser");
 var cors = require("cors");
-export const TEST_HOST = "TEST_HOST";
+export const TEST_ORIGIN = "TEST_ORIGIN";
 export const app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -21,19 +21,21 @@ app.use(bodyParser.json());
 
 app.use("*", async function (req: Request, res: Response, next: NextFunction) {
   if (
-    !req.headers.host ||
-    req.headers.host.includes("localhost") ||
-    req.headers.host.includes("test") ||
-    req.headers.host.includes("stage")
+    !req.headers.origin ||
+    req.headers.origin.includes("localhost") ||
+    req.headers.origin.includes("test") ||
+    req.headers.origin.includes("stage")
   ) {
     console.log(
       `${new Date().toISOString()} TEST host was detected on ${
         req.baseUrl
       } [host: ${req.headers.host?.slice(0, 30)}]`
     );
-    app.set(TEST_HOST, true);
+    app.set(TEST_ORIGIN, true);
+    res.setHeader("env", "test");
   } else {
-    app.set(TEST_HOST, false);
+    res.setHeader("env", "prod");
+    app.set(TEST_ORIGIN, false);
   }
 
   next();

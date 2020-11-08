@@ -1,5 +1,4 @@
-import { appendFile } from "fs";
-import { app, TEST_HOST } from ".";
+import { app, TEST_ORIGIN } from ".";
 import { client } from "./mongodefs";
 export const deleteAllMyData = async (
   uid: number
@@ -10,7 +9,10 @@ export const deleteAllMyData = async (
       throw err;
     });
   }
-  const testHost = app.get(TEST_HOST);
+  const testOrigin = app.get(TEST_ORIGIN);
+  if (!testOrigin) {
+    throw "Not allowed to delete everything on prod";
+  }
   const dbName = `nysos${testHost ? "-test" : ""}`;
   const delData = client
     .db(dbName)
