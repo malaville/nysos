@@ -122,7 +122,7 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
       this.cytoHierarchy
     );
 
-    this.cytoHierarchy.on('move', (ele: EventObjectNode) => {
+    const handleMoveEvent = (ele: EventObjectNode) => {
       if (ele.target.isEdge()) return;
       if (ele.target.parent().length > 0) {
         // ele was moved in a group
@@ -202,18 +202,28 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
           }
         }
       } else {
-        // ele was moved "out" of a container
-        // The problem of this one is that, if a container is removed (when they are only two).
-        // The other nodes also trigger this event !
-        const previousParent = ele.target.outgoers()?.incomers()?.parent();
-        //
-        ele.target.outgoers()?.edges()[0]?.remove();
-        if (previousParent.children().length == 1) {
-          previousParent.children().move({ parent: null });
-          previousParent.remove();
+        // The goNode : going-out node leaves the group.
+        // goNode leaves the group should lose it's ougoing relation.
+        // if the group contains only one brother after that.
+        // It should be deleted. Nevertheless, the new brother will trigger also the "move" event.
+        const goNode = ele.target;
+        const goNodeSiblings = goNode
+          .outgoers()
+          .nodes()
+          .incomers()
+          .nodes()
+          .filter((sib) => sib.id() !== goNode.id());
+        goNode.outgoers().edges().remove();
+        if (goNodeSiblings.length == 1) {
+          this.cytoHierarchy.unlisten('move');
+          const groupNode = goNodeSiblings.parent()[0];
+          goNodeSiblings.move({ parent: null });
+          groupNode.remove();
+          this.cytoHierarchy.on('move', handleMoveEvent);
         }
       }
-    });
+    };
+    this.cytoHierarchy.on('move', handleMoveEvent);
     this.cytoHierarchy.nodes().unselectify();
     this.cytoHierarchy.fit();
   }
