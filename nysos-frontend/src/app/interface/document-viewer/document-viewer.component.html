@@ -1,5 +1,9 @@
 <div class="button-container">
-  <button mat-mini-fab [color]="large ? 'warn' : 'primary'" (click)="newDocumentClicked()">
+  <button
+    mat-mini-fab
+    [color]="large ? 'warn' : 'primary'"
+    (click)="newDocumentClicked()"
+  >
     <mat-icon>{{
       large
         ? "close"
@@ -8,11 +12,22 @@
         : "rate_review"
     }}</mat-icon>
   </button>
-  <button mat-mini-fab color="primary" (click)="addAChildClicked()">
+  <button
+    *ngIf="!isEdgeOrDocument"
+    mat-mini-fab
+    color="primary"
+    (click)="addAChildClicked()"
+  >
     <mat-icon>center_focus_strong</mat-icon>
   </button>
-  <a *ngIf="(documentStateObs | async).bibliography" mat-mini-fab color="primary" target="_blank"
-    [disabled]="!(documentStateObs | async).bibliography?.link" [href]="(documentStateObs | async).bibliography?.link">
+  <a
+    *ngIf="(documentStateObs | async).bibliography"
+    mat-mini-fab
+    color="primary"
+    target="_blank"
+    [disabled]="!(documentStateObs | async).bibliography?.link"
+    [href]="(documentStateObs | async).bibliography?.link"
+  >
     <mat-icon>link</mat-icon>
   </a>
   <button mat-mini-fab color="warn" (click)="deleteElementClicked()">
@@ -24,28 +39,54 @@
   <app-content-save-state-indicator></app-content-save-state-indicator>
 </app-document-title>
 
-<app-bibliography-details [bibliography]="(documentStateObs | async).bibliography">
+<app-bibliography-details
+  [bibliography]="(documentStateObs | async).bibliography"
+>
   <app-content-save-state-indicator></app-content-save-state-indicator>
 </app-bibliography-details>
 <ng-container *ngIf="this.asyncContentState">
-  <app-content-loader *ngIf="(asyncContentState | async)?.resolving"></app-content-loader>
+  <app-content-loader
+    *ngIf="(asyncContentState | async)?.resolving"
+  ></app-content-loader>
   <div>
-    <button mat-stroked-button disabled *ngIf="(asyncContentState | async)?.failed">
+    <button
+      mat-stroked-button
+      disabled
+      *ngIf="(asyncContentState | async)?.failed"
+    >
       Local Content
       <!-- <button (click)="resfreshButtonClicked()">
         <mat-icon>refresh</mat-icon>
       </button> -->
     </button>
   </div>
-  <div *ngIf="(asyncContentState | async)?.resolved" #contentdiv id="content-of-document" contenteditable="true"
-    (input)="onDescriptionChange($event.target.innerHTML)" [innerHTML]="(asyncContentState | async)?.content"></div>
-  <div *ngIf="(asyncContentState | async)?.failed" #contentdiv id="content-of-document" contenteditable="true"
-    (input)="onDescriptionChange($event.target.innerHTML)" [innerHTML]="(documentStateObs | async).content"></div>
-  <div *ngIf="!(asyncContentState | async)?.resolved" id="content-of-document"></div>
+  <div
+    *ngIf="(asyncContentState | async)?.resolved"
+    #contentdiv
+    id="content-of-document"
+    contenteditable="true"
+    (input)="onDescriptionChange($event.target.innerHTML)"
+    [innerHTML]="(asyncContentState | async)?.content"
+  ></div>
+  <div
+    *ngIf="(asyncContentState | async)?.failed"
+    #contentdiv
+    id="content-of-document"
+    contenteditable="true"
+    (input)="onDescriptionChange($event.target.innerHTML)"
+    [innerHTML]="(documentStateObs | async).content"
+  ></div>
+  <div
+    *ngIf="!(asyncContentState | async)?.resolved"
+    id="content-of-document"
+  ></div>
 </ng-container>
 <div>
   <span *ngFor="let bib of bibliography | async">
-    <app-bibliography-link [bib]="bib" [linkDescriptionChange]="onLinkDescriptionChangeCallback()">
+    <app-bibliography-link
+      [bib]="bib"
+      [linkDescriptionChange]="onLinkDescriptionChangeCallback()"
+    >
     </app-bibliography-link>
   </span>
 </div>

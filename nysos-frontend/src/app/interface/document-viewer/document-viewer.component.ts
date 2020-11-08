@@ -20,6 +20,7 @@ export class DocumentViewerComponent {
   documentStateObs: Observable<DocumentDataStateInterface>;
   asyncContentState: Observable<AsyncContentStateInterface>;
   @Input() large: boolean;
+  isEdgeOrDocument: boolean;
 
   constructor(
     private cytostate: CytostateService,
@@ -30,6 +31,7 @@ export class DocumentViewerComponent {
   ngOnInit() {
     this.documentStateObs = this.appState.documentStateObservable;
     this.appState.documentStateObservable.subscribe((state) => {
+      this.isEdgeOrDocument = !!state.edgeSourceId || !!state.bibliography;
       this.asyncContentState = state.asyncContent?.asyncContentState;
     });
 
