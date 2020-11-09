@@ -45,8 +45,18 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   @HostListener('window:keydown', ['$event'])
   handleCTRLGPressed($event: KeyboardEvent) {
-    if (($event.ctrlKey || $event.metaKey) && $event.key.toLowerCase() == 'g') {
-      this.genState.ctrlgKeyPUpEventTriggered();
+    if (
+      ($event.ctrlKey || $event.metaKey) &&
+      $event.altKey &&
+      $event.key.toLowerCase() == 'g'
+    ) {
+      this.genState.ctrlAltGKeyUpEventTriggered();
+      $event.preventDefault();
+    } else if (
+      ($event.ctrlKey || $event.metaKey) &&
+      $event.key.toLowerCase() == 'g'
+    ) {
+      this.genState.ctrlgKeyUpEventTriggered();
       $event.preventDefault();
     }
   }

@@ -45,9 +45,14 @@ export class GeneralStateService {
     this.appState.closeGroupingMode();
     this.appState.toggleInfoModal(true);
   }
-  ctrlgKeyPUpEventTriggered() {
+  ctrlgKeyUpEventTriggered() {
     this.appState.unselectContent();
     !this.appState.UIstate.groupingMode && this.toggleGroupingMode();
+  }
+
+  ctrlAltGKeyUpEventTriggered() {
+    this.cytoState.groupSeletedNodesAtAncestorLevels();
+    console.log('Detected quick grouping action');
   }
 
   toggleInfoModal = () => this.appState.toggleInfoModal();

@@ -201,6 +201,7 @@ export class CytostateService {
       .select();
 
     this.saveData({ ...newNode.data(), position: newNode.position() });
+    return newNode;
   }
 
   changeNodeName(newName: string) {
@@ -454,5 +455,18 @@ export class CytostateService {
       }
     });
     this.cytocore.removeListener('on');
+  }
+
+  groupSeletedNodesAtAncestorLevels() {
+    const newNode = this.cytocore.add({
+      group: 'nodes',
+      classes: NODE_TYPES.THEME_NODE,
+      data: {
+        name: 'New Container',
+        type: NODE_TYPES.THEME_NODE,
+      },
+    });
+    console.log(this.cytocore.nodes(':selected').orphans());
+    this.cytocore.nodes(':selected').orphans().move({ parent: newNode.id() });
   }
 }

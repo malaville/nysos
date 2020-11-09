@@ -153,7 +153,7 @@ export class AppstateService {
   public closeGroupingMode() {
     this.UIstate.groupingMode = false;
     this.UIstateBS.next(this.UIstate);
-    this.dialogRef?.close();
+    this.dialogRef.close();
   }
 
   public toggleInfoModal(forcedClose = false) {
@@ -166,6 +166,7 @@ export class AppstateService {
     if (this.UIstate.infoModalOpened) {
       this.infoModalRef = this.matDialog.open(InfoModalComponent, {
         width: '60%',
+        minWidth: '300px',
       });
       this.infoModalRef
         .afterClosed()
@@ -174,7 +175,7 @@ export class AppstateService {
           this.UIstate.infoModalOpened && this.toggleInfoModal();
         });
     } else {
-      this.infoModalRef?.close();
+      this.infoModalRef.close();
     }
   }
 }
