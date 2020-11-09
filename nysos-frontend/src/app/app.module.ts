@@ -40,6 +40,7 @@ import {
   OpenButtonDirective,
   Rotate90Directive,
 } from './interface/common/expanding-fab-button/expanding-fab-button.component';
+import { InfoModalComponent } from './interface/info-modal/info-modal.component';
 const config = new SocialAuthService({
   autoLogin: true,
   providers: [
@@ -72,6 +73,7 @@ export function provideConfig() {
     ExpandingFabButtonComponent,
     Rotate90Directive,
     OpenButtonDirective,
+    InfoModalComponent,
   ],
   imports: [
     BrowserModule,

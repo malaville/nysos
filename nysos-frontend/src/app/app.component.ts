@@ -98,4 +98,6 @@ export class AppComponent implements OnInit, AfterViewInit {
   groupingModeClicked = () => () => this.genState.toggleGroupingMode();
 
   importMyDataClicked = () => () => this.cytoDb.importMyData();
+
+  moreInfoClicked = () => () => this.genState.toggleInfoModal();
 }

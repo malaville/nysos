@@ -77,6 +77,14 @@
     >
       Import my data from real database
     </app-expanding-fab-button>
+    <app-expanding-fab-button
+      *ngIf="isTest"
+      [color]="''"
+      [onClick]="moreInfoClicked()"
+      [iconName]="'info_outline'"
+    >
+      More infos on this app
+    </app-expanding-fab-button>
   </div>
   <app-google-authentication></app-google-authentication>
   <div #cy id="cy"></div>

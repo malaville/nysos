@@ -3,7 +3,9 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 import { EdgeCollection, NodeCollection } from 'cytoscape';
 import { BehaviorSubject, Observable, of } from 'rxjs';
+import { first } from 'rxjs/operators';
 import { GroupingToolComponent } from 'src/app/interface/grouping-tool/grouping-tool.component';
+import { InfoModalComponent } from 'src/app/interface/info-modal/info-modal.component';
 import { BibliographyItem } from 'src/app/interface/source-manager/bibliography-item';
 import { AsyncContent } from '../cytodatabase/asyncContent';
 import { CytodatabaseService } from '../cytodatabase/cytodatabase.service';
@@ -32,6 +34,7 @@ export interface UIStateInterface {
   addingDocument: boolean;
   editDocument: boolean;
   groupingMode: boolean;
+  infoModalOpened: boolean;
 }
 
 @Injectable({
@@ -40,6 +43,7 @@ export interface UIStateInterface {
 export class AppstateService {
   sidenavref: MatSidenav;
   dialogRef: MatDialogRef<GroupingToolComponent>;
+  infoModalRef: MatDialogRef<InfoModalComponent>;
 
   readonly documentState: DocumentDataStateInterface = defaultDocumentState;
   private documentStateBS = new BehaviorSubject(this.documentState);
@@ -49,6 +53,7 @@ export class AppstateService {
     addingDocument: false,
     editDocument: false,
     groupingMode: false,
+    infoModalOpened: false,
   };
   private UIstateBS = new BehaviorSubject(this.UIstate);
   readonly UIstateObservable = this.UIstateBS.asObservable();
@@ -148,6 +153,28 @@ export class AppstateService {
   public closeGroupingMode() {
     this.UIstate.groupingMode = false;
     this.UIstateBS.next(this.UIstate);
-    this.dialogRef.close();
+    this.dialogRef?.close();
+  }
+
+  public toggleInfoModal(forcedClose = false) {
+    if (forcedClose) {
+      this.UIstate.infoModalOpened = false;
+    } else {
+      this.UIstate.infoModalOpened = !this.UIstate.infoModalOpened;
+    }
+    this.UIstateBS.next(this.UIstate);
+    if (this.UIstate.infoModalOpened) {
+      this.infoModalRef = this.matDialog.open(InfoModalComponent, {
+        width: '60%',
+      });
+      this.infoModalRef
+        .afterClosed()
+        .pipe(first())
+        .subscribe(() => {
+          this.UIstate.infoModalOpened && this.toggleInfoModal();
+        });
+    } else {
+      this.infoModalRef?.close();
+    }
   }
 }

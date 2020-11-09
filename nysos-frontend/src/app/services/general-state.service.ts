@@ -43,9 +43,12 @@ export class GeneralStateService {
     this.appState.unselectContent();
     this.appState.closeNewDocument();
     this.appState.closeGroupingMode();
+    this.appState.toggleInfoModal(true);
   }
   gKeyPUpEventTriggered() {
     this.appState.unselectContent();
     !this.appState.UIstate.groupingMode && this.toggleGroupingMode();
   }
+
+  toggleInfoModal = () => this.appState.toggleInfoModal();
 }
