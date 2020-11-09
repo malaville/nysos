@@ -407,8 +407,10 @@ export class CytostateService {
   }
 
   importNewParentingRelations(newRelations: EdgeCollection) {
-    console.log(this.cytocore.nodes().length);
-    // this.cytocore.on('move', (node) => console.log(node.target.id()));
+    this.cytocore.on('move', 'node', (event) => {
+      const movedNode = event.target;
+      this.cyDb.saveDataOrContentOf(movedNode.id(), movedNode.data());
+    });
     this.cytocore.nodes().forEach((node) => {
       if (node.parent().length > 0) {
         // check if the parent is still its parent
@@ -423,7 +425,12 @@ export class CytostateService {
         // We found you, but you may have a new parent
         if (foundNode.target().id() !== node.parent()[0].id()) {
           // Sorry you were adopted by a new dude, Brandon. Call him daddy.
-          node.move({ parent: foundNode.target().id() });
+          const parentId = foundNode.target().id();
+          if (this.cytocore.getElementById(parentId).length == 0) {
+            const addedNode = this.cytocore.add(foundNode.target());
+            this.cyDb.saveDataOrContentOf(addedNode.id(), addedNode.data());
+          }
+          node.move({ parent: parentId });
           return;
         }
         // Lucky You, nothing happened
@@ -436,10 +443,16 @@ export class CytostateService {
         );
         if (foundNode.length > 0) {
           // SYou have a new DADDYYYY
-          node.move({ parent: foundNode.target().id() });
+          const parentId = foundNode.target().id();
+          if (this.cytocore.getElementById(parentId).length == 0) {
+            const addedNode = this.cytocore.add(foundNode.target());
+            this.cyDb.saveDataOrContentOf(addedNode.id(), addedNode.data());
+          }
+          node.move({ parent: parentId });
           return;
         }
       }
     });
+    this.cytocore.removeListener('on');
   }
 }

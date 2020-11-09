@@ -11,6 +11,7 @@ import { Core } from 'cytoscape';
 import dagre from 'cytoscape-dagre';
 import compoundDragAndDrop from 'cytoscape-compound-drag-and-drop';
 import { edgehandlestyles } from 'src/app/services/cytostate/edgehandlesstyles';
+import { NODE_TYPES } from 'src/app/services/cytostate/models';
 
 cytoscape.use(compoundDragAndDrop);
 cytoscape.use(dagre);
@@ -187,7 +188,10 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
             } else {
               // Case 4
 
-              iNode.parent()[0].data({ name: 'Future Parent' });
+              iNode
+                .parent()[0]
+                .data({ name: 'Future Parent', type: NODE_TYPES.THEME_NODE })
+                .addClass(NODE_TYPES.THEME_NODE);
               GroupingToolComponent.createEdgeBetween(
                 rNode,
                 rNode.parent()[0],
