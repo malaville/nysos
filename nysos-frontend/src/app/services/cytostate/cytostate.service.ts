@@ -467,6 +467,27 @@ export class CytostateService {
       },
     });
     console.log(this.cytocore.nodes(':selected').orphans());
-    this.cytocore.nodes(':selected').orphans().move({ parent: newNode.id() });
+    this.cytocore
+      .nodes(':selected')
+      .orphans()
+      .move({ parent: newNode.id() })
+      .union(newNode)
+      .forEach((node) => this.saveData(node.data()));
+  }
+
+  deleteSelectedThemes() {
+    const deletedNodesAndConnectedEdges = this.cytocore
+      .nodes(':selected')
+      .union(this.cytocore.nodes(':selected').neighborhood().edges());
+
+    const confirmation = confirm(
+      `Are you sure you want to delete those ${deletedNodesAndConnectedEdges.length} elements ?`
+    );
+    if (confirmation) {
+      deletedNodesAndConnectedEdges.remove();
+      deletedNodesAndConnectedEdges.forEach((ele) =>
+        this.saveDeletionLocallyAndRemote(ele.id())
+      );
+    }
   }
 }

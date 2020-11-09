@@ -54,6 +54,12 @@ export class AppComponent implements OnInit, AfterViewInit {
       $event.preventDefault();
     } else if (
       ($event.ctrlKey || $event.metaKey) &&
+      $event.key.toLowerCase() == 'd'
+    ) {
+      this.genState.ctrlDKeyUpEventTriggered();
+      $event.preventDefault();
+    } else if (
+      ($event.ctrlKey || $event.metaKey) &&
       $event.key.toLowerCase() == 'g'
     ) {
       this.genState.ctrlgKeyUpEventTriggered();

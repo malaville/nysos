@@ -40,20 +40,21 @@ export class GeneralStateService {
   };
 
   escapeKeyDownEventTriggered() {
+    this.appState.closeGroupingMode();
     this.appState.unselectContent();
     this.appState.closeNewDocument();
-    this.appState.closeGroupingMode();
     this.appState.toggleInfoModal(true);
   }
+
   ctrlgKeyUpEventTriggered() {
     this.appState.unselectContent();
     !this.appState.UIstate.groupingMode && this.toggleGroupingMode();
   }
 
-  ctrlAltGKeyUpEventTriggered() {
+  ctrlAltGKeyUpEventTriggered = () =>
     this.cytoState.groupSeletedNodesAtAncestorLevels();
-    console.log('Detected quick grouping action');
-  }
+
+  ctrlDKeyUpEventTriggered = () => this.cytoState.deleteSelectedThemes();
 
   toggleInfoModal = () => this.appState.toggleInfoModal();
 }

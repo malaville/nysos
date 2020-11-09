@@ -153,7 +153,7 @@ export class AppstateService {
   public closeGroupingMode() {
     this.UIstate.groupingMode = false;
     this.UIstateBS.next(this.UIstate);
-    this.dialogRef.close();
+    this.dialogRef?.close();
   }
 
   public toggleInfoModal(forcedClose = false) {
@@ -175,7 +175,7 @@ export class AppstateService {
           this.UIstate.infoModalOpened && this.toggleInfoModal();
         });
     } else {
-      this.infoModalRef.close();
+      this.infoModalRef?.close();
     }
   }
 }
