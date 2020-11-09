@@ -185,6 +185,7 @@ export class CytostateService {
   addNode(params: { parent?: string; x?: number; y?: number } = {}) {
     const bb = this.cytocore.nodes().boundingBox({});
     const center = { x: (bb.x1 + bb.x2) / 2, y: (bb.y1 + bb.y2) / 2 };
+    this.cytocore.elements().unselect();
     const newNode = this.cytocore
       .add({
         group: 'nodes',
