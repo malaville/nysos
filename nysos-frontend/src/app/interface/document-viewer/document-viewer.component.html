@@ -1,5 +1,14 @@
 <div class="button-container">
   <button
+    class="show-on-phones"
+    mat-mini-fab
+    color="primary"
+    (click)="closePanelClicked()"
+  >
+    <mat-icon>keyboard_arrow_left</mat-icon>
+  </button>
+  <button
+    class="hide-on-phones"
     mat-mini-fab
     [color]="large ? 'warn' : 'primary'"
     (click)="newDocumentClicked()"

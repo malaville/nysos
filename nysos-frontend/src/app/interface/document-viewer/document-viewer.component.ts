@@ -59,4 +59,6 @@ export class DocumentViewerComponent {
   deleteElementClicked = () => {
     const edges = this.cytostate.deleteFocusedElement();
   };
+
+  closePanelClicked = () => this.appState.unselectContent();
 }

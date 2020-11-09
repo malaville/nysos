@@ -42,3 +42,19 @@ div:focus {
   transform: rotate(90deg);
   transition: transform 0.5s;
 }
+
+@media only screen and (min-width: 500px) {
+  .show-on-phones {
+    visibility: hidden;
+    position: absolute;
+  }
+}
+@media only screen and (max-width: 500px) {
+  .hide-on-phones {
+    visibility: hidden;
+    position: absolute;
+  }
+  .show-on-phones {
+    visibility: inherit;
+  }
+}
