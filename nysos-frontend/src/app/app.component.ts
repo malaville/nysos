@@ -43,9 +43,12 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.genState.escapeKeyDownEventTriggered();
   }
 
-  @HostListener('document:keyup.g', ['$event'])
-  handleGPressed(event: KeyboardEvent) {
-    this.genState.gKeyPUpEventTriggered();
+  @HostListener('window:keydown', ['$event'])
+  handleCTRLGPressed($event: KeyboardEvent) {
+    if (($event.ctrlKey || $event.metaKey) && $event.key.toLowerCase() == 'g') {
+      this.genState.ctrlgKeyPUpEventTriggered();
+      $event.preventDefault();
+    }
   }
 
   constructor(

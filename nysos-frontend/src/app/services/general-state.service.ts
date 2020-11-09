@@ -45,7 +45,7 @@ export class GeneralStateService {
     this.appState.closeGroupingMode();
     this.appState.toggleInfoModal(true);
   }
-  gKeyPUpEventTriggered() {
+  ctrlgKeyPUpEventTriggered() {
     this.appState.unselectContent();
     !this.appState.UIstate.groupingMode && this.toggleGroupingMode();
   }
