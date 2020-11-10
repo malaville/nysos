@@ -13,3 +13,8 @@ body {
   margin: 0;
   font-family: monospace;
 }
+.custom-modalbox mat-dialog-container {
+  border-radius: 40px;
+  overflow: hidden;
+  padding: 10px 40px;
+}

@@ -192,7 +192,10 @@ export class AppstateService {
     this.UIstateBS.next(this.UIstate);
     this.searchBarModalRef = this.matDialog.open(SearchBarComponent, {
       position: { top: '100px' },
+      height: '80px',
+      width: '700px',
       autoFocus: true,
+      panelClass: 'custom-modalbox',
     });
     this.searchBarModalRef.componentInstance.options = keys;
     this.searchBarModalRef.componentInstance.optionSelected = optionSelected;
