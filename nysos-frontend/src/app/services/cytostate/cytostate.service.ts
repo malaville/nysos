@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
 import {
-  CollectionReturnValue,
   Core,
   EdgeCollection,
   EdgeHandlesApi,
-  Ext,
-  NodeSingular,
+  NodeCollection,
 } from 'cytoscape';
 import { defaults } from './edgehandlesdefault';
 import cytoscape from 'cytoscape';
@@ -23,6 +21,7 @@ import { GoogleLoginProvider, SocialAuthService } from 'angularx-social-login';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { take } from 'rxjs/operators';
 import { apiIsReachable } from '../cytodatabase/fetchNysosBackend';
+import { Color } from 'src/app/interface/common/color-picker/color-picker.component';
 
 const NEW_NAME = '';
 
@@ -466,7 +465,6 @@ export class CytostateService {
         type: NODE_TYPES.THEME_NODE,
       },
     });
-    console.log(this.cytocore.nodes(':selected').orphans());
     this.cytocore
       .nodes(':selected')
       .orphans()
@@ -489,5 +487,36 @@ export class CytostateService {
         this.saveDeletionLocallyAndRemote(ele.id())
       );
     }
+  }
+
+  setColor(nodeId: string, color: Color) {
+    const targetNode = this.cytocore.getElementById(nodeId).nodes();
+    let ancestor: NodeCollection = targetNode;
+    if (targetNode.parents().length > 0) {
+      ancestor = targetNode.ancestors().last().union([]);
+    }
+    let maxdepth = 0;
+    let currentNode = ancestor.nodes();
+    while (currentNode.length > 0) {
+      maxdepth++;
+      currentNode = currentNode.children();
+    }
+    let currentDepth = 0;
+    currentNode = ancestor.nodes();
+    while (currentNode.length > 0) {
+      currentDepth++;
+      const c = this.colorShade(color[0], currentDepth, maxdepth);
+      const backgroundColor = `hsl(${c[0]}, ${Math.floor(c[1])}% ,${c[2]}%)`;
+      currentNode.style({
+        backgroundColor,
+      });
+      currentNode = currentNode.children();
+    }
+  }
+
+  colorShade(h, depth, maxdepth): [number, number, number] {
+    const factor = depth / maxdepth;
+    const factorReaching0 = (depth - 1) / maxdepth;
+    return [h, 60 * factorReaching0 + 20, 80 * (1 - factorReaching0)];
   }
 }
