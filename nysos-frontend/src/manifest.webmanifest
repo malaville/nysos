@@ -1,6 +1,6 @@
 {
-  "name": "nysos-frontend",
-  "short_name": "nysos-frontend",
+  "name": "Nysos",
+  "short_name": "Nysos",
   "theme_color": "#1976d2",
   "background_color": "#fafafa",
   "display": "standalone",
