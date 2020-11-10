@@ -50,19 +50,29 @@ export class AppComponent implements OnInit, AfterViewInit {
       $event.altKey &&
       $event.key.toLowerCase() == 'g'
     ) {
+      // CTRL + ALT + D
       this.genState.ctrlAltGKeyUpEventTriggered();
       $event.preventDefault();
     } else if (
       ($event.ctrlKey || $event.metaKey) &&
       $event.key.toLowerCase() == 'd'
     ) {
+      // CTRL + D
       this.genState.ctrlDKeyUpEventTriggered();
       $event.preventDefault();
     } else if (
       ($event.ctrlKey || $event.metaKey) &&
       $event.key.toLowerCase() == 'g'
+      // CTRL + G
     ) {
       this.genState.ctrlgKeyUpEventTriggered();
+      $event.preventDefault();
+    } else if (
+      ($event.ctrlKey || $event.metaKey) &&
+      $event.key.toLowerCase() == 'p'
+      // CTRL + P
+    ) {
+      this.genState.openSearchBarClicked();
       $event.preventDefault();
     }
   }
@@ -119,4 +129,6 @@ export class AppComponent implements OnInit, AfterViewInit {
   importMyDataClicked = () => () => this.cytoDb.importMyData();
 
   moreInfoClicked = () => () => this.genState.toggleInfoModal();
+
+  searchButtonClicked = () => () => this.genState.openSearchBarClicked();
 }

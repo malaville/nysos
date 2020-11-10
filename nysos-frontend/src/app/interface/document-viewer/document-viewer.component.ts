@@ -8,6 +8,7 @@ import {
 import { AsyncContentStateInterface } from 'src/app/services/cytodatabase/asyncContent';
 import { CytodatabaseService } from 'src/app/services/cytodatabase/cytodatabase.service';
 import { CytostateService } from 'src/app/services/cytostate/cytostate.service';
+import { GeneralStateService } from 'src/app/services/general-state.service';
 import { BibliographyItemLink } from '../source-manager/bibliography-item';
 
 @Component({
@@ -25,7 +26,8 @@ export class DocumentViewerComponent {
   constructor(
     private cytostate: CytostateService,
     private appState: AppstateService,
-    private cytoDb: CytodatabaseService
+    private cytoDb: CytodatabaseService,
+    private genState: GeneralStateService
   ) {}
 
   ngOnInit() {
@@ -61,4 +63,6 @@ export class DocumentViewerComponent {
   };
 
   closePanelClicked = () => this.appState.unselectContent();
+
+  searchClicked = () => this.genState.openSearchBarClicked();
 }

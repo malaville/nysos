@@ -57,4 +57,16 @@ export class GeneralStateService {
   ctrlDKeyUpEventTriggered = () => this.cytoState.deleteSelectedThemes();
 
   toggleInfoModal = () => this.appState.toggleInfoModal();
+
+  openSearchBarClicked = () => {
+    const keys = this.cytoState
+      .getThemeNodes()
+      .map((node) => ({ name: node.data().name, id: node.id() }));
+    const optionSelected = (id: string) => {
+      const data = this.cytoState.getThemeNodes().getElementById(id).data();
+      this.appState.contentSelected(data.id, data.name);
+      this.appState.closeSearchBar();
+    };
+    this.appState.openSearchBar(keys, optionSelected);
+  };
 }
