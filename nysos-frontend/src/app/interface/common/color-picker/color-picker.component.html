@@ -1,0 +1,20 @@
+<button
+  mat-mini-fab
+  (click)="colorPaletteClicked()"
+  [class.open]="open"
+  color=""
+>
+  <div class="palette-and-circles-container">
+    <mat-icon [ngStyle]="{ color: colorSelected ? toHSL(colorSelected) : '' }"
+      >palette</mat-icon
+    >
+    <div class="color-circle-containers">
+      <div
+        *ngFor="let color of colorPalette"
+        class="color-circle"
+        [ngStyle]="{ backgroundColor: toHSL(color) }"
+        (click)="colorClicked(color)"
+      ></div>
+    </div>
+  </div>
+</button>

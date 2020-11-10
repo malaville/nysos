@@ -43,6 +43,7 @@ import {
 } from './interface/common/expanding-fab-button/expanding-fab-button.component';
 import { InfoModalComponent } from './interface/info-modal/info-modal.component';
 import { SearchBarComponent } from './interface/search-bar/search-bar.component';
+import { ColorPickerComponent } from './interface/common/color-picker/color-picker.component';
 const config = new SocialAuthService({
   autoLogin: true,
   providers: [
@@ -77,6 +78,7 @@ export function provideConfig() {
     OpenButtonDirective,
     InfoModalComponent,
     SearchBarComponent,
+    ColorPickerComponent,
   ],
   imports: [
     BrowserModule,

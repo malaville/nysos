@@ -1,0 +1,47 @@
+.color-circle {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  margin-left: 5px;
+  border: 2px solid black;
+  display: block;
+}
+
+mat-icon {
+  margin-right: 3px;
+}
+
+.color-circle-containers {
+  display: flex;
+  flex-direction: row;
+}
+
+button.open .palette-and-circles-container {
+  max-width: 300px;
+  transition: max-width 0.3s;
+}
+
+.color-circle-containers > div {
+  margin-left: 5px;
+}
+
+.palette-and-circles-container {
+  display: flex;
+  margin-left: 8px;
+  margin-top: -2px;
+  margin-right: 5px;
+  align-items: center;
+  max-width: 27px;
+
+  overflow: hidden;
+  transition: max-width 0.2s;
+}
+
+button,
+button > * {
+  width: auto;
+}
+
+button {
+  border-radius: 20px;
+}
