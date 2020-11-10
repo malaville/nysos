@@ -25,6 +25,16 @@
     *ngIf="!isEdgeOrDocument"
     mat-mini-fab
     color="primary"
+    class="show-on-phones"
+    (click)="searchClicked()"
+  >
+    <mat-icon>search</mat-icon>
+  </button>
+  <button
+    *ngIf="!isEdgeOrDocument"
+    mat-mini-fab
+    color="primary"
+    class="hide-on-phones"
     (click)="addAChildClicked()"
   >
     <mat-icon>center_focus_strong</mat-icon>
@@ -39,7 +49,12 @@
   >
     <mat-icon>link</mat-icon>
   </a>
-  <button mat-mini-fab color="warn" (click)="deleteElementClicked()">
+  <button
+    mat-mini-fab
+    color="warn"
+    (click)="deleteElementClicked()"
+    class="hide-on-phones"
+  >
     <mat-icon>delete</mat-icon>
   </button>
 </div>

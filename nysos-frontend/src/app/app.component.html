@@ -30,6 +30,12 @@
       Created an edge
     </app-expanding-fab-button>
     <app-expanding-fab-button
+      [onClick]="searchButtonClicked()"
+      [iconName]="'search'"
+    >
+      Search for themes (Nodes only)
+    </app-expanding-fab-button>
+    <app-expanding-fab-button
       [onClick]="addThemeClicked()"
       [iconName]="'add_circle_outline'"
     >

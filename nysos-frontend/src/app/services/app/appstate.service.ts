@@ -6,6 +6,7 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 import { first } from 'rxjs/operators';
 import { GroupingToolComponent } from 'src/app/interface/grouping-tool/grouping-tool.component';
 import { InfoModalComponent } from 'src/app/interface/info-modal/info-modal.component';
+import { SearchBarComponent } from 'src/app/interface/search-bar/search-bar.component';
 import { BibliographyItem } from 'src/app/interface/source-manager/bibliography-item';
 import { AsyncContent } from '../cytodatabase/asyncContent';
 import { CytodatabaseService } from '../cytodatabase/cytodatabase.service';
@@ -35,6 +36,7 @@ export interface UIStateInterface {
   editDocument: boolean;
   groupingMode: boolean;
   infoModalOpened: boolean;
+  searchBarOpened: boolean;
 }
 
 @Injectable({
@@ -44,6 +46,7 @@ export class AppstateService {
   sidenavref: MatSidenav;
   dialogRef: MatDialogRef<GroupingToolComponent>;
   infoModalRef: MatDialogRef<InfoModalComponent>;
+  searchBarModalRef: MatDialogRef<SearchBarComponent>;
 
   readonly documentState: DocumentDataStateInterface = defaultDocumentState;
   private documentStateBS = new BehaviorSubject(this.documentState);
@@ -54,6 +57,7 @@ export class AppstateService {
     editDocument: false,
     groupingMode: false,
     infoModalOpened: false,
+    searchBarOpened: true,
   };
   private UIstateBS = new BehaviorSubject(this.UIstate);
   readonly UIstateObservable = this.UIstateBS.asObservable();
@@ -177,5 +181,26 @@ export class AppstateService {
     } else {
       this.infoModalRef?.close();
     }
+  }
+
+  openSearchBar(
+    keys: { name: string; id: string }[],
+    optionSelected: (id: string) => void
+  ) {
+    console.log('OpenSearchBar');
+    this.UIstate.searchBarOpened = true;
+    this.UIstateBS.next(this.UIstate);
+    this.searchBarModalRef = this.matDialog.open(SearchBarComponent, {
+      position: { top: '100px' },
+      autoFocus: true,
+    });
+    this.searchBarModalRef.componentInstance.options = keys;
+    this.searchBarModalRef.componentInstance.optionSelected = optionSelected;
+  }
+
+  closeSearchBar() {
+    this.UIstate.searchBarOpened = true;
+    this.UIstateBS.next(this.UIstate);
+    this.searchBarModalRef?.close();
   }
 }

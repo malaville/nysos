@@ -12,6 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 // Components
 import { AppRoutingModule } from './app-routing.module';
@@ -41,6 +42,7 @@ import {
   Rotate90Directive,
 } from './interface/common/expanding-fab-button/expanding-fab-button.component';
 import { InfoModalComponent } from './interface/info-modal/info-modal.component';
+import { SearchBarComponent } from './interface/search-bar/search-bar.component';
 const config = new SocialAuthService({
   autoLogin: true,
   providers: [
@@ -74,6 +76,7 @@ export function provideConfig() {
     Rotate90Directive,
     OpenButtonDirective,
     InfoModalComponent,
+    SearchBarComponent,
   ],
   imports: [
     BrowserModule,
@@ -93,6 +96,7 @@ export function provideConfig() {
       enabled: environment.production,
     }),
     MatDialogModule,
+    MatAutocompleteModule,
   ],
   providers: [
     {
