@@ -199,6 +199,10 @@ export class AppstateService {
     });
     this.searchBarModalRef.componentInstance.options = keys;
     this.searchBarModalRef.componentInstance.optionSelected = optionSelected;
+    this.searchBarModalRef
+      .afterClosed()
+      .pipe(first())
+      .subscribe(() => this.closeSearchBar());
   }
 
   closeSearchBar() {
