@@ -9,6 +9,7 @@ import { AsyncContentStateInterface } from 'src/app/services/cytodatabase/asyncC
 import { CytodatabaseService } from 'src/app/services/cytodatabase/cytodatabase.service';
 import { CytostateService } from 'src/app/services/cytostate/cytostate.service';
 import { GeneralStateService } from 'src/app/services/general-state.service';
+import { Color } from '../common/color-picker/color-picker.component';
 import { BibliographyItemLink } from '../source-manager/bibliography-item';
 
 @Component({
@@ -65,4 +66,7 @@ export class DocumentViewerComponent {
   closePanelClicked = () => this.appState.unselectContent();
 
   searchClicked = () => this.genState.openSearchBarClicked();
+
+  colorSelectedCallback = () => (color: Color) =>
+    this.genState.colorSelected(color);
 }

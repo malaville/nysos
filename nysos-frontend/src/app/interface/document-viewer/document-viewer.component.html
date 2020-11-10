@@ -39,6 +39,18 @@
   >
     <mat-icon>center_focus_strong</mat-icon>
   </button>
+  <app-color-picker
+    [colorPalette]="[
+      [0, 60, 60],
+      [40, 60, 60],
+      [80, 60, 60],
+      [120, 60, 60],
+      [160, 60, 60],
+      [200, 60, 60],
+      [240, 60, 60]
+    ]"
+    [colorSelectedCallback]="colorSelectedCallback()"
+  ></app-color-picker>
   <a
     *ngIf="(documentStateObs | async).bibliography"
     mat-mini-fab
