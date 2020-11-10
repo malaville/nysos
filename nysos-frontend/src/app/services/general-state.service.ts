@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { EdgeCollection } from 'cytoscape';
 import { Observable } from 'rxjs';
+import { Color } from '../interface/common/color-picker/color-picker.component';
 import {
   AppstateService,
   DocumentDataStateInterface,
@@ -69,4 +70,7 @@ export class GeneralStateService {
     };
     this.appState.openSearchBar(keys, optionSelected);
   };
+
+  colorSelected = (color: Color) =>
+    this.cytoState.setColor(this.appState.documentState.contentId, color);
 }
