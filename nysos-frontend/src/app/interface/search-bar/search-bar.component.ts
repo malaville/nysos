@@ -32,7 +32,7 @@ export class SearchBarComponent implements OnInit {
 
   private _filter(value: string | object): Option[] {
     if (typeof value == 'object') return [];
-    if (!value) return this.initialOptions;
+    if (!value) return [];
     const filterValue = value?.toLowerCase();
     return this._options.search(filterValue);
   }
