@@ -1,4 +1,9 @@
 pre {
+  font-weight: bolder;
+  color: maroon;
   display: inline-block;
   width: 200px;
+}
+:host {
+  font-size: larger;
 }
