@@ -41,6 +41,7 @@ export class GeneralStateService {
   };
 
   escapeKeyDownEventTriggered() {
+    this.appState.closeSearchBar();
     this.appState.closeGroupingMode();
     this.appState.unselectContent();
     this.appState.closeNewDocument();

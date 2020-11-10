@@ -57,7 +57,7 @@ export class AppstateService {
     editDocument: false,
     groupingMode: false,
     infoModalOpened: false,
-    searchBarOpened: true,
+    searchBarOpened: false,
   };
   private UIstateBS = new BehaviorSubject(this.UIstate);
   readonly UIstateObservable = this.UIstateBS.asObservable();
@@ -187,7 +187,7 @@ export class AppstateService {
     keys: { name: string; id: string }[],
     optionSelected: (id: string) => void
   ) {
-    console.log('OpenSearchBar');
+    if (this.UIstate.searchBarOpened) return;
     this.UIstate.searchBarOpened = true;
     this.UIstateBS.next(this.UIstate);
     this.searchBarModalRef = this.matDialog.open(SearchBarComponent, {
@@ -202,7 +202,7 @@ export class AppstateService {
   }
 
   closeSearchBar() {
-    this.UIstate.searchBarOpened = true;
+    this.UIstate.searchBarOpened = false;
     this.UIstateBS.next(this.UIstate);
     this.searchBarModalRef?.close();
   }
