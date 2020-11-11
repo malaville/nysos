@@ -96,6 +96,7 @@ export function provideConfig() {
     MatSnackBarModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,
+      registrationStrategy: 'registerWithDelay:1000',
     }),
     MatDialogModule,
     MatAutocompleteModule,
