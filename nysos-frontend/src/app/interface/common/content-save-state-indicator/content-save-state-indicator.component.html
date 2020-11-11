@@ -1,9 +1,9 @@
 <div class="loaders-container">
   <img
     [hidden]="!(contentSaveState | async).writing"
-    style="width: 25px; border-radius: 50%"
+    style="width: 25px; height: 25px; border-radius: 50%"
     src="/assets/loader.svg"
-    width="25px;"
+    alt="Content is saving"
   />
   <ng-container *ngIf="!(contentSaveState | async).writing">
     <mat-spinner *ngIf="retrying" [diameter]="20"></mat-spinner>
