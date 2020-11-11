@@ -6,19 +6,49 @@
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
-    <link
+    <!-- <link
       rel="preload"
       href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&amp;display=swap"
       as="style"
       onload="this.onload=null;this.rel='stylesheet'"
+    /> -->
+    <link rel="preconnect" href="https://accounts.google.com" />
+    <link rel="preconnect" href="https://lh3.googleusercontent.com" />
+    <link rel="preconnect" href="https://ssl.gstatic.com" />
+    <link rel="preconnect" href="https://apis.google.com" />
+    <link
+      rel="preconnect"
+      href="https://europe-west1-nysos-289715.cloudfunctions.net"
     />
     <noscript><link rel="stylesheet" href="styles.css" /></noscript>
-    <link
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet"
-    />
     <link rel="manifest" href="manifest.webmanifest" />
     <meta name="theme-color" content="#1976d2" />
+    <style>
+      /* fallback */
+      @font-face {
+        font-family: "Material Icons";
+        font-style: normal;
+        font-weight: 400;
+        src: url(https://fonts.gstatic.com/s/materialicons/v67/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2)
+          format("woff2");
+      }
+
+      .material-icons {
+        font-family: "Material Icons";
+        font-weight: normal;
+        font-style: normal;
+        font-size: 24px;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-block;
+        white-space: nowrap;
+        word-wrap: normal;
+        direction: ltr;
+        -webkit-font-feature-settings: "liga";
+        -webkit-font-smoothing: antialiased;
+      }
+    </style>
   </head>
   <body>
     <app-root></app-root>
