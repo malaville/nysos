@@ -1,5 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import cytoscape, {
+  Core,
+  CytoscapeOptions,
   EdgeCollection,
   EdgeHandlesApi,
   EdgeSingular,
@@ -7,14 +9,8 @@ import cytoscape, {
   NodeCollection,
   NodeSingular,
 } from 'cytoscape';
-import { Core } from 'cytoscape';
-import dagre from 'cytoscape-dagre';
-import compoundDragAndDrop from 'cytoscape-compound-drag-and-drop';
 import { edgehandlestyles } from 'src/app/services/cytostate/edgehandlesstyles';
 import { NODE_TYPES } from 'src/app/services/cytostate/models';
-
-cytoscape.use(compoundDragAndDrop);
-cytoscape.use(dagre);
 
 type NodeDataType = {
   data: { name: string; id: string };
@@ -57,7 +53,16 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
   private static edgeHandles: EdgeHandlesApi;
   constructor() {}
 
-  ngOnInit(): void {
+  async ngOnInit() {
+    const dagreOpen = import(
+      /* webpackChunkName: 'dagre_compound' */ 'cytoscape-dagre'
+    ).then((module) => module.default);
+    const compoundDragAndDropOpen = import(
+      /* webpackChunkName: 'dagre_compound' */ 'cytoscape-compound-drag-and-drop'
+    ).then((module) => module.default);
+    console.log(await compoundDragAndDropOpen);
+    cytoscape.use(await compoundDragAndDropOpen);
+    cytoscape.use(await dagreOpen);
     const edges = GroupingToolComponent.generateParentEdges(this.config.nodes);
     const nodesWithParentsOrChildren = GroupingToolComponent.cleanNodes(
       this.config.nodes.filter(
