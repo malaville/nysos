@@ -17,6 +17,11 @@
         [ngStyle]="{ backgroundColor: toHSL(color) }"
         (click)="colorClicked(color)"
       ></div>
+      <div
+        style="background-color: lightgray"
+        class="color-circle"
+        (click)="colorClicked(undefined)"
+      ></div>
     </div>
   </div>
 </button>
