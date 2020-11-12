@@ -211,6 +211,7 @@ export class CytostateService {
       .select();
 
     this.saveData({ ...newNode.data(), position: newNode.position() });
+    this.selectContent(newNode.id());
     return newNode;
   }
 
