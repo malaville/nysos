@@ -45,3 +45,8 @@ button > * {
 button {
   border-radius: 20px;
 }
+
+.counter-rotate {
+  transform: rotate(90deg);
+  transition: transform 0.5s;
+}

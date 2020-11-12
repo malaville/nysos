@@ -5,7 +5,9 @@
   color=""
 >
   <div class="palette-and-circles-container">
-    <mat-icon [ngStyle]="{ color: colorSelected ? toHSL(colorSelected) : '' }"
+    <mat-icon
+      [class.counter-rotate]="counterRotate"
+      [ngStyle]="{ color: colorSelected ? toHSL(colorSelected) : '' }"
       >palette</mat-icon
     >
     <div class="color-circle-containers">

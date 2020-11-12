@@ -17,6 +17,9 @@ export class ColorPickerComponent implements OnInit {
   @Input()
   colorPalette: Color[];
 
+  @Input()
+  counterRotate: boolean = false;
+
   constructor() {}
 
   ngOnInit(): void {}

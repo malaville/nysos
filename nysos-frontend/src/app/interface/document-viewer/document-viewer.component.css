@@ -38,7 +38,8 @@ div:focus {
   transition: transform 0.5s, top 0.5s, right 0.5s;
 }
 
-:host.large .button-container > * {
+:host.large .button-container > button,
+:host.large .button-container > a {
   transform: rotate(90deg);
   transition: transform 0.5s;
 }
