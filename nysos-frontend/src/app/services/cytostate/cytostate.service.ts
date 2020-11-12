@@ -91,7 +91,7 @@ export class CytostateService {
         this.selectContent(node.target.id())
     );
     const timeoutId = setTimeout(
-      () => this.cyDb.loadFromLocalStorage(this.cytocore),
+      () => this.loadWithSave(this.cyDb.loadFromLocalStorage().data),
       1000
     );
     this.authState.authState.pipe(take(1)).subscribe((socialUser) => {
@@ -148,19 +148,30 @@ export class CytostateService {
           });
       }
       try {
-        await this.cyDb.loadFromRemote(cytocore);
+        const { data } = await this.cyDb.loadFromRemote();
+        this.loadWithSave(data);
         this.cyDb.saveNodesAndEdgesLocally(cytocore.elements());
       } catch (err) {
-        this.cyDb.loadFromLocalStorage(this.cytocore);
+        this.loadWithSave(this.cyDb.loadFromLocalStorage().data);
         if (err.empty) {
           this.cyDb.saveAllToRemote(this.cytocore);
         }
       }
     } else {
-      this.cyDb.loadFromLocalStorage(this.cytocore);
+      this.loadWithSave(this.cyDb.loadFromLocalStorage().data);
     }
   }
 
+  loadWithSave(cytosave: any) {
+    if (cytosave) {
+      this.cytocore.elements().remove();
+      this.cytocore.add(cytosave);
+      this.computeColors(this.cytocore);
+      this.cytocore.fit(undefined, 200);
+      return true;
+    }
+    return false;
+  }
   edgeCreationMode() {
     this.addedgemode = !this.addedgemode;
     this.addedgemode ? this.edgehandles.enable() : this.edgehandles.disable();
@@ -177,7 +188,7 @@ export class CytostateService {
   }
 
   loadFromLocalStorage() {
-    this.cyDb.loadFromLocalStorage(this.cytocore);
+    this.loadWithSave(this.cyDb.loadFromLocalStorage().data);
     this.cytocore.reset();
   }
 

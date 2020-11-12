@@ -184,9 +184,9 @@ export class CytodatabaseService {
     localStorage.setItem(CYTOSAVE_KEY, JSON.stringify(elements.jsons()));
   }
 
-  loadFromLocalStorage(cytocore: Core) {
+  loadFromLocalStorage(): { data: any } {
     const cytosave = JSON.parse(localStorage.getItem(CYTOSAVE_KEY));
-    this.loadCytocoreWithSave(cytocore, cytosave);
+    return cytosave;
   }
 
   tryFetchFromRemote(): Promise<any> {
@@ -208,7 +208,7 @@ export class CytodatabaseService {
       );
   }
 
-  async loadFromRemote(cytocore: Core) {
+  async loadFromRemote(): Promise<{ data: any }> {
     let attempts = 0;
     let MAX_ATTEMPTS = 10;
     let data = undefined;
@@ -257,10 +257,10 @@ export class CytodatabaseService {
         );
         throw { name: 'DataEmpty', empty: true };
       }
-      this.loadCytocoreWithSave(cytocore, data);
-      cytocore.fit(undefined, 100);
+      // this.loadCytocoreWithSave(cytocore, data);
+      // cytocore.fit(undefined, 100);
       this.updateContentSaveState({ saved: true });
-      return true;
+      return { data };
     } else {
       this._snackBar.open(
         "Remote unreachable... you're working offline",
@@ -272,16 +272,6 @@ export class CytodatabaseService {
       this.updateContentSaveState({ offline: true, saved: false });
       throw { name: `MaxAttemptsReached${MAX_ATTEMPTS}` };
     }
-  }
-
-  loadCytocoreWithSave(cytocore: Core, cytosave: any) {
-    if (cytosave) {
-      cytocore.elements().remove();
-      cytocore.add(cytosave);
-      cytocore.fit(undefined, 200);
-      return true;
-    }
-    return false;
   }
 
   saveDataOrContentOf(id: string, dataOrContent: string | object) {
