@@ -63,7 +63,7 @@ export class GeneralStateService {
   openSearchBarClicked = () => {
     const keys = this.cytoState
       .getThemeNodes()
-      .map((node) => ({ name: node.data().name, id: node.id() }));
+      .map((node) => ({ ...node.data() }));
     const optionSelected = (id: string) => {
       const data = this.cytoState.getThemeNodes().getElementById(id).data();
       this.appState.contentSelected(data.id, data.name);

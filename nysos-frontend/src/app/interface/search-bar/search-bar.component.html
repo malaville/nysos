@@ -1,6 +1,7 @@
 <form class="example-form">
   <mat-form-field class="example-full-width">
     <input
+      (keydown)="onKeyDown($event)"
       type="text"
       placeholder="Find your theme"
       aria-label="Name of theme"
@@ -9,15 +10,17 @@
       [matAutocomplete]="auto"
     />
     <mat-autocomplete
+      [class]="xlheight && 'xlheight'"
       autoActiveFirstOption
       #auto="matAutocomplete"
       [displayWith]="getOptionName"
       (optionSelected)="optionSelected($event.option.value.id)"
     >
-      <mat-option
-        *ngFor="let option of filteredOptions | async"
-        [value]="option"
-      >
+      <mat-option *ngFor="let option of filteredOptions" [value]="option">
+        <span
+          class="small-dot-color"
+          [ngStyle]="{ backgroundColor: getHue(option) }"
+        ></span>
         {{ option.name }}
       </mat-option>
     </mat-autocomplete>

@@ -2,10 +2,10 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { map, startWith, tap } from 'rxjs/operators';
 import Fuse from 'fuse.js';
 
-type Option = { name: string; id: string };
+type Option = { name: string; id: string; hue: number };
 @Component({
   selector: 'app-search-bar',
   templateUrl: './search-bar.component.html',
@@ -15,19 +15,22 @@ export class SearchBarComponent implements OnInit {
   inputControl = new FormControl();
   _options: Fuse<Option>;
   initialOptions: Option[];
+  xlheight: boolean = false;
   @Input()
   set options(options: Option[]) {
-    this.initialOptions = options;
+    this.initialOptions = options
+      .filter((option) => option.name)
+      .sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1));
     this._options = new Fuse(options, { keys: ['name'] });
   }
   @Input() optionSelected: (id: string) => void;
-  filteredOptions: Observable<Option[]>;
+  filteredOptions: Option[];
 
   ngOnInit() {
-    this.filteredOptions = this.inputControl.valueChanges.pipe(
-      startWith(''),
-      map((value) => this._filter(value))
-    );
+    this.inputControl.valueChanges.pipe(startWith('')).subscribe((value) => {
+      this.filteredOptions = this._filter(value);
+      this.xlheight = false;
+    });
   }
 
   private _filter(value: string | object): Option[] {
@@ -39,5 +42,18 @@ export class SearchBarComponent implements OnInit {
 
   getOptionName(option: Option) {
     return option && option.name;
+  }
+
+  getHue(option: Option): string {
+    return option.hue ? `hsl( ${option.hue}, 70%, 40%)` : 'lightgray';
+  }
+
+  onKeyDown($event) {
+    console.log($event.key);
+    console.log($event.key === 'ArrowDown', !this.inputControl.value);
+    if ($event.key === 'ArrowDown' && !this.inputControl.value) {
+      this.filteredOptions = this.initialOptions;
+      this.xlheight = true;
+    }
   }
 }

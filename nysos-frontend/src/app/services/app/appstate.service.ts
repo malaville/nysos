@@ -184,7 +184,7 @@ export class AppstateService {
   }
 
   openSearchBar(
-    keys: { name: string; id: string }[],
+    keys: { name: string; id: string; hue: number }[],
     optionSelected: (id: string) => void
   ) {
     if (this.UIstate.searchBarOpened) return;
