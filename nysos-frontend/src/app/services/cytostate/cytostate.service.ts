@@ -555,6 +555,9 @@ export class CytostateService {
       currentNode.style({
         backgroundColor,
       });
+      currentNode.forEach((node) => {
+        node.data({ inheritedHue: c[0] });
+      });
       currentNode = currentNode.children();
     }
     if (cleanHue) {

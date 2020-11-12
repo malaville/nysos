@@ -61,9 +61,11 @@ export class GeneralStateService {
   toggleInfoModal = () => this.appState.toggleInfoModal();
 
   openSearchBarClicked = () => {
-    const keys = this.cytoState
-      .getThemeNodes()
-      .map((node) => ({ ...node.data() }));
+    const keys = this.cytoState.getThemeNodes().map((node) => ({
+      id: node.id(),
+      name: node.data().name,
+      hue: node.data().hue || node.data().inheritedHue,
+    }));
     const optionSelected = (id: string) => {
       const data = this.cytoState.getThemeNodes().getElementById(id).data();
       this.appState.contentSelected(data.id, data.name);

@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { Observable } from 'rxjs';
-import { map, startWith, tap } from 'rxjs/operators';
+import { startWith } from 'rxjs/operators';
 import Fuse from 'fuse.js';
 
 type Option = { name: string; id: string; hue: number };
@@ -45,7 +45,9 @@ export class SearchBarComponent implements OnInit {
   }
 
   getHue(option: Option): string {
-    return option.hue ? `hsl( ${option.hue}, 70%, 40%)` : 'lightgray';
+    return typeof option.hue === 'number'
+      ? `hsl( ${option.hue}, 60%, 60%)`
+      : 'lightgray';
   }
 
   onKeyDown($event) {
