@@ -512,6 +512,9 @@ export class CytostateService {
       });
       currentNode = currentNode.children();
     }
+
+    ancestor.last().data({ hue: color[0] });
+    this.saveData(ancestor.last().data());
   }
 
   colorShade(h, depth, maxdepth): [number, number, number] {
