@@ -60,9 +60,12 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
     const compoundDragAndDropOpen = import(
       /* webpackChunkName: 'dagre_compound' */ 'cytoscape-compound-drag-and-drop'
     ).then((module) => module.default);
-    console.log(await compoundDragAndDropOpen);
-    cytoscape.use(await compoundDragAndDropOpen);
-    cytoscape.use(await dagreOpen);
+    try {
+      cytoscape.use(await compoundDragAndDropOpen);
+      cytoscape.use(await dagreOpen);
+    } catch (err) {
+      console.warn('TECHNICAL DEBT, library was charged more than one');
+    }
     const edges = GroupingToolComponent.generateParentEdges(this.config.nodes);
     const nodesWithParentsOrChildren = GroupingToolComponent.cleanNodes(
       this.config.nodes.filter(
