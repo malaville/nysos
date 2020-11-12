@@ -3,6 +3,7 @@ import {
   Core,
   EdgeCollection,
   EdgeHandlesApi,
+  EventObjectNode,
   NodeCollection,
 } from 'cytoscape';
 import { defaults } from './edgehandlesdefault';
@@ -33,6 +34,10 @@ export class CytostateService {
   edgehandles: EdgeHandlesApi;
   hoverednode: boolean = false;
   addedgemode: boolean = false;
+  saveDataOfNodeEvent = (event: EventObjectNode) => {
+    const movedNode = event.target;
+    this.cyDb.saveDataOrContentOf(movedNode.id(), movedNode.data());
+  };
 
   constructor(
     private cyDb: CytodatabaseService,
@@ -65,6 +70,9 @@ export class CytostateService {
       const id = e.target.id();
       this.selectContent(id);
     });
+
+    this.cytocore.on('move', 'node', this.saveDataOfNodeEvent);
+    this.cytocore.on('move', 'node', this.handleColorationAfterMoveEvent);
 
     const complete = (x, y, addedEles) => {
       addedEles.forEach((ele) =>
@@ -172,6 +180,15 @@ export class CytostateService {
     }
     return false;
   }
+
+  computeColors(core: Core) {
+    core
+      .elements('node[hue]')
+      .forEach((nodeWithHue) =>
+        this.setHueToDescendants(nodeWithHue, nodeWithHue.data().hue)
+      );
+  }
+
   edgeCreationMode() {
     this.addedgemode = !this.addedgemode;
     this.addedgemode ? this.edgehandles.enable() : this.edgehandles.disable();
@@ -338,7 +355,8 @@ export class CytostateService {
   addChildToCurrentNode() {
     const currentId = this.appstate.documentState.contentId;
     const { x, y } = this.cytocore.getElementById(currentId).position();
-    this.addNode({ parent: currentId, x, y });
+    const node = this.addNode({ parent: currentId, x, y });
+    this.handleColorationAfterMove(node);
     this.appstate.sidenavref.close();
   }
 
@@ -419,10 +437,6 @@ export class CytostateService {
   }
 
   importNewParentingRelations(newRelations: EdgeCollection) {
-    this.cytocore.on('move', 'node', (event) => {
-      const movedNode = event.target;
-      this.cyDb.saveDataOrContentOf(movedNode.id(), movedNode.data());
-    });
     this.cytocore.nodes().forEach((node) => {
       if (node.parent().length > 0) {
         // check if the parent is still its parent
@@ -432,10 +446,9 @@ export class CytostateService {
         if (foundNode.length == 0) {
           // we didn't find the node in the list, it became an orphan, sorry bro
           node.move({ parent: null });
-          return;
         }
         // We found you, but you may have a new parent
-        if (foundNode.target().id() !== node.parent()[0].id()) {
+        else if (foundNode.target().id() !== node.parent()[0].id()) {
           // Sorry you were adopted by a new dude, Brandon. Call him daddy.
           const parentId = foundNode.target().id();
           if (this.cytocore.getElementById(parentId).length == 0) {
@@ -443,12 +456,9 @@ export class CytostateService {
             this.cyDb.saveDataOrContentOf(addedNode.id(), addedNode.data());
           }
           node.move({ parent: parentId });
-          return;
         }
         // Lucky You, nothing happened
-      }
-
-      if (node.parent().length == 0) {
+      } else if (node.parent().length == 0) {
         // Maybe you were adopted lately
         const foundNode = newRelations.filter(
           (edge) => edge.source().id() == node.id()
@@ -461,11 +471,9 @@ export class CytostateService {
             this.cyDb.saveDataOrContentOf(addedNode.id(), addedNode.data());
           }
           node.move({ parent: parentId });
-          return;
         }
       }
     });
-    this.cytocore.removeListener('on');
   }
 
   groupSeletedNodesAtAncestorLevels() {
@@ -501,11 +509,36 @@ export class CytostateService {
     }
   }
 
-  setColor(nodeId: string, color: Color) {
+  setColor(nodeId: string, color: Color | number) {
+    if (color === undefined) {
+      color = [undefined, 0, 0];
+    }
+    if (typeof color == 'number') {
+      color = [color, 0, 0];
+    }
     const targetNode = this.cytocore.getElementById(nodeId).nodes();
     let ancestor: NodeCollection = targetNode;
     if (targetNode.parents().length > 0) {
       ancestor = targetNode.ancestors().last().union([]);
+    }
+    this.setHueToDescendants(ancestor, color[0]);
+
+    ancestor.last().data({ hue: color[0] });
+    this.saveData(ancestor.last().data());
+  }
+
+  setHueToDescendants(ancestor: NodeCollection, hue: number, cleanHue = true) {
+    if (hue === undefined) {
+      ancestor
+        .descendants()
+        .union(ancestor)
+        .removeStyle('background-color')
+        .forEach((node) => {
+          if (node.data().hue) {
+            node.removeData('hue');
+          }
+        });
+      return;
     }
     let maxdepth = 0;
     let currentNode = ancestor.nodes();
@@ -517,17 +550,42 @@ export class CytostateService {
     currentNode = ancestor.nodes();
     while (currentNode.length > 0) {
       currentDepth++;
-      const c = this.colorShade(color[0], currentDepth, maxdepth);
+      const c = this.colorShade(hue, currentDepth, maxdepth);
       const backgroundColor = `hsl(${c[0]}, ${Math.floor(c[1])}% ,${c[2]}%)`;
       currentNode.style({
         backgroundColor,
       });
       currentNode = currentNode.children();
     }
-
-    ancestor.last().data({ hue: color[0] });
-    this.saveData(ancestor.last().data());
+    if (cleanHue) {
+      ancestor.descendants().forEach((node) => {
+        if (node.data().hue) {
+          node.removeData('hue');
+          this.saveData(node.data());
+        }
+      });
+    }
   }
+
+  handleColorationAfterMoveEvent = (event: EventObjectNode) =>
+    this.handleColorationAfterMove(event.target);
+
+  handleColorationAfterMove = (nodeBeingMoved: NodeCollection) => {
+    const ancestor = nodeBeingMoved.ancestors().last();
+    if (ancestor.length > 0) {
+      // The node was moved in
+      // It should take color of new ancestor (be it something or null)
+      const ancestorHue = ancestor.data().hue;
+      if (ancestorHue) {
+        this.setHueToDescendants(ancestor, ancestorHue);
+      } else {
+        this.setHueToDescendants(ancestor, undefined);
+      }
+      return;
+    }
+    // The node was moved OUT
+    this.setHueToDescendants(nodeBeingMoved, undefined);
+  };
 
   colorShade(h, depth, maxdepth): [number, number, number] {
     const factor = depth / maxdepth;
