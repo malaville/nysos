@@ -66,6 +66,7 @@ export class GeneralStateService {
       name: node.data().name,
       hue: node.data().hue || node.data().inheritedHue,
     }));
+    if (keys.length == 0) return;
     const optionSelected = (id: string) => {
       const data = this.cytoState.getThemeNodes().getElementById(id).data();
       this.appState.contentSelected(data.id, data.name);
