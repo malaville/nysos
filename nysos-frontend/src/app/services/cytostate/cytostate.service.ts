@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable, InjectionToken } from '@angular/core';
 import {
   Core,
   EdgeCollection,
   EdgeHandlesApi,
+  EventObject,
   EventObjectNode,
   NodeCollection,
 } from 'cytoscape';
@@ -26,6 +27,17 @@ import { Color } from 'src/app/interface/common/color-picker/color-picker.compon
 
 const NEW_NAME = '';
 
+type Cytoscape = typeof cytoscape;
+
+export const CYTOSCAPE = new InjectionToken<Cytoscape>('Browser Storage', {
+  providedIn: 'root',
+  factory: () => {
+    console.log('Cytoscape gets created');
+    // @ts-ignore
+    cytoscape.use(edgehandles);
+    return cytoscape;
+  },
+});
 @Injectable({
   providedIn: 'root',
 })
@@ -43,23 +55,26 @@ export class CytostateService {
     private cyDb: CytodatabaseService,
     private appstate: AppstateService,
     private authState: SocialAuthService,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    @Inject(CYTOSCAPE) private cytoscape: Cytoscape
   ) {}
+
+  handleDataEvent(e: EventObject) {
+    this.saveData({
+      ...e.target.data(),
+      position: (e.target.isNode() && e.target.position()) || undefined,
+    });
+  }
 
   setCytocoreId(id: string) {
     // @ts-ignore
-    cytoscape.use(edgehandles);
-    this.cytocore = cytoscape({
+
+    this.cytocore = this.cytoscape({
       container: document.getElementById('cy'),
       style: [...styles, ...edgehandlestyles],
     });
 
-    this.cytocore.on('data', (e) => {
-      this.saveData({
-        ...e.target.data(),
-        position: (e.target.isNode() && e.target.position()) || undefined,
-      });
-    });
+    this.cytocore.on('data', this.handleDataEvent);
 
     this.cytocore.on('click touchend', 'node', (e) => {
       const id = e.target.id();
@@ -555,9 +570,11 @@ export class CytostateService {
       currentNode.style({
         backgroundColor,
       });
+      this.cytocore.removeListener('data');
       currentNode.forEach((node) => {
         node.data({ inheritedHue: c[0] });
       });
+      this.cytocore.on('data', this.handleDataEvent);
       currentNode = currentNode.children();
     }
     if (cleanHue) {
