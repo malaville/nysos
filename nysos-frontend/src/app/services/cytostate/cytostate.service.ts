@@ -1,4 +1,4 @@
-import { Inject, Injectable, InjectionToken } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import {
   Core,
   EdgeCollection,
@@ -62,7 +62,7 @@ export class CytostateService {
       style: [...styles, ...edgehandlestyles],
     });
 
-    this.cytocore.on('data', this.handleDataEvent);
+    this.cytocore.on('data', (e) => this.handleDataEvent(e));
 
     this.cytocore.on('click touchend', 'node', (e) => {
       const id = e.target.id();

@@ -1,9 +1,10 @@
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { GoogleLoginProvider, SocialAuthService } from 'angularx-social-login';
 import { CollectionReturnValue, Core } from 'cytoscape';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { LocalDatabaseService } from '../local-database/local-database.service';
 import { AsyncContent } from './asyncContent';
 import { ContentChanges, ContentChangesInterface } from './contentChanges';
 import {
@@ -51,9 +52,10 @@ export class CytodatabaseService {
 
   constructor(
     private authService: SocialAuthService,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private storage: LocalDatabaseService
   ) {
-    this.contentChanges = ContentChanges.loadFromLocalStorage();
+    this.contentChanges = ContentChanges.loadFromLocalStorage(storage);
     this.contentChangesObs = this.contentChanges.contentChangesObs;
     this.authService.authState.subscribe((st) => {
       this.authToken = st?.authToken;
@@ -93,7 +95,7 @@ export class CytodatabaseService {
   }
 
   deleteAllMyLocalData() {
-    return localStorage.clear();
+    return this.storage.clear();
   }
   changesAreWaiting() {
     return this.contentChanges.getNumberOfUpdates() > 0;
@@ -181,11 +183,12 @@ export class CytodatabaseService {
   }
 
   saveNodesAndEdgesLocally(elements: CollectionReturnValue) {
-    localStorage.setItem(CYTOSAVE_KEY, JSON.stringify(elements.jsons()));
+    this.storage.setItem(CYTOSAVE_KEY, JSON.stringify(elements.jsons()));
   }
 
   loadFromLocalStorage(): { data: any } {
-    const cytosave = JSON.parse(localStorage.getItem(CYTOSAVE_KEY));
+    console.log('Storage', Object.keys(this.storage));
+    const cytosave = JSON.parse(this.storage.getItem(CYTOSAVE_KEY));
     return cytosave;
   }
 
@@ -387,13 +390,13 @@ export class CytodatabaseService {
   }
 
   loadContentOf(id: string): string {
-    return localStorage.getItem(`${id}:content`) || '';
+    return this.storage.getItem(`${id}:content`) || '';
   }
 
   loadRemoteContentOf(id: string): AsyncContent {
-    if (!this.contentSaveState.offline)
-      return new AsyncContent(id).attemptFetching(this.authToken);
-    return new AsyncContent(id).forcedFail();
+    const asCo = new AsyncContent(id, this.storage);
+    if (this.contentSaveState.offline) return asCo.forcedFail();
+    return asCo.attemptFetching(this.authToken);
   }
 
   saveAllToRemote(cytocore: Core) {

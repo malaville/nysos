@@ -1,4 +1,5 @@
-import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
+import { Observable, ReplaySubject } from 'rxjs';
+import { LocalDatabaseService } from '../local-database/local-database.service';
 import { AsyncContent } from './asyncContent';
 
 export interface ContentChangesInterface {
@@ -22,6 +23,7 @@ const CONTENTCHANGESSAVE_KEY = 'contentchangessave';
 export class ContentChanges implements ContentChangesInterface {
   private contentChangesBS: ReplaySubject<ContentChangesInterface>;
   readonly contentChangesObs: Observable<ContentChangesInterface>;
+  private storage: LocalDatabaseService;
 
   constructor(
     readonly datas = {},
@@ -37,21 +39,28 @@ export class ContentChanges implements ContentChangesInterface {
     this.contentChangesObs = this.contentChangesBS.asObservable();
   }
 
-  static loadFromLocalStorage(): ContentChanges {
+  static loadFromLocalStorage(storage: LocalDatabaseService): ContentChanges {
     const localSave: ContentChangesSaveStringInterface = JSON.parse(
-      localStorage.getItem(CONTENTCHANGESSAVE_KEY)
+      storage.getItem(CONTENTCHANGESSAVE_KEY)
     );
-    if (!localSave) return new ContentChanges();
+    if (!localSave) {
+      let contentChanges = new ContentChanges();
+      contentChanges.storage = storage;
+      return contentChanges;
+    }
+
     const objectsToDelete = new Set<string>(localSave.objectsToDelete);
-    return new ContentChanges(
+    const contentChanges = new ContentChanges(
       localSave.datas,
       localSave.contents,
       objectsToDelete
     );
+    contentChanges.storage = storage;
+    return contentChanges;
   }
 
   saveContentChangesLocally() {
-    localStorage.setItem(
+    this.storage.setItem(
       CONTENTCHANGESSAVE_KEY,
       JSON.stringify(this.toStringifyFriendlyJson())
     );
@@ -95,7 +104,7 @@ export class ContentChanges implements ContentChangesInterface {
     if (typeof dataOrContent == 'string') {
       this.contents[id] = dataOrContent;
       this.contentsToUpdate.add(id);
-      localStorage.setItem(`${id}:content`, dataOrContent);
+      this.storage.saveContent(id, dataOrContent);
     }
     if (typeof dataOrContent == 'object') {
       this.datas[id] = dataOrContent;

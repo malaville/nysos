@@ -1,4 +1,5 @@
 import { BehaviorSubject, Observable } from 'rxjs';
+import { LocalDatabaseService } from '../local-database/local-database.service';
 import { fetchContent } from './fetchNysosBackend';
 
 export interface AsyncContentStateInterface {
@@ -17,7 +18,7 @@ export class AsyncContent {
     [id: string]: any;
   } = {};
 
-  constructor(public contentId: string) {
+  constructor(public contentId: string, private storage: LocalDatabaseService) {
     this._asyncContentState = {
       resolved: false,
       resolving: false,
@@ -53,7 +54,7 @@ export class AsyncContent {
         const content = respJson.content;
         this.updateState({ resolving: false, resolved: true, content });
         AsyncContent.contentStore[this.contentId] = content;
-        localStorage.setItem(`${this.contentId}:content`, content);
+        this.storage.setItem(`${this.contentId}:content`, content);
       } catch (err) {
         this.updateState({ resolving: false, failed: true });
       }
