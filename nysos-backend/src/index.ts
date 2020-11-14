@@ -1,5 +1,5 @@
 import {
-  copyProdToTest,
+  useCollectionReplication,
   saveOneDocument,
   saveOneObjectData,
 } from "./mongowrite";
@@ -139,6 +139,16 @@ app.delete("/", async function (req: Request, res: Response) {
     return;
   }
   try {
+    const testOrigin = app.get(TEST_ORIGIN);
+    if (!testOrigin) {
+      throw "Not allowed to delete everything on prod";
+    }
+    await useCollectionReplication(
+      uid,
+      testOrigin ? "-test" : "",
+      (testOrigin ? "-test" : " ") +
+        `:save${new Date().toISOString().slice(0, 10)}`
+    );
     const [delContent, delData] = await deleteAllMyData(uid);
 
     res.send({ delContent, delData });
@@ -200,11 +210,13 @@ app.get("/synctestandprod", async function (req: Request, res: Response) {
       });
       throw null;
     });
-    const copied = await copyProdToTest(uid).catch((err) => {
-      res.statusCode = 400;
-      res.send({ success: false, delContent, delData, copied: false });
-      throw null;
-    });
+    const copied = await useCollectionReplication(uid, "", "-test").catch(
+      (err) => {
+        res.statusCode = 400;
+        res.send({ success: false, delContent, delData, copied: false });
+        throw null;
+      }
+    );
     res.statusCode = 200;
     res.send({
       success: delContent && delData && copied,
