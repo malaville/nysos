@@ -8,8 +8,6 @@ import {
   NodeCollection,
 } from 'cytoscape';
 import { defaults } from './edgehandlesdefault';
-import cytoscape from 'cytoscape';
-import edgehandles from 'cytoscape-edgehandles';
 import { styles } from './cytostyles';
 import { EDGE_TYPES, NODE_TYPES } from './models';
 import { edgehandlestyles } from './edgehandlesstyles';
@@ -24,20 +22,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { take } from 'rxjs/operators';
 import { apiIsReachable } from '../cytodatabase/fetchNysosBackend';
 import { Color } from 'src/app/interface/common/color-picker/color-picker.component';
+import { Cytoscape, CYTOSCAPE } from './cytoscape.injectable';
 
 const NEW_NAME = '';
 
-export type Cytoscape = typeof cytoscape;
-
-export const CYTOSCAPE = new InjectionToken<Cytoscape>('Browser Storage', {
-  providedIn: 'root',
-  factory: () => {
-    console.log('Cytoscape gets created');
-    // @ts-ignore
-    cytoscape.use(edgehandles);
-    return cytoscape;
-  },
-});
 @Injectable({
   providedIn: 'root',
 })

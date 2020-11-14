@@ -12,7 +12,7 @@ import {
 import {
   CYTOSCAPE,
   Cytoscape,
-} from 'src/app/services/cytostate/cytostate.service';
+} from 'src/app/services/cytostate/cytoscape.injectable';
 import { edgehandlestyles } from 'src/app/services/cytostate/edgehandlesstyles';
 import { NODE_TYPES } from 'src/app/services/cytostate/models';
 
@@ -85,7 +85,7 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
       transform: (node, pos) => ({ x: pos.x * 1.2, y: -pos.y * 1.4 }),
       padding: 20,
     };
-    this.cytoHierarchy = cytoscape({
+    this.cytoHierarchy = this.cytoscape({
       container: document.getElementById('hierarchicalCytoscape'),
       elements: {
         nodes: nodesWithParentsOrChildren,
