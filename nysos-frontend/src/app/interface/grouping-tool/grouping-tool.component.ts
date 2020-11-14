@@ -1,5 +1,5 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import cytoscape, {
+import { Component, Inject, Input, OnDestroy, OnInit } from '@angular/core';
+import {
   Core,
   CytoscapeOptions,
   EdgeCollection,
@@ -9,6 +9,10 @@ import cytoscape, {
   NodeCollection,
   NodeSingular,
 } from 'cytoscape';
+import {
+  CYTOSCAPE,
+  Cytoscape,
+} from 'src/app/services/cytostate/cytostate.service';
 import { edgehandlestyles } from 'src/app/services/cytostate/edgehandlesstyles';
 import { NODE_TYPES } from 'src/app/services/cytostate/models';
 
@@ -51,7 +55,7 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
   private cytoHierarchy: Core;
   public removeMode: boolean;
   private static edgeHandles: EdgeHandlesApi;
-  constructor() {}
+  constructor(@Inject(CYTOSCAPE) private cytoscape: Cytoscape) {}
 
   async ngOnInit() {
     const dagreOpen = import(
@@ -61,8 +65,8 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
       /* webpackChunkName: 'dagre_compound' */ 'cytoscape-compound-drag-and-drop'
     ).then((module) => module.default);
     try {
-      cytoscape.use(await compoundDragAndDropOpen);
-      cytoscape.use(await dagreOpen);
+      this.cytoscape.use(await compoundDragAndDropOpen);
+      this.cytoscape.use(await dagreOpen);
     } catch (err) {
       console.warn('TECHNICAL DEBT, library was charged more than one');
     }
