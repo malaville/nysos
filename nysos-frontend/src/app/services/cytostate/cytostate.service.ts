@@ -47,12 +47,12 @@ export class CytostateService {
     @Inject(CYTOSCAPE) private cytoscape: Cytoscape
   ) {}
 
-  handleDataEvent(e: EventObject) {
+  handleDataEvent = (e: EventObject) => {
     this.saveData({
       ...e.target.data(),
       position: (e.target.isNode() && e.target.position()) || undefined,
     });
-  }
+  };
 
   setCytocoreId(id: string) {
     // @ts-ignore
