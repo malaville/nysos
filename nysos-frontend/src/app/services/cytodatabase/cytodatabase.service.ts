@@ -11,6 +11,7 @@ import {
   deleteAllMyData,
   deleteDataOfElement,
   fetchAllData,
+  fetchAllScopeData,
   importAllMyDataToTestEnv,
   postContent,
   postData,
@@ -192,8 +193,11 @@ export class CytodatabaseService {
     return cytosave;
   }
 
-  tryFetchFromRemote(): Promise<any> {
-    return fetchAllData(this.authToken)
+  tryFetchFromRemote(scope?: string): Promise<any> {
+    return (scope
+      ? fetchAllScopeData(this.authToken, scope)
+      : fetchAllData(this.authToken)
+    )
       .then((resp) => {
         if (resp.status != 200) throw { name: 'GettingDataFailed' };
         return resp.json();

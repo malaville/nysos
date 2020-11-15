@@ -10,6 +10,7 @@ import {
 } from './app/appstate.service';
 import { CytodatabaseService } from './cytodatabase/cytodatabase.service';
 import { CytostateService } from './cytostate/cytostate.service';
+import { RouterListenerService } from './router-listener/router-listener.service';
 
 @Injectable({
   providedIn: 'root',
@@ -20,10 +21,15 @@ export class GeneralStateService {
   constructor(
     private appState: AppstateService,
     private cytoState: CytostateService,
-    private dbState: CytodatabaseService
+    private dbState: CytodatabaseService,
+    private routeListener: RouterListenerService,
+    private cytodatabase: CytodatabaseService
   ) {
     this.documentStateObservable = this.appState.documentStateObservable;
     this.UIStateObservable = this.appState.UIstateObservable;
+    this.routeListener.currentScope.subscribe((scope) => {
+      this.handleScopeChange(scope);
+    });
   }
 
   // AppState Only Methods
@@ -77,4 +83,10 @@ export class GeneralStateService {
 
   colorSelected = (color: Color) =>
     this.cytoState.setColor(this.appState.documentState.contentId, color);
+
+  async handleScopeChange(scope: string) {
+    const data = await this.cytodatabase.tryFetchFromRemote(scope);
+    if (!data) throw { name: 'DataUndefined' };
+    this.cytoState.loadWithSave(data);
+  }
 }

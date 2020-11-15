@@ -1,10 +1,15 @@
 import { Inject, Injectable, InjectionToken } from '@angular/core';
 
 @Injectable()
-export class LocalDatabaseService {
+export abstract class LocalDatabaseService {
+  abstract _initialScope = '$SCOPE$';
   private _scope = '$SCOPE$';
   public setScope(value: string) {
     this._scope = value;
+  }
+
+  public resetScope() {
+    this._scope = this._initialScope;
   }
 
   constructor() {}
@@ -63,8 +68,9 @@ export class LocalDatabaseService {
 
 @Injectable()
 export class RootLocalDatabaseService extends LocalDatabaseService {
+  _initialScope = 'ROOT';
   constructor() {
     super();
-    this.setScope('ROOT');
+    this.resetScope();
   }
 }

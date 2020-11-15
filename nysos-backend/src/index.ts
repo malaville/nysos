@@ -11,9 +11,11 @@ import {
   deleteOneDocument,
   deleteOneObjectData,
 } from "./mongodelete";
+import { Logger } from "./logger";
 const bodyParser = require("body-parser");
 var cors = require("cors");
 export const TEST_ORIGIN = "TEST_ORIGIN";
+export const LOGGER = "LOGGER";
 export const app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -37,6 +39,7 @@ app.use("*", async function (req: Request, res: Response, next: NextFunction) {
     res.setHeader("env", "prod");
     app.set(TEST_ORIGIN, false);
   }
+  app.set(LOGGER, new Logger().setEnv("" + res.getHeader("env")));
 
   next();
 });
@@ -110,6 +113,8 @@ app.get("/data", async function (req: Request, res: Response) {
   let uid = undefined;
   try {
     uid = await identifyGoogleUser(token);
+    const logger: Logger = app.get(LOGGER);
+    logger.setUser(uid);
   } catch (err) {
     console.log("identifyUser failed", err.name);
     res.statusCode = 401;
@@ -118,6 +123,31 @@ app.get("/data", async function (req: Request, res: Response) {
   }
   try {
     const allData = await getAllData(uid);
+
+    res.send(allData);
+  } catch (err) {
+    console.log("getAllData failed", err.name);
+    res.statusCode = 404;
+    res.send({ err });
+  }
+});
+
+app.get("/graph/:graphid/data", async function (req: Request, res: Response) {
+  let token = "" + req.query.token;
+  let uid = undefined;
+  const graphId = parseInt(req.params.graphid);
+  try {
+    uid = await identifyGoogleUser(token);
+    const logger: Logger = app.get(LOGGER);
+    logger.setUser(uid);
+  } catch (err) {
+    console.log("identifyUser failed", err.name);
+    res.statusCode = 401;
+    res.send(err);
+    return;
+  }
+  try {
+    const allData = await getAllData(graphId);
 
     res.send(allData);
   } catch (err) {
@@ -232,5 +262,10 @@ app.get("/synctestandprod", async function (req: Request, res: Response) {
 });
 
 app.listen(3000);
+
+process.on("uncaughtException", (event) => {
+  console.log("unCaughtException", event);
+  process.exit();
+});
 
 exports.function = app;

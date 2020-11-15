@@ -1,4 +1,5 @@
-import { app, TEST_ORIGIN } from ".";
+import { Logger } from "./logger";
+import { app, LOGGER, TEST_ORIGIN } from ".";
 import {
   CytoscapeJsObjectInterface,
   fromDatabaseToCytoscapeObj,
@@ -50,6 +51,7 @@ export const getAllData = async (uid: number) => {
         return;
       }
     }
+    const logger: Logger = app.get(LOGGER);
     const testOrigin = app.get(TEST_ORIGIN);
     const dbName = `nysos${testOrigin ? "-test" : ""}`;
     const collection = client.db(dbName).collection(`${uid}:data`);
@@ -61,8 +63,10 @@ export const getAllData = async (uid: number) => {
     allData
       .toArray()
       .then((array) => {
-        console.log(
-          `${new Date().toISOString()} getAllData ${array.length} elements ...`
+        logger.log(
+          "mongoread.ts",
+          "getAllData",
+          `${array.length} elements were retrieved`
         );
         resolve(array.map((data) => fromDatabaseToCytoscapeObj(data)));
       })

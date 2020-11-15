@@ -12,6 +12,9 @@ export class AppComponent {
     private routeListener: RouterListenerService,
     private router: Router
   ) {
-    this.router.navigateByUrl('share/qzx');
+    setTimeout(
+      () => this.router.navigateByUrl('share/106737924724727700000'),
+      2000
+    );
   }
 }
