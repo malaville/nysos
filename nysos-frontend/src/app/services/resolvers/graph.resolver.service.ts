@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import {
   ActivatedRouteSnapshot,
   Resolve,
-  Router,
   RouterStateSnapshot,
 } from '@angular/router';
 import { SocialAuthService } from 'angularx-social-login';
@@ -15,7 +14,6 @@ import { LoaderService } from '../loader/loader.service';
 export class GraphResolver implements Resolve<any> {
   constructor(
     private cydb: CytodatabaseService,
-    private router: Router,
     private loader: LoaderService,
     private authService: SocialAuthService
   ) {}
