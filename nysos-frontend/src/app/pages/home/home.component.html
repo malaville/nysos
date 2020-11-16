@@ -23,7 +23,7 @@
     </div>
   </mat-sidenav>
   <div class="button-container">
-    <app-expanding-fab-button
+    <!-- <app-expanding-fab-button
       [onClick]="activateEdgeCreation()"
       [iconName]="'timeline'"
     >
@@ -90,7 +90,12 @@
       [iconName]="'info_outline'"
     >
       More infos on this app
-    </app-expanding-fab-button>
+    </app-expanding-fab-button> -->
+    <button mat-mini-fab routerLink="../../share/">Share</button>
+    <button mat-mini-fab routerLink="../../share/106737924724727700000">
+      Share/id
+    </button>
+    <button mat-mini-fab routerLink="../../">Back</button>
   </div>
   <app-google-authentication></app-google-authentication>
   <div #cy id="cy"></div>
@@ -100,3 +105,4 @@
     ></app-content-save-state-indicator>
   </div>
 </mat-sidenav-container>
+<router-outlet></router-outlet>

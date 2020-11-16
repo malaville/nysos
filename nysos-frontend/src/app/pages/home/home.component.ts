@@ -35,10 +35,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.documentStateObs = this.genState.documentStateObservable;
-    this.isTest =
-      window.location.hostname.includes('test') ||
-      window.location.hostname.includes('stage') ||
-      window.location.hostname.includes('localhost');
     this.contentChangesObs = this.cytoDb.contentChangesObs;
     this.large = this.genState.UIStateObservable.pipe(
       map((uistate) => uistate.addingDocument || uistate.editDocument)

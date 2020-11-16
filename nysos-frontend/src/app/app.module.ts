@@ -49,6 +49,7 @@ import {
   LocalDatabaseService,
   RootLocalDatabaseService,
 } from './services/local-database/local-database.service';
+import { ShareModalComponent } from './pages/home/share-modal/share-modal.component';
 const config = new SocialAuthService({
   autoLogin: true,
   providers: [
@@ -85,6 +86,7 @@ export function provideConfig() {
     SearchBarComponent,
     ColorPickerComponent,
     HomeComponent,
+    ShareModalComponent,
   ],
   imports: [
     BrowserModule,
