@@ -13,6 +13,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 // Components
 import { AppRoutingModule } from './app-routing.module';
@@ -45,10 +46,6 @@ import { InfoModalComponent } from './interface/info-modal/info-modal.component'
 import { SearchBarComponent } from './interface/search-bar/search-bar.component';
 import { ColorPickerComponent } from './interface/common/color-picker/color-picker.component';
 import { HomeComponent } from './pages/home/home.component';
-import {
-  LocalDatabaseService,
-  RootLocalDatabaseService,
-} from './services/local-database/local-database.service';
 import { ShareModalComponent } from './pages/home/share-modal/share-modal.component';
 const config = new SocialAuthService({
   autoLogin: true,
@@ -108,15 +105,12 @@ export function provideConfig() {
     }),
     MatDialogModule,
     MatAutocompleteModule,
+    MatProgressBarModule,
   ],
   providers: [
     {
       provide: SocialAuthService,
       useFactory: provideConfig,
-    },
-    {
-      provide: LocalDatabaseService,
-      useClass: RootLocalDatabaseService,
     },
   ],
   bootstrap: [AppComponent],

@@ -4,7 +4,7 @@ import { GoogleLoginProvider, SocialAuthService } from 'angularx-social-login';
 import { CollectionReturnValue, Core } from 'cytoscape';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { LocalDatabaseService } from '../local-database/local-database.service';
+import { ShareLocalDatabaseService } from '../local-database/local-database.service';
 import { AsyncContent } from './asyncContent';
 import { ContentChanges, ContentChangesInterface } from './contentChanges';
 import {
@@ -54,8 +54,9 @@ export class CytodatabaseService {
   constructor(
     private authService: SocialAuthService,
     private _snackBar: MatSnackBar,
-    private storage: LocalDatabaseService
+    private storage: ShareLocalDatabaseService
   ) {
+    console.log('Instantiated yay', storage);
     this.contentChanges = ContentChanges.loadFromLocalStorage(storage);
     this.contentChangesObs = this.contentChanges.contentChangesObs;
     this.authService.authState.subscribe((st) => {

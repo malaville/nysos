@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@angular/core';
+import { ElementRef, Inject, Injectable } from '@angular/core';
 import {
   Core,
   EdgeCollection,
@@ -19,10 +19,10 @@ import {
 } from 'src/app/interface/source-manager/bibliography-item';
 import { GoogleLoginProvider, SocialAuthService } from 'angularx-social-login';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { take } from 'rxjs/operators';
 import { apiIsReachable } from '../cytodatabase/fetchNysosBackend';
 import { Color } from 'src/app/interface/common/color-picker/color-picker.component';
 import { Cytoscape, CYTOSCAPE } from './cytoscape.injectable';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 const NEW_NAME = '';
 
@@ -34,6 +34,8 @@ export class CytostateService {
   edgehandles: EdgeHandlesApi;
   hoverednode: boolean = false;
   addedgemode: boolean = false;
+  cytocoreReadyBs = new BehaviorSubject(false);
+  cytocoreReady = this.cytocoreReadyBs.asObservable();
   saveDataOfNodeEvent = (event: EventObjectNode) => {
     const movedNode = event.target;
     this.cyDb.saveDataOrContentOf(movedNode.id(), movedNode.data());
@@ -54,14 +56,21 @@ export class CytostateService {
     });
   };
 
-  setCytocoreId(id: string) {
-    // @ts-ignore
+  setCytocoreId(container: ElementRef) {
+    if (!this.cytocore) {
+      this.cytocore = this.cytoscape({
+        container: container.nativeElement,
+        style: [...styles, ...edgehandlestyles],
+      });
 
-    this.cytocore = this.cytoscape({
-      container: document.getElementById('cy'),
-      style: [...styles, ...edgehandlestyles],
-    });
+      this.initCytocore();
+    } else {
+      this.cytocore.mount(container.nativeElement);
+    }
+  }
 
+  initCytocore() {
+    console.log('init cytocore');
     this.cytocore.on('data', (e) => this.handleDataEvent(e));
 
     this.cytocore.on('click touchend', 'node', (e) => {
@@ -101,14 +110,7 @@ export class CytostateService {
         node.target.data().name == NEW_NAME &&
         this.selectContent(node.target.id())
     );
-    const timeoutId = setTimeout(
-      () => this.loadWithSave(this.cyDb.loadFromLocalStorage().data),
-      1000
-    );
-    this.authState.authState.pipe(take(1)).subscribe((socialUser) => {
-      clearTimeout(timeoutId);
-      this.startUpProcessWhenAuthenticated(this.cytocore, socialUser);
-    });
+    this.cytocoreReadyBs.next(true);
   }
 
   async isAuthStateResolved(): Promise<boolean> {
@@ -123,6 +125,7 @@ export class CytostateService {
 
   async restartStartUp() {
     let resolved = await this.isAuthStateResolved();
+    console.log('isResolved');
     if (!resolved) {
       const online = await apiIsReachable();
       if (online) {
@@ -175,10 +178,15 @@ export class CytostateService {
 
   loadWithSave(cytosave: any) {
     if (cytosave) {
-      this.cytocore.elements().remove();
-      this.cytocore.add(cytosave);
-      this.computeColors(this.cytocore);
-      this.cytocore.fit(undefined, 200);
+      this.cytocoreReady.subscribe((ready) => {
+        if (ready) {
+          this.cytocore.elements().remove();
+          this.cytocore.add(cytosave);
+          this.computeColors(this.cytocore);
+          this.cytocore.fit(undefined, 200);
+        }
+      });
+
       return true;
     }
     return false;

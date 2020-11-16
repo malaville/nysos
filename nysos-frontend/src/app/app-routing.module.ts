@@ -3,12 +3,16 @@ import { Routes, RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './pages/home/home.component';
 import { ShareModalComponent } from './pages/home/share-modal/share-modal.component';
+import { SHARE_PARAM_KEY } from './routingvars';
 import { GraphResolver } from './services/resolvers/graph.resolver.service';
 
 const routes: Routes = [
   {
     path: '',
     component: HomeComponent,
+    resolve: {
+      graphdata: GraphResolver,
+    },
 
     children: [
       {
@@ -18,7 +22,7 @@ const routes: Routes = [
     ],
   },
   {
-    path: 'share/:shareid',
+    path: 'share/:' + SHARE_PARAM_KEY,
     component: HomeComponent,
     resolve: {
       graphdata: GraphResolver,

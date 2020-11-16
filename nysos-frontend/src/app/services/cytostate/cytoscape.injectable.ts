@@ -7,9 +7,10 @@ export type Cytoscape = typeof cytoscape;
 export const CYTOSCAPE = new InjectionToken<Cytoscape>('Browser Storage', {
   providedIn: 'root',
   factory: () => {
-    console.log('Cytoscape gets created');
-    // @ts-ignore
-    cytoscape.use(edgehandles);
+    try {
+      // @ts-ignore
+      cytoscape.use(edgehandles);
+    } catch {}
     return cytoscape;
   },
 });

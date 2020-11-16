@@ -1,1 +1,6 @@
+<mat-progress-bar
+  style="position: absolute; z-index: 3"
+  *ngIf="loader.loading | async"
+  [mode]="(loader.loading | async) ? 'query' : 'determinate'"
+></mat-progress-bar>
 <router-outlet></router-outlet>

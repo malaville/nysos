@@ -1,4 +1,6 @@
-import { Inject, Injectable, InjectionToken } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { SHARE_PARAM_KEY } from 'src/app/routingvars';
 
 @Injectable()
 export abstract class LocalDatabaseService {
@@ -72,5 +74,14 @@ export class RootLocalDatabaseService extends LocalDatabaseService {
   constructor() {
     super();
     this.resetScope();
+  }
+}
+
+@Injectable({ providedIn: 'root' })
+export class ShareLocalDatabaseService extends LocalDatabaseService {
+  _initialScope = 'ROOT';
+  constructor(private route: ActivatedRoute) {
+    super();
+    this.setScope(this.route.snapshot.paramMap.get(SHARE_PARAM_KEY) || 'ROOT');
   }
 }

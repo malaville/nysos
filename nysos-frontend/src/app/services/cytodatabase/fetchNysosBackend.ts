@@ -1,8 +1,9 @@
-// const url =
-//   'https://europe-west1-nysos-289715.cloudfunctions.net/nysos-backend';
-const url = 'http://localhost:3000';
-export const fetchAllData = (authToken: string) =>
-  fetch(`${url}/data?token=${authToken}`, {
+const url =
+  // 'https://europe-west1-nysos-289715.cloudfunctions.net/nysos-backend';
+  'https://europe-west1-nysos-289715.cloudfunctions.net/nysos-backend-ver1';
+// const url = 'http://localhost:3000';
+export const fetchAllData = (authToken: string) => {
+  return fetch(`${url}/data?token=${authToken}`, {
     method: 'GET',
     mode: 'cors',
     cache: 'default',
@@ -10,9 +11,10 @@ export const fetchAllData = (authToken: string) =>
       'Content-Type': 'application/json',
     },
   });
+};
 
-export const fetchAllScopeData = (authToken: string, scope: string) =>
-  fetch(`${url}/graph/${scope}/data?token=${authToken}`, {
+export const fetchAllScopeData = (authToken: string, scope: string) => {
+  return fetch(`${url}/graph/${scope}/data?token=${authToken}`, {
     method: 'GET',
     mode: 'cors',
     cache: 'default',
@@ -20,6 +22,7 @@ export const fetchAllScopeData = (authToken: string, scope: string) =>
       'Content-Type': 'application/json',
     },
   });
+};
 
 export const postContent = (
   authToken: string,
