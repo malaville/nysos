@@ -1,4 +1,4 @@
-import { FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormGroup, Validators } from '@angular/forms';
 import { AsyncContent } from 'src/app/services/cytodatabase/asyncContent';
 
 export class BibliographyItem {
@@ -6,23 +6,33 @@ export class BibliographyItem {
     public title = '',
     public link = '',
     public acronym = '',
-    public author = '',
-    public year = new Date().getFullYear(),
-    public contentId = undefined
+    public authors = [],
+    public date = new Date().toISOString(),
+    public contentId = undefined,
+    public doi = '',
+    public referenceType: string = undefined,
+    public journal = ''
   ) {}
 
   static fromFormGroup(fg: FormGroup) {
+    console.log(fg.value);
     console.assert(fg.value.title);
     console.assert(fg.value.acronym);
     console.assert(fg.value.acronym);
-    console.assert(fg.value.year);
+    console.assert(fg.value.date);
     console.assert(fg.value.author);
+    console.assert(fg.value.doi);
+    console.assert(fg.value.referenceType);
     return new BibliographyItem(
       fg.value.title,
       fg.value.link,
       fg.value.acronym,
       fg.value.author,
-      fg.value.year
+      fg.value.date.toIsoString(),
+      undefined,
+      fg.value.doi,
+      fg.value.referenceType,
+      fg.value.journal
     );
   }
 
@@ -34,8 +44,11 @@ export class BibliographyItem {
       data.link,
       data.name,
       data.author,
-      data.year,
-      id
+      data.date,
+      id,
+      data.doi,
+      data.referenceType,
+      data.journal
     );
   }
 
@@ -50,11 +63,11 @@ export class BibliographyItem {
       title: [this.title, [Validators.required, Validators.minLength(10)]],
       acronym: [this.acronym, Validators.maxLength(10)],
       link: [this.link, []],
-      year: [
-        this.year,
-        [Validators.min(1000), Validators.max(2030), Number.isInteger],
-      ],
-      author: [this.author, [Validators.required, Validators.minLength(8)]],
+      date: [new Date(this.date)],
+      author: [this.authors[0], [Validators.required, Validators.minLength(8)]],
+      doi: [this.doi],
+      referenceType: [this.referenceType],
+      journal: [this.journal],
     };
   }
 }
@@ -70,9 +83,12 @@ export class BibliographyItemLink extends BibliographyItem {
       bib.title,
       bib.link,
       bib.acronym,
-      bib.author,
-      bib.year,
-      bib.contentId
+      bib.authors[0],
+      bib.date,
+      bib.contentId,
+      bib.doi,
+      bib.referenceType,
+      bib.journal
     );
   }
 }

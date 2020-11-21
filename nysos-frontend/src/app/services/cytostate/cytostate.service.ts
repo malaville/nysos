@@ -271,8 +271,8 @@ export class CytostateService {
         name: biblioItem.acronym,
         type: NODE_TYPES.DOCUMENT_NODE,
         title: biblioItem.title,
-        author: biblioItem.author,
-        year: biblioItem.year,
+        author: biblioItem.authors[0],
+        date: biblioItem.date,
         link: biblioItem.link,
       },
     });

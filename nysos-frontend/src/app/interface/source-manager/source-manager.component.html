@@ -1,25 +1,24 @@
 <h2>{{ title | async }}</h2>
 <form [formGroup]="myForm" #form="ngForm" autocomplete="off" novalidate>
-  <div class="double-form-field-container">
-    <mat-form-field appearance="fill">
-      <mat-label>Acronym</mat-label>
-      <input formControlName="acronym" matInput />
-      <mat-error *ngIf="myForm.controls.acronym.errors?.maxlength">
-        The acronym is too long (max : 10)
-      </mat-error>
-    </mat-form-field>
-    <mat-form-field appearance="fill">
-      <mat-label>Year</mat-label>
-      <input formControlName="year" matInput />
-    </mat-form-field>
-  </div>
+  <!-- DOI -->
   <mat-form-field appearance="fill">
-    <mat-label>Link</mat-label>
-    <input formControlName="link" matInput url />
-    <mat-error *ngIf="myForm.controls.link.errors?.validateUrl">
-      The url doesn't match the right pattern
-    </mat-error>
+    <mat-label>DOI</mat-label>
+    <input formControlName="doi" matInput />
   </mat-form-field>
+
+  <!-- Reference Type -->
+  <mat-form-field appearance="fill">
+    <mat-label>Reference Type</mat-label>
+    <mat-select formControlName="referenceType">
+      <mat-option
+        *ngFor="let refType of ['Journal Article', 'Online']"
+        [value]="refType"
+        >{{ refType }}</mat-option
+      >
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Title -->
   <mat-form-field appearance="fill">
     <mat-label>Title</mat-label>
     <input formControlName="title" matInput />
@@ -30,6 +29,8 @@
       The title should be longer than 10 chars
     </mat-error>
   </mat-form-field>
+
+  <!-- Author(s) -->
   <mat-form-field appearance="fill">
     <mat-label>Author</mat-label>
     <input formControlName="author" matInput />
@@ -38,6 +39,37 @@
     </mat-error>
     <mat-error *ngIf="myForm.controls.author.errors?.minlength">
       The author should be longer than 8 chars
+    </mat-error>
+  </mat-form-field>
+
+  <!-- Journal -->
+  <mat-form-field appearance="fill">
+    <mat-label>Journal</mat-label>
+    <input formControlName="journal" matInput />
+  </mat-form-field>
+
+  <!-- Year -->
+  <mat-form-field appearance="fill">
+    <mat-label>Publication Date</mat-label>
+    <input
+      matInput
+      [matDatepicker]="date"
+      fomrControlName="date"
+      [value]="myForm.controls.date.value"
+      (dateChange)="myForm.controls.date.setValue($event.value)"
+    />
+    <mat-datepicker-toggle matSuffix [for]="date"></mat-datepicker-toggle>
+    <mat-datepicker #date></mat-datepicker>
+  </mat-form-field>
+  <!-- <div class="double-form-field-container">
+  </div> -->
+
+  <!-- Link -->
+  <mat-form-field appearance="fill">
+    <mat-label>Link</mat-label>
+    <input formControlName="link" matInput url />
+    <mat-error *ngIf="myForm.controls.link.errors?.validateUrl">
+      The url doesn't match the right pattern
     </mat-error>
   </mat-form-field>
 
@@ -50,5 +82,8 @@
   </button>
   <button mat-stroked-button (click)="mockDataClicked()">
     Mock the document
+  </button>
+  <button mat-stroked-button (click)="$event.preventDefault()" disabled>
+    Import reference
   </button>
 </form>

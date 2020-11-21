@@ -1,12 +1,11 @@
 import { Input, OnChanges, ViewChild } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, NgForm } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppstateService } from 'src/app/services/app/appstate.service';
 import { CytostateService } from 'src/app/services/cytostate/cytostate.service';
 import { BibliographyItem } from './bibliography-item';
-
 @Component({
   selector: 'app-source-manager',
   templateUrl: './source-manager.component.html',
@@ -39,7 +38,7 @@ export class SourceManagerComponent implements OnChanges, OnInit {
           ? 'Add a new source to this theme'
           : uistate.editDocument
           ? 'Edit this source infos'
-          : ''
+          : 'Neither adding nor editing !'
       )
     );
   }
@@ -74,8 +73,10 @@ export class SourceManagerComponent implements OnChanges, OnInit {
       title: LOREM.slice(randint, randint + 3).join(' '),
       acronym: LOREM[randint - 1].slice(0, 7).toUpperCase(),
       author: 'Lorem Author',
-      link: 'https://google.com',
+      link: 'https://mock.google.com',
       year: 2022,
+      doi: '10.1340/309mock',
+      referenceType: 'Journal Article',
     });
     this.myForm.markAsDirty();
   }
