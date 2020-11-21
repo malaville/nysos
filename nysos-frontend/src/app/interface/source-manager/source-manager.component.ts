@@ -1,6 +1,12 @@
 import { Input, OnChanges, ViewChild } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, NgForm } from '@angular/forms';
+import {
+  FormArray,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  NgForm,
+} from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppstateService } from 'src/app/services/app/appstate.service';
@@ -13,6 +19,7 @@ import { BibliographyItem } from './bibliography-item';
 })
 export class SourceManagerComponent implements OnChanges, OnInit {
   myForm: FormGroup;
+  authors: FormArray;
 
   @Input() bibliographyId: string;
 
@@ -29,6 +36,9 @@ export class SourceManagerComponent implements OnChanges, OnInit {
     private appState: AppstateService
   ) {
     this.myForm = this.fb.group(new BibliographyItem().toFormGroupObject());
+    if (this.myForm.controls.authors instanceof FormArray) {
+      this.authors = this.myForm.controls.authors;
+    }
   }
 
   ngOnInit() {
@@ -72,13 +82,24 @@ export class SourceManagerComponent implements OnChanges, OnInit {
     this.myForm.patchValue({
       title: LOREM.slice(randint, randint + 3).join(' '),
       acronym: LOREM[randint - 1].slice(0, 7).toUpperCase(),
-      author: 'Lorem Author',
+
       link: 'https://mock.google.com',
       year: 2022,
       doi: '10.1340/309mock',
       referenceType: 'Journal Article',
     });
+    this.authors.patchValue(['Well known author', 'Famousguy', 'amazing guy']);
     this.myForm.markAsDirty();
+  }
+
+  addAuthorClicked() {
+    this.authors.push(new FormControl(''));
+  }
+
+  deleteAuthorClicked(index: number) {
+    if (this.authors.length > 1) {
+      this.authors.removeAt(index);
+    }
   }
 }
 

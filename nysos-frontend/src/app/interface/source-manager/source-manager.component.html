@@ -31,16 +31,33 @@
   </mat-form-field>
 
   <!-- Author(s) -->
-  <mat-form-field appearance="fill">
-    <mat-label>Author</mat-label>
-    <input formControlName="author" matInput />
-    <mat-error *ngIf="myForm.controls.author.errors?.required">
-      The Author is required
-    </mat-error>
-    <mat-error *ngIf="myForm.controls.author.errors?.minlength">
-      The author should be longer than 8 chars
-    </mat-error>
-  </mat-form-field>
+  <ng-container formArrayName="authors">
+    <div
+      class="with_add_button__container"
+      *ngFor="let author of authors.controls; let i = index"
+    >
+      <mat-form-field appearance="fill">
+        <mat-label>Author n°{{ i + 1 }}</mat-label>
+        <input matInput [formControlName]="i" />
+        <button
+          mat-icon-button
+          matSuffix
+          style="opacity: 0.6"
+          (click)="deleteAuthorClicked(i)"
+          *ngIf="authors.length > 1"
+        >
+          <mat-icon>delete_outline</mat-icon>
+        </button>
+      </mat-form-field>
+      <button
+        mat-icon-button
+        *ngIf="i + 1 == authors.length"
+        (click)="addAuthorClicked()"
+      >
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </ng-container>
 
   <!-- Journal -->
   <mat-form-field appearance="fill">

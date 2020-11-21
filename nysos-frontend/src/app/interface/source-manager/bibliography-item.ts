@@ -1,4 +1,10 @@
-import { AbstractControl, FormGroup, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormArray,
+  FormControl,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { AsyncContent } from 'src/app/services/cytodatabase/asyncContent';
 
 export class BibliographyItem {
@@ -6,7 +12,7 @@ export class BibliographyItem {
     public title = '',
     public link = '',
     public acronym = '',
-    public authors = [],
+    public authors = [''],
     public date = new Date().toISOString(),
     public contentId = undefined,
     public doi = '',
@@ -20,14 +26,14 @@ export class BibliographyItem {
     console.assert(fg.value.acronym);
     console.assert(fg.value.acronym);
     console.assert(fg.value.date);
-    console.assert(fg.value.author);
+    console.assert(fg.value.authors);
     console.assert(fg.value.doi);
     console.assert(fg.value.referenceType);
     return new BibliographyItem(
       fg.value.title,
       fg.value.link,
       fg.value.acronym,
-      fg.value.author,
+      fg.value.authors,
       fg.value.date.toIsoString(),
       undefined,
       fg.value.doi,
@@ -64,7 +70,9 @@ export class BibliographyItem {
       acronym: [this.acronym, Validators.maxLength(10)],
       link: [this.link, []],
       date: [new Date(this.date)],
-      author: [this.authors[0], [Validators.required, Validators.minLength(8)]],
+      authors: new FormArray(
+        this.authors.map((author) => new FormControl(author))
+      ),
       doi: [this.doi],
       referenceType: [this.referenceType],
       journal: [this.journal],
@@ -83,7 +91,7 @@ export class BibliographyItemLink extends BibliographyItem {
       bib.title,
       bib.link,
       bib.acronym,
-      bib.authors[0],
+      bib.authors,
       bib.date,
       bib.contentId,
       bib.doi,
