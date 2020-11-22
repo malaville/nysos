@@ -51,6 +51,7 @@ import { ColorPickerComponent } from './interface/common/color-picker/color-pick
 import { HomeComponent } from './pages/home/home.component';
 import { ShareModalComponent } from './pages/home/share-modal/share-modal.component';
 import { ImportBibtexButtonComponent } from './interface/source-manager/import-bibtex-button/import-bibtex-button.component';
+import { TestbibtexComponent } from './pages/testbibtex/testbibtex.component';
 const config = new SocialAuthService({
   autoLogin: true,
   providers: [
@@ -89,6 +90,7 @@ export function provideConfig() {
     HomeComponent,
     ShareModalComponent,
     ImportBibtexButtonComponent,
+    TestbibtexComponent,
   ],
   imports: [
     BrowserModule,

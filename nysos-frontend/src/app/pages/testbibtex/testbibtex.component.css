@@ -1,0 +1,10 @@
+app-source-manager {
+  max-width: 600px;
+  display: block;
+  margin: auto;
+}
+
+textarea {
+  display: block;
+  margin: auto;
+}

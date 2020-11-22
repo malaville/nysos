@@ -1,8 +1,10 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { AppComponent } from './app.component';
+import { ImportBibtexButtonComponent } from './interface/source-manager/import-bibtex-button/import-bibtex-button.component';
+import { SourceManagerComponent } from './interface/source-manager/source-manager.component';
 import { HomeComponent } from './pages/home/home.component';
 import { ShareModalComponent } from './pages/home/share-modal/share-modal.component';
+import { TestbibtexComponent } from './pages/testbibtex/testbibtex.component';
 import { SHARE_PARAM_KEY } from './routingvars';
 import { GraphResolver } from './services/resolvers/graph.resolver.service';
 
@@ -28,6 +30,7 @@ const routes: Routes = [
       graphdata: GraphResolver,
     },
   },
+  { path: 'testbibtex', component: TestbibtexComponent },
 ];
 
 @NgModule({
