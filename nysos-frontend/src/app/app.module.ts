@@ -47,6 +47,7 @@ import {
 import { InfoModalComponent } from './interface/info-modal/info-modal.component';
 import { SearchBarComponent } from './interface/search-bar/search-bar.component';
 import { ColorPickerComponent } from './interface/common/color-picker/color-picker.component';
+import { ImportBibtexButtonComponent } from './interface/source-manager/import-bibtex-button/import-bibtex-button.component';
 const config = new SocialAuthService({
   autoLogin: true,
   providers: [
@@ -82,6 +83,7 @@ export function provideConfig() {
     InfoModalComponent,
     SearchBarComponent,
     ColorPickerComponent,
+    ImportBibtexButtonComponent,
   ],
   imports: [
     BrowserModule,

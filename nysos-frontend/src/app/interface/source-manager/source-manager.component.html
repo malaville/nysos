@@ -8,11 +8,28 @@
   #template
 >
   <form [formGroup]="myForm" autocomplete="off" novalidate>
-    <!-- DOI -->
-    <mat-form-field appearance="fill">
-      <mat-label>DOI</mat-label>
-      <input formControlName="doi" matInput />
-    </mat-form-field>
+    <!-- DOI  and Date-->
+    <div class="double-form-field-container">
+      <!-- DOI -->
+      <mat-form-field appearance="fill">
+        <mat-label>DOI</mat-label>
+        <input formControlName="doi" matInput />
+      </mat-form-field>
+
+      <!-- Date -->
+      <mat-form-field appearance="fill">
+        <mat-label>Publication Date</mat-label>
+        <input
+          matInput
+          [matDatepicker]="date"
+          fomrControlName="date"
+          [value]="myForm.controls.date.value"
+          (dateChange)="myForm.controls.date.setValue($event.value)"
+        />
+        <mat-datepicker-toggle matSuffix [for]="date"></mat-datepicker-toggle>
+        <mat-datepicker #date></mat-datepicker>
+      </mat-form-field>
+    </div>
 
     <!-- Reference Type -->
     <mat-form-field appearance="fill">
@@ -90,22 +107,6 @@
       <input formControlName="journal" matInput />
     </mat-form-field>
 
-    <!-- Year -->
-    <mat-form-field appearance="fill">
-      <mat-label>Publication Date</mat-label>
-      <input
-        matInput
-        [matDatepicker]="date"
-        fomrControlName="date"
-        [value]="myForm.controls.date.value"
-        (dateChange)="myForm.controls.date.setValue($event.value)"
-      />
-      <mat-datepicker-toggle matSuffix [for]="date"></mat-datepicker-toggle>
-      <mat-datepicker #date></mat-datepicker>
-    </mat-form-field>
-    <!-- <div class="double-form-field-container">
-  </div> -->
-
     <!-- Link -->
     <mat-form-field appearance="fill">
       <mat-label>Link</mat-label>
@@ -125,8 +126,6 @@
     <button mat-stroked-button (click)="mockDataClicked()">
       Mock the document
     </button>
-    <button mat-stroked-button (click)="$event.preventDefault()" disabled>
-      Import reference
-    </button>
+    <app-import-bibtex-button></app-import-bibtex-button>
   </form>
 </ng-template>
