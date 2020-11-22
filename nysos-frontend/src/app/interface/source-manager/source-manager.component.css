@@ -11,3 +11,16 @@ form > * {
   display: flex;
   justify-content: space-between;
 }
+
+.with_add_button__container {
+  display: flex;
+  align-items: center;
+}
+.with_add_button__container mat-form-field {
+  flex: 1 0 80%;
+}
+
+.with_add_button__container > button {
+  margin-left: 20px;
+  margin-bottom: 1.34375em;
+}

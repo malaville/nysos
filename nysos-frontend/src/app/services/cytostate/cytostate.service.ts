@@ -265,8 +265,8 @@ export class CytostateService {
         name: biblioItem.acronym,
         type: NODE_TYPES.DOCUMENT_NODE,
         title: biblioItem.title,
-        author: biblioItem.author,
-        year: biblioItem.year,
+        author: biblioItem.authors[0],
+        date: biblioItem.date,
         link: biblioItem.link,
       },
     });
@@ -350,8 +350,7 @@ export class CytostateService {
     const targetObj = this.cytocore.getElementById(id);
     if (targetObj.isNode()) {
       if (targetObj.data().type == NODE_TYPES.DOCUMENT_NODE) {
-        const { title, link, author, year, name } = targetObj.data();
-        const bib = new BibliographyItem(title, link, name, author, year);
+        const bib = BibliographyItem.fromNode(targetObj);
         this.appstate.contentSelected(id, name || '', {}, bib);
       } else {
         this.appstate.contentSelected(id, targetObj.data().name);

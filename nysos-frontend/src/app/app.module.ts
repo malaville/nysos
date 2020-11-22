@@ -14,6 +14,9 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 // Components
 import { AppRoutingModule } from './app-routing.module';
@@ -47,6 +50,7 @@ import { SearchBarComponent } from './interface/search-bar/search-bar.component'
 import { ColorPickerComponent } from './interface/common/color-picker/color-picker.component';
 import { HomeComponent } from './pages/home/home.component';
 import { ShareModalComponent } from './pages/home/share-modal/share-modal.component';
+import { ImportBibtexButtonComponent } from './interface/source-manager/import-bibtex-button/import-bibtex-button.component';
 const config = new SocialAuthService({
   autoLogin: true,
   providers: [
@@ -84,6 +88,7 @@ export function provideConfig() {
     ColorPickerComponent,
     HomeComponent,
     ShareModalComponent,
+    ImportBibtexButtonComponent,
   ],
   imports: [
     BrowserModule,
@@ -106,6 +111,9 @@ export function provideConfig() {
     MatDialogModule,
     MatAutocompleteModule,
     MatProgressBarModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
   ],
   providers: [
     {

@@ -20,6 +20,7 @@ export interface DocumentDataStateInterface {
   bibliography: BibliographyItem;
   title?: string;
   asyncContent: AsyncContent;
+  isBibliography: boolean;
 }
 
 const defaultDocumentState: DocumentDataStateInterface = {
@@ -29,6 +30,7 @@ const defaultDocumentState: DocumentDataStateInterface = {
   bibliography: undefined,
   name: undefined,
   asyncContent: undefined,
+  isBibliography: undefined,
 };
 
 export interface UIStateInterface {
@@ -92,6 +94,7 @@ export class AppstateService {
     const { source, target } = edgeInfos;
     this.documentState.edgeSourceId = source || undefined;
     this.documentState.edgeTargetId = target || undefined;
+    this.documentState.isBibliography = !!bibliography;
     this.documentState.bibliography = bibliography;
     this.documentStateBS.next(this.documentState);
 

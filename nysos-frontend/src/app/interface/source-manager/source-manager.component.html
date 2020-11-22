@@ -1,54 +1,131 @@
-<h2>{{ title | async }}</h2>
-<form [formGroup]="myForm" #form="ngForm" autocomplete="off" novalidate>
-  <div class="double-form-field-container">
+<h2>{{ sourceManagerController.title$ | async }}</h2>
+<ng-template
+  let-myForm="myForm"
+  [ngTemplateOutletContext]="{
+    myForm: sourceManagerController.bibliographyForm
+  }"
+  [ngTemplateOutlet]="template"
+  #template
+>
+  <form [formGroup]="myForm" autocomplete="off" novalidate>
+    <!-- DOI  and Date-->
+    <div class="double-form-field-container">
+      <!-- DOI -->
+      <mat-form-field appearance="fill">
+        <mat-label>DOI</mat-label>
+        <input formControlName="doi" matInput />
+      </mat-form-field>
+
+      <!-- Date -->
+      <mat-form-field appearance="fill">
+        <mat-label>Publication Date</mat-label>
+        <input
+          matInput
+          [matDatepicker]="date"
+          fomrControlName="date"
+          [value]="myForm.controls.date.value"
+          (dateChange)="myForm.controls.date.setValue($event.value)"
+        />
+        <mat-datepicker-toggle matSuffix [for]="date"></mat-datepicker-toggle>
+        <mat-datepicker #date></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- Reference Type -->
     <mat-form-field appearance="fill">
-      <mat-label>Acronym</mat-label>
-      <input formControlName="acronym" matInput />
-      <mat-error *ngIf="myForm.controls.acronym.errors?.maxlength">
-        The acronym is too long (max : 10)
+      <mat-label>Reference Type</mat-label>
+      <mat-select formControlName="referenceType">
+        <mat-option
+          *ngFor="let refType of ['Journal Article', 'Online']"
+          [value]="refType"
+          >{{ refType }}</mat-option
+        >
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Title -->
+    <mat-form-field appearance="fill">
+      <mat-label>Title</mat-label>
+      <input formControlName="title" matInput />
+      <mat-error *ngIf="myForm.controls.title.errors?.required">
+        The title is required
+      </mat-error>
+      <mat-error *ngIf="myForm.controls.title.errors?.minlength">
+        The title should be longer than 10 chars
       </mat-error>
     </mat-form-field>
-    <mat-form-field appearance="fill">
-      <mat-label>Year</mat-label>
-      <input formControlName="year" matInput />
-    </mat-form-field>
-  </div>
-  <mat-form-field appearance="fill">
-    <mat-label>Link</mat-label>
-    <input formControlName="link" matInput url />
-    <mat-error *ngIf="myForm.controls.link.errors?.validateUrl">
-      The url doesn't match the right pattern
-    </mat-error>
-  </mat-form-field>
-  <mat-form-field appearance="fill">
-    <mat-label>Title</mat-label>
-    <input formControlName="title" matInput />
-    <mat-error *ngIf="myForm.controls.title.errors?.required">
-      The title is required
-    </mat-error>
-    <mat-error *ngIf="myForm.controls.title.errors?.minlength">
-      The title should be longer than 10 chars
-    </mat-error>
-  </mat-form-field>
-  <mat-form-field appearance="fill">
-    <mat-label>Author</mat-label>
-    <input formControlName="author" matInput />
-    <mat-error *ngIf="myForm.controls.author.errors?.required">
-      The Author is required
-    </mat-error>
-    <mat-error *ngIf="myForm.controls.author.errors?.minlength">
-      The author should be longer than 8 chars
-    </mat-error>
-  </mat-form-field>
 
-  <button
-    mat-raised-button
-    [color]="myForm.touched && !myForm.valid ? 'warn' : 'primary'"
-    (click)="submitClicked()"
-  >
-    Save the document
-  </button>
-  <button mat-stroked-button (click)="mockDataClicked()">
-    Mock the document
-  </button>
-</form>
+    <!-- Author(s) -->
+    <ng-template
+      let-authorArray="authorArray"
+      [ngTemplateOutletContext]="{
+        authorArray: sourceManagerController.authors
+      }"
+      [ngTemplateOutlet]="template"
+      #template
+    >
+      <ng-container formArrayName="authors">
+        <div
+          class="with_add_button__container"
+          *ngFor="let author of authorArray.controls; let i = index"
+        >
+          <mat-form-field appearance="fill">
+            <mat-label>Author n°{{ i + 1 }}</mat-label>
+            <mat-icon matPrefix style="margin-right: 10px">face</mat-icon>
+            <input
+              matInput
+              [formControlName]="i"
+              (keydown.enter)="$event.preventDefault(); $event.target.blur()"
+            />
+            <button
+              mat-icon-button
+              matSuffix
+              style="opacity: 0.6"
+              (click)="deleteAuthorClicked(i)"
+              *ngIf="authorArray.length > 1"
+            >
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+            <mat-error *ngIf="author.errors?.required"
+              >You cannot leave this emtpy</mat-error
+            >
+          </mat-form-field>
+          <button
+            mat-icon-button
+            *ngIf="i + 1 == authorArray.length"
+            (click)="addAuthorClicked()"
+          >
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+      </ng-container>
+    </ng-template>
+
+    <!-- Journal -->
+    <mat-form-field appearance="fill">
+      <mat-label>Journal</mat-label>
+      <input formControlName="journal" matInput />
+    </mat-form-field>
+
+    <!-- Link -->
+    <mat-form-field appearance="fill">
+      <mat-label>Link</mat-label>
+      <input formControlName="link" matInput url />
+      <mat-error *ngIf="myForm.controls.link.errors?.validateUrl">
+        The url doesn't match the right pattern
+      </mat-error>
+    </mat-form-field>
+
+    <button
+      mat-raised-button
+      [color]="myForm.touched && !myForm.valid ? 'warn' : 'primary'"
+      (click)="submitClicked()"
+    >
+      Save the document
+    </button>
+    <button mat-stroked-button (click)="mockDataClicked()">
+      Mock the document
+    </button>
+    <app-import-bibtex-button></app-import-bibtex-button>
+  </form>
+</ng-template>

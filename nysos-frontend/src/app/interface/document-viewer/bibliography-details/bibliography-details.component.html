@@ -1,11 +1,15 @@
 <ng-container *ngIf="bibliography">
   <div class="loader-and-acronym-container">
     <ng-content></ng-content>
-    <h3>{{ bibliography.acronym }}</h3>
+    <h3>{{ bibliography.doi }}</h3>
   </div>
 
   <h2>
-    <small>{{ bibliography.author }} ({{ bibliography.year }})</small>
+    <small
+      >{{ bibliography.authors[0] }} ({{
+        bibliography.date | date: "yyyy,MM"
+      }})</small
+    >
     - {{ bibliography.title }}
   </h2>
 </ng-container>
