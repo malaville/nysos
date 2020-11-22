@@ -34,7 +34,7 @@ export class BibliographyItem {
       fg.value.link,
       fg.value.acronym,
       fg.value.authors,
-      fg.value.date.toIsoString(),
+      new Date(fg.value.date).toISOString(),
       undefined,
       fg.value.doi,
       fg.value.referenceType,
@@ -44,12 +44,20 @@ export class BibliographyItem {
 
   static fromNode(cyNode: cytoscape.NodeSingular) {
     const data = cyNode.data();
+    console.log('FromNode', data);
     const id = cyNode.id();
+    let authors = [];
+    if (data.authors) {
+      authors = data.authors;
+    } else {
+      authors = typeof data.author === 'string' ? [data.author] : data.author;
+    }
+    console.log('authors ', authors);
     return new BibliographyItem(
       data.title,
       data.link,
       data.name,
-      data.author,
+      authors,
       data.date,
       id,
       data.doi,
@@ -62,21 +70,6 @@ export class BibliographyItem {
     const data = { ...this, name: this.acronym };
     delete data['acronym'];
     return data;
-  }
-
-  toFormGroupObject() {
-    return {
-      title: [this.title, [Validators.required, Validators.minLength(10)]],
-      acronym: [this.acronym, Validators.maxLength(10)],
-      link: [this.link, []],
-      date: [new Date(this.date)],
-      authors: new FormArray(
-        this.authors.map((author) => new FormControl(author))
-      ),
-      doi: [this.doi],
-      referenceType: [this.referenceType],
-      journal: [this.journal],
-    };
   }
 }
 

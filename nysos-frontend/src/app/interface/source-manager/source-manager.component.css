@@ -20,7 +20,7 @@ form > * {
   flex: 1 0 80%;
 }
 
-.with_add_button__container button {
+.with_add_button__container > button {
   margin-left: 20px;
   margin-bottom: 1.34375em;
 }
