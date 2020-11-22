@@ -56,7 +56,6 @@ export class CytodatabaseService {
     private _snackBar: MatSnackBar,
     private storage: ShareLocalDatabaseService
   ) {
-    console.log('Instantiated yay', storage);
     this.contentChanges = ContentChanges.loadFromLocalStorage(storage);
     this.contentChangesObs = this.contentChanges.contentChangesObs;
     this.authService.authState.subscribe((st) => {

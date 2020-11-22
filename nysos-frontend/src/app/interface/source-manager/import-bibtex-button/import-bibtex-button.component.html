@@ -1,7 +1,8 @@
 <button
   class="import_button"
+  color="primary"
   [class.editing]="this.MODE"
-  mat-stroked-button
+  mat-flat-button
   (click)="importRefClicked($event)"
 >
   Import reference
@@ -9,12 +10,16 @@
 <div [class.editing]="this.MODE" (keydown.enter)="enterDown()">
   <mat-form-field appearance="fill">
     <mat-label>Enter @bibtex</mat-label>
-    <input
+    <textarea
       matInput
+      cdkTextareaAutosize
+      #autosize="cdkTextareaAutosize"
+      cdkAutosizeMinRows="1"
+      cdkAutosizeMaxRows="5"
       placeholder="p@bibtex{...}"
       [formControl]="bibtexForm"
       required
-    />
+    ></textarea>
     <mat-error *ngIf="bibtexForm.touched && bibtexForm.invalid"
       >Invalide</mat-error
     ></mat-form-field
@@ -23,5 +28,3 @@
     <mat-icon>add</mat-icon>
   </button>
 </div>
-
-{{ fakeValue }}

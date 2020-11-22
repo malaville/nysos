@@ -1,10 +1,4 @@
-import {
-  AbstractControl,
-  FormArray,
-  FormControl,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { AsyncContent } from 'src/app/services/cytodatabase/asyncContent';
 
 export class BibliographyItem {
@@ -17,7 +11,8 @@ export class BibliographyItem {
     public contentId = undefined,
     public doi = '',
     public referenceType: string = undefined,
-    public journal = ''
+    public journal = '',
+    public otherData: any = {}
   ) {}
 
   static fromFormGroup(fg: FormGroup) {
@@ -62,7 +57,8 @@ export class BibliographyItem {
       id,
       data.doi,
       data.referenceType,
-      data.journal
+      data.journal,
+      data.otherData || {}
     );
   }
 

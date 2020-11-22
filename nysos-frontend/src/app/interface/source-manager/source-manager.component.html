@@ -14,6 +14,9 @@
       <mat-form-field appearance="fill">
         <mat-label>DOI</mat-label>
         <input formControlName="doi" matInput />
+        <mat-error *ngIf="myForm.controls.doi.errors?.required">
+          The DOI is required
+        </mat-error>
       </mat-form-field>
 
       <!-- Date -->
@@ -78,6 +81,7 @@
               (keydown.enter)="$event.preventDefault(); $event.target.blur()"
             />
             <button
+              type="button"
               mat-icon-button
               matSuffix
               style="opacity: 0.6"
@@ -91,6 +95,7 @@
             >
           </mat-form-field>
           <button
+            type="button"
             mat-icon-button
             *ngIf="i + 1 == authorArray.length"
             (click)="addAuthorClicked()"
@@ -115,8 +120,12 @@
         The url doesn't match the right pattern
       </mat-error>
     </mat-form-field>
-
+    <p>
+      Other data: <br />
+      {{ sourceManagerController.otherData | json }}
+    </p>
     <button
+      type="submit"
       mat-raised-button
       [color]="myForm.touched && !myForm.valid ? 'warn' : 'primary'"
       (click)="submitClicked()"
@@ -126,6 +135,8 @@
     <button mat-stroked-button (click)="mockDataClicked()">
       Mock the document
     </button>
-    <app-import-bibtex-button></app-import-bibtex-button>
+    <app-import-bibtex-button
+      (onBibtexParsed)="onBibtexParsed($event)"
+    ></app-import-bibtex-button>
   </form>
 </ng-template>

@@ -26,6 +26,7 @@ export class SourceManagerService {
   title$: Observable<string>;
   bibliographyForm: FormGroup;
   authors: FormArray;
+  otherData: any;
   private bibliographyId: string;
   private MODE: MODES;
 
@@ -40,7 +41,7 @@ export class SourceManagerService {
           ? 'Add a new source to this theme'
           : uistate.editDocument
           ? 'Edit this source infos'
-          : 'Neither adding nor editing !'
+          : '#TEST 🚩 🚩 FUNKY Teste ce magnifique composant'
       )
     );
 
@@ -66,6 +67,11 @@ export class SourceManagerService {
     if (nextBibliographyForm.controls.authors instanceof FormArray) {
       this.authors = nextBibliographyForm.controls.authors;
     }
+    this.otherData = bibliography.otherData;
+  }
+
+  handlePushedBibliography(bib: BibliographyItem) {
+    this.handleBibliographyEditionMode(bib);
   }
 
   handleBibliographyCreationMode() {

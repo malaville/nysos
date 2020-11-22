@@ -13,12 +13,9 @@
       >
       </app-document-viewer>
       <app-source-manager
+        *ngIf="large | async"
         [open]="large | async"
         [class.large]="large | async"
-        [bibliographyId]="
-          (documentStateObs | async).bibliography &&
-          (documentStateObs | async).contentId
-        "
       ></app-source-manager>
     </div>
   </mat-sidenav>
@@ -97,6 +94,7 @@
       Graph
     </button>
     <button mat-mini-fab routerLink="../../">Back</button>
+    <button mat-mini-fab routerLink="../testbibtex/">bib</button>
   </div>
   <app-google-authentication></app-google-authentication>
   <div #cy id="cy"></div>

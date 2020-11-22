@@ -11,7 +11,9 @@ form > * {
   display: flex;
   justify-content: space-between;
 }
-
+.double-form-field-container mat-form-field {
+  flex: 0 0 45%;
+}
 .with_add_button__container {
   display: flex;
   align-items: center;

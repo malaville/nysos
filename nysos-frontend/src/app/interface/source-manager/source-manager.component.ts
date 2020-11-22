@@ -1,5 +1,6 @@
 import { Input, Component } from '@angular/core';
 import { Observable } from 'rxjs';
+import { BibliographyItem } from './bibliography-item';
 import { SourceManagerService } from './source-manager.service';
 
 @Component({
@@ -31,5 +32,9 @@ export class SourceManagerComponent {
 
   deleteAuthorClicked(index: number) {
     this.sourceManagerController.deleteAuthorClicked(index);
+  }
+
+  onBibtexParsed(bib: BibliographyItem) {
+    this.sourceManagerController.handlePushedBibliography(bib);
   }
 }
