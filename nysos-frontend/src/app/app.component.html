@@ -13,12 +13,9 @@
       >
       </app-document-viewer>
       <app-source-manager
+        *ngIf="large | async"
         [open]="large | async"
         [class.large]="large | async"
-        [bibliographyId]="
-          (documentStateObs | async).bibliography &&
-          (documentStateObs | async).contentId
-        "
       ></app-source-manager>
     </div>
   </mat-sidenav>
