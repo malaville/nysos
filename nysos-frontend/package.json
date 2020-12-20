@@ -8,6 +8,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "stageyaml": "cp app.yaml ./dist/app.yaml && sed -i '5iservice: stage' ./dist/app.yaml",
+    "testyaml": "cp app.yaml ./dist/app.yaml && sed -i '5iservice: test' ./dist/app.yaml",
     "prodymal": "cp app.yaml ./dist/app.yaml",
     "build": "rm -rf dist/ && ng build --aot --prod --output-hashing=all",
     "gaedeploy": "cd dist && yes | gcloud app deploy --project=nysos-289715 && cd ..",
@@ -15,6 +16,7 @@
     "deploy+": "npm run -s build && npm run -s prodymal &&  npm run -s gaedeploy",
     "deploy-": "npm run -s build && npm run -s prodymal &&  npm run -s gaedeploy-",
     "deploystage": "npm run -s build && npm run -s stageyaml &&  npm run -s gaedeploy",
+    "deploytest": "npm run -s build && npm run -s testyaml &&  npm run -s gaedeploy",
     "analyze": "ng run nysos-frontend:build:production --stats-json=true --statsJson=true",
     "webpack-analyzer": "webpack-bundle-analyzer dist/nysos-frontend/stats-es2015.json"
   },

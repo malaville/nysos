@@ -1,14 +1,12 @@
 import { Injectable } from '@angular/core';
 import {
-  AbstractControl,
   FormArray,
   FormBuilder,
   FormControl,
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs';
 import {
   AppstateService,
   DocumentDataStateInterface,
@@ -23,7 +21,8 @@ enum MODES {
 
 @Injectable()
 export class SourceManagerService {
-  title$: Observable<string>;
+  titleBS = new BehaviorSubject<string>('title');
+  title$ = this.titleBS.asObservable();
   bibliographyForm: FormGroup;
   authors: FormArray;
   otherData: any;
@@ -35,16 +34,6 @@ export class SourceManagerService {
     private fb: FormBuilder,
     private cytostate: CytostateService
   ) {
-    this.title$ = this.appState.UIstateObservable.pipe(
-      map((uistate) =>
-        uistate.addingDocument
-          ? 'Add a new source to this theme'
-          : uistate.editDocument
-          ? 'Edit this source infos'
-          : '#TEST 🚩 🚩 FUNKY Teste ce magnifique composant'
-      )
-    );
-
     this.appState.documentStateObservable.subscribe((bib) =>
       this.handleDocumenStateChange(bib)
     );
@@ -62,6 +51,7 @@ export class SourceManagerService {
   }
 
   handleBibliographyEditionMode(bibliography: BibliographyItem) {
+    this.titleBS.next('🚩 🚩 Editing ... ' + bibliography.acronym);
     const nextBibliographyForm = this.fromBibliographyItem(bibliography);
     this.bibliographyForm = nextBibliographyForm;
     if (nextBibliographyForm.controls.authors instanceof FormArray) {
@@ -75,6 +65,7 @@ export class SourceManagerService {
   }
 
   handleBibliographyCreationMode() {
+    this.titleBS.next("You're creating a new reference");
     const nextBibliographyForm = this.fromBibliographyItem(
       new BibliographyItem()
     );

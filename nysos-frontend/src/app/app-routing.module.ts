@@ -8,30 +8,7 @@ import { TestbibtexComponent } from './pages/testbibtex/testbibtex.component';
 import { SHARE_PARAM_KEY } from './routingvars';
 import { GraphResolver } from './services/resolvers/graph.resolver.service';
 
-const routes: Routes = [
-  {
-    path: '',
-    component: HomeComponent,
-    resolve: {
-      graphdata: GraphResolver,
-    },
-
-    children: [
-      {
-        path: 'share',
-        component: ShareModalComponent,
-      },
-    ],
-  },
-  {
-    path: 'share/:' + SHARE_PARAM_KEY,
-    component: HomeComponent,
-    resolve: {
-      graphdata: GraphResolver,
-    },
-  },
-  { path: 'testbibtex', component: TestbibtexComponent },
-];
+const routes: Routes = [{ path: '', component: TestbibtexComponent }];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' })],
