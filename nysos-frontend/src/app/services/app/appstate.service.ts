@@ -10,6 +10,8 @@ import { SearchBarComponent } from 'src/app/interface/search-bar/search-bar.comp
 import { BibliographyItem } from 'src/app/interface/source-manager/bibliography-item';
 import { AsyncContent } from '../cytodatabase/asyncContent';
 import { CytodatabaseService } from '../cytodatabase/cytodatabase.service';
+import { CytostateService } from '../cytostate/cytostate.service';
+import { ElementSelectedEvent, NODE_TYPES } from '../cytostate/models';
 
 export interface DocumentDataStateInterface {
   name: string;
@@ -64,8 +66,11 @@ export class AppstateService {
 
   constructor(
     private cytoDb: CytodatabaseService,
-    private matDialog: MatDialog
-  ) {}
+    private matDialog: MatDialog,
+    private cytostate: CytostateService
+  ) {
+    this.cytostate.elementSelected$.subscribe(this.contentSelected.bind(this));
+  }
 
   setSidenavRef(sidenavref: MatSidenav) {
     this.sidenavref = sidenavref;
@@ -79,17 +84,26 @@ export class AppstateService {
     this.sidenavref.close();
   }
 
-  contentSelected(
-    id: string,
-    name: string,
-    edgeInfos: any = {},
-    bibliography: BibliographyItem = undefined
-  ) {
+  contentSelected($event: ElementSelectedEvent) {
+    const name = $event.data.name;
+    const id = $event.id;
+    const { source, target } = $event.data;
+    let bibliography = undefined;
+    if ($event.type == NODE_TYPES.DOCUMENT_NODE) {
+      const { title, link, author, year, name } = $event.data;
+      if ([title, link, author, year, name].every((_) => !_)) {
+        console.error(
+          'Event was of type DOCUMENT but no data was found',
+          $event
+        );
+      }
+      bibliography = new BibliographyItem(title, link, name, author, year);
+    }
+
     this.documentState.name = name;
     this.documentState.contentId = id;
     this.documentState.content = this.cytoDb.loadContentOf(id);
     this.documentState.asyncContent = this.cytoDb.loadRemoteContentOf(id);
-    const { source, target } = edgeInfos;
     this.documentState.edgeSourceId = source || undefined;
     this.documentState.edgeTargetId = target || undefined;
     this.documentState.bibliography = bibliography;

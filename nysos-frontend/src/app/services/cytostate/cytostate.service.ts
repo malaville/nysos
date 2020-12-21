@@ -1,20 +1,21 @@
-import { Inject, Injectable, InjectionToken } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import {
   Core,
   EdgeCollection,
   EdgeHandlesApi,
+  EdgeSingular,
   EventObject,
   EventObjectNode,
   NodeCollection,
+  NodeSingular,
+  SingularElementArgument,
 } from 'cytoscape';
+
 import { defaults } from './edgehandlesdefault';
-import cytoscape from 'cytoscape';
-import edgehandles from 'cytoscape-edgehandles';
 import { styles } from './cytostyles';
-import { EDGE_TYPES, NODE_TYPES } from './models';
+import { EDGE_TYPES, ElementSelectedEvent, NODE_TYPES } from './models';
 import { edgehandlestyles } from './edgehandlesstyles';
 import { CytodatabaseService } from '../cytodatabase/cytodatabase.service';
-import { AppstateService } from '../app/appstate.service';
 import {
   BibliographyItem,
   BibliographyItemLink,
@@ -24,22 +25,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { take } from 'rxjs/operators';
 import { apiIsReachable } from '../cytodatabase/fetchNysosBackend';
 import { Color } from 'src/app/interface/common/color-picker/color-picker.component';
+import { ReplaySubject } from 'rxjs';
+import { CYTOSCAPE, Cytoscape } from './cytoscape.injection.token';
 
 const NEW_NAME = '';
 
-type Cytoscape = typeof cytoscape;
-
-export const CYTOSCAPE = new InjectionToken<Cytoscape>('Browser Storage', {
-  providedIn: 'root',
-  factory: () => {
-    console.log('Cytoscape gets created');
-    try {
-      // @ts-ignore
-      cytoscape.use(edgehandles);
-    } catch (e) {}
-    return cytoscape;
-  },
-});
 @Injectable({
   providedIn: 'root',
 })
@@ -53,9 +43,16 @@ export class CytostateService {
     this.cyDb.saveDataOrContentOf(movedNode.id(), movedNode.data());
   };
 
+  private elementSelectedSubject = new ReplaySubject<
+    ElementSelectedEvent | undefined
+  >();
+  readonly elementSelected$ = this.elementSelectedSubject.asObservable();
+
+  private elementDataUpdatedSubject = new ReplaySubject<ElementSelectedEvent>();
+  readonly elementDataUpdated$ = this.elementSelectedSubject.asObservable();
+
   constructor(
     private cyDb: CytodatabaseService,
-    private appstate: AppstateService,
     private authState: SocialAuthService,
     private _snackBar: MatSnackBar,
     @Inject(CYTOSCAPE) private cytoscape: Cytoscape
@@ -69,8 +66,6 @@ export class CytostateService {
   };
 
   setCytocoreId(id: string) {
-    // @ts-ignore
-
     this.cytocore = this.cytoscape({
       container: document.getElementById('cy'),
       style: [...styles, ...edgehandlestyles],
@@ -80,12 +75,12 @@ export class CytostateService {
 
     this.cytocore.on('click touchend', 'node', (e) => {
       const id = e.target.id();
-      this.selectContent(id);
+      this.selectElement(id);
     });
 
     this.cytocore.on('click touchend', 'edge', (e) => {
       const id = e.target.id();
-      this.selectContent(id);
+      this.selectElement(id);
     });
 
     this.cytocore.on('move', 'node', this.saveDataOfNodeEvent);
@@ -113,7 +108,7 @@ export class CytostateService {
       'node',
       (node) =>
         node.target.data().name == NEW_NAME &&
-        this.selectContent(node.target.id())
+        this.selectElement(node.target.id())
     );
     const timeoutId = setTimeout(
       () => this.loadWithSave(this.cyDb.loadFromLocalStorage().data),
@@ -245,25 +240,48 @@ export class CytostateService {
       .select();
 
     this.saveData({ ...newNode.data(), position: newNode.position() });
-    this.selectContent(newNode.id());
+    this.selectElement(newNode.id());
     return newNode;
   }
 
-  changeNodeName(newName: string) {
-    const id = this.appstate.documentState.contentId;
-    const valid =
-      this.cytocore.getElementById(id).data({ name: newName }).data().name ==
-      newName;
-    !valid &&
-      this.appstate.contentSelected(
-        id,
-        newName,
-        this.cytocore.getElementById(id).data()
-      );
+  changeElementName(id: string, newName: string) {
+    const element = this.findElementByIdOrThrow(id).data({ name: newName });
+    this.updatedElementData(element);
   }
 
-  addBibliography(biblioItem: BibliographyItem) {
-    const { contentId } = this.appstate.documentState;
+  findNodeByIdOrThrow(id: string): NodeSingular {
+    const element = this.findElementByIdOrThrow(id);
+    if (element.isNode()) {
+      return element as NodeSingular;
+    }
+    console.error(`The element you queried was not a node`, element);
+  }
+
+  findEdgeByIdOrThrow(id: string): EdgeSingular {
+    const element = this.findElementByIdOrThrow(id);
+    if (element.isEdge()) {
+      return element as EdgeSingular;
+    }
+    console.error(`The element you queried was not an edge`, element);
+  }
+
+  existsById(id: string): boolean {
+    return this.cytocore.getElementById(id).length > 0;
+  }
+
+  findElementByIdOrThrow(id: string): EdgeSingular | NodeSingular {
+    const elements = this.cytocore.getElementById(id);
+    if (elements.length !== 1) {
+      console.error(
+        `The id you queried returned ${elements.length} elements, but should be one`,
+        elements
+      );
+    }
+
+    return elements.first();
+  }
+
+  addBibliography(contentId: string, biblioItem: BibliographyItem) {
     const documentData = this.cytocore.add({
       group: 'nodes',
       classes: NODE_TYPES.DOCUMENT_NODE,
@@ -279,17 +297,20 @@ export class CytostateService {
     this.saveData(documentData.data());
     this.addBibliographyLink(documentData.id(), contentId);
 
-    this.appstate.refreshDocummentState();
-    this.appstate.closeNewDocument();
+    this.elementDataUpdatedSubject.next({
+      id: documentData.first().id(),
+      data: documentData.first().data,
+      type: documentData.data().type,
+    });
   }
 
   addBibliographyLink(documentId: string, nodeOrEdgeId: string) {
-    const documentAcronym = this.cytocore.getElementById(documentId).data()
-      .name;
-    const objectName = this.cytocore.getElementById(nodeOrEdgeId).data().name;
+    const documentAcronym = this.findNodeByIdOrThrow(documentId).data().name;
+    const element = this.findElementByIdOrThrow(nodeOrEdgeId);
+    const objectName = element.data().name;
 
     let edge_type = EDGE_TYPES.DOCUMENT_ON_RELATION;
-    if (this.cytocore.getElementById(nodeOrEdgeId).isNode()) {
+    if (element.isNode()) {
       edge_type = EDGE_TYPES.DOCUMENT_ON_THEME;
     }
 
@@ -309,14 +330,11 @@ export class CytostateService {
 
   modifyBibliography(id: string, biblioItem: BibliographyItem) {
     const nodeData = biblioItem.toNodeData();
-    const nodeDataModified = this.cytocore.getElementById(id).data(nodeData);
+    const targetNode = this.findElementByIdOrThrow(id);
+    targetNode.data(nodeData);
+    const nodeModified = this.findElementByIdOrThrow(id);
 
-    this.appstate.contentSelected(
-      id,
-      nodeDataModified.data().name,
-      nodeDataModified.data(),
-      BibliographyItem.fromNode(nodeDataModified)
-    );
+    this.updatedElementData(nodeModified);
   }
 
   findBibliographyAbout(id: string) {
@@ -345,36 +363,35 @@ export class CytostateService {
   }
 
   findBibliographyById(id: string) {
-    const bibliography = this.cytocore?.getElementById(id);
+    const bibliography = this.findNodeByIdOrThrow(id);
     if (bibliography) {
       return BibliographyItem.fromNode(bibliography);
     }
     return new BibliographyItem();
   }
 
-  selectContent(id: string) {
-    const targetObj = this.cytocore.getElementById(id);
-    if (targetObj.isNode()) {
-      if (targetObj.data().type == NODE_TYPES.DOCUMENT_NODE) {
-        const { title, link, author, year, name } = targetObj.data();
-        const bib = new BibliographyItem(title, link, name, author, year);
-        this.appstate.contentSelected(id, name || '', {}, bib);
-      } else {
-        this.appstate.contentSelected(id, targetObj.data().name);
-      }
-    }
-    if (targetObj.isEdge()) {
-      const { name, source, target } = targetObj.data();
-      this.appstate.contentSelected(id, name || '', { source, target });
-    }
+  selectElement(id: string) {
+    const targetObj = this.findElementByIdOrThrow(id);
+    this.elementSelectedSubject.next({
+      id: targetObj.id(),
+      data: targetObj.data(),
+      type: targetObj.data().type,
+    });
   }
 
-  addChildToCurrentNode() {
-    const currentId = this.appstate.documentState.contentId;
-    const { x, y } = this.cytocore.getElementById(currentId).position();
+  updatedElementData(element: NodeSingular | EdgeSingular) {
+    this.elementDataUpdatedSubject.next({
+      id: element.id(),
+      data: element.data(),
+      type: element.data().type,
+    });
+  }
+
+  addChildToCurrentNode(currentId: string): boolean {
+    const { x, y } = this.findNodeByIdOrThrow(currentId).position();
     const node = this.addNode({ parent: currentId, x, y });
     this.handleColorationAfterMove(node);
-    this.appstate.sidenavref.close();
+    return true;
   }
 
   private getEdgesRelyingOn(elementId: string) {
@@ -387,8 +404,7 @@ export class CytostateService {
   }
 
   private eraseAllParentingRelationsWithAncestor(ancestorId: string) {
-    this.cytocore
-      .getElementById(ancestorId)
+    this.findNodeByIdOrThrow(ancestorId)
       .children()
       .forEach((childElement) => {
         childElement.move({ parent: null });
@@ -397,14 +413,14 @@ export class CytostateService {
 
   private deleteElement(elementId: string) {
     this.eraseAllParentingRelationsWithAncestor(elementId);
-    this.cytocore.remove(this.cytocore.getElementById(elementId));
+    this.cytocore.remove(this.findElementByIdOrThrow(elementId));
     this.saveDeletionLocallyAndRemote(elementId);
   }
 
   private hasADocumentAsASourceThatWillBecomeOrphan(
     elementId: string
   ): string | null {
-    const element = this.cytocore.getElementById(elementId);
+    const element = this.findElementByIdOrThrow(elementId);
     if (
       !element.isEdge() ||
       element.source().data().type !== NODE_TYPES.DOCUMENT_NODE ||
@@ -425,13 +441,10 @@ export class CytostateService {
       }
       this.deleteElement(elementId);
 
-      if (
-        this.cytocore.getElementById(this.appstate.documentState.contentId)
-          .length
-      ) {
-        this.appstate.refreshDocummentState();
+      if (this.existsById(elementId)) {
+        this.updateElementDataUpdate(this.findElementByIdOrThrow(elementId));
       } else {
-        this.appstate.unselectContent();
+        this.elementSelectedSubject.next(undefined);
       }
     } else {
       this._snackBar.open(
@@ -442,8 +455,15 @@ export class CytostateService {
     }
   }
 
-  deleteFocusedElement() {
-    const elementId = this.appstate.documentState.contentId;
+  updateElementDataUpdate(element: SingularElementArgument) {
+    this.elementDataUpdatedSubject.next({
+      id: element.id(),
+      data: element.data(),
+      type: element.data().type,
+    });
+  }
+
+  deleteFocusedElement(elementId: string) {
     this.handleDeleteElement(elementId);
   }
 
@@ -468,7 +488,7 @@ export class CytostateService {
         else if (foundNode.target().id() !== node.parent()[0].id()) {
           // Sorry you were adopted by a new dude, Brandon. Call him daddy.
           const parentId = foundNode.target().id();
-          if (this.cytocore.getElementById(parentId).length == 0) {
+          if (this.existsById(parentId)) {
             const addedNode = this.cytocore.add(foundNode.target());
             this.cyDb.saveDataOrContentOf(addedNode.id(), addedNode.data());
           }
@@ -483,7 +503,7 @@ export class CytostateService {
         if (foundNode.length > 0) {
           // SYou have a new DADDYYYY
           const parentId = foundNode.target().id();
-          if (this.cytocore.getElementById(parentId).length == 0) {
+          if (this.existsById(parentId)) {
             const addedNode = this.cytocore.add(foundNode.target());
             this.cyDb.saveDataOrContentOf(addedNode.id(), addedNode.data());
           }
@@ -533,7 +553,7 @@ export class CytostateService {
     if (typeof color == 'number') {
       color = [color, 0, 0];
     }
-    const targetNode = this.cytocore.getElementById(nodeId).nodes();
+    const targetNode = this.findNodeByIdOrThrow(nodeId);
     let ancestor: NodeCollection = targetNode;
     if (targetNode.parents().length > 0) {
       ancestor = targetNode.ancestors().last().union([]);

@@ -8,3 +8,9 @@ export enum NODE_TYPES {
   DOCUMENT_NODE = 'DOCUMENT_NODE',
   THEME_NODE = 'THEME_NODE',
 }
+
+export type ElementSelectedEvent = {
+  id: string;
+  data: any;
+  type: EDGE_TYPES | NODE_TYPES;
+};

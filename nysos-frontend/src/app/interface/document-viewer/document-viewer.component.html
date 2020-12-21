@@ -16,7 +16,7 @@
     <mat-icon>{{
       large
         ? "close"
-        : (documentStateObs | async).bibliography
+        : (documentStateObs$ | async).bibliography
         ? "edit"
         : "rate_review"
     }}</mat-icon>
@@ -54,12 +54,12 @@
     [colorSelectedCallback]="colorSelectedCallback()"
   ></app-color-picker>
   <a
-    *ngIf="(documentStateObs | async).bibliography"
+    *ngIf="(documentStateObs$ | async).bibliography"
     mat-mini-fab
     color="primary"
     target="_blank"
-    [disabled]="!(documentStateObs | async).bibliography?.link"
-    [href]="(documentStateObs | async).bibliography?.link"
+    [disabled]="!(documentStateObs$ | async).bibliography?.link"
+    [href]="(documentStateObs$ | async).bibliography?.link"
   >
     <mat-icon>link</mat-icon>
   </a>
@@ -73,12 +73,12 @@
   </button>
 </div>
 
-<app-document-title *ngIf="!(documentStateObs | async).bibliography">
+<app-document-title *ngIf="!(documentStateObs$ | async).bibliography">
   <app-content-save-state-indicator></app-content-save-state-indicator>
 </app-document-title>
 
 <app-bibliography-details
-  [bibliography]="(documentStateObs | async).bibliography"
+  [bibliography]="(documentStateObs$ | async).bibliography"
 >
   <app-content-save-state-indicator></app-content-save-state-indicator>
 </app-bibliography-details>
@@ -112,7 +112,7 @@
     id="content-of-document"
     contenteditable="true"
     (input)="onDescriptionChange($event.target.innerHTML)"
-    [innerHTML]="(documentStateObs | async).content"
+    [innerHTML]="(documentStateObs$ | async).content"
   ></div>
   <div
     *ngIf="!(asyncContentState | async)?.resolved"
@@ -120,7 +120,7 @@
   ></div>
 </ng-container>
 <div>
-  <span *ngFor="let bib of bibliography | async">
+  <span *ngFor="let bib of bibliography$ | async">
     <app-bibliography-link
       [bib]="bib"
       [linkDescriptionChange]="onLinkDescriptionChangeCallback()"

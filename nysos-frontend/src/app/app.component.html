@@ -16,8 +16,8 @@
         [open]="large | async"
         [class.large]="large | async"
         [bibliographyId]="
-          (documentStateObs | async).bibliography &&
-          (documentStateObs | async).contentId
+          (documentStateObs$ | async).bibliography &&
+          (documentStateObs$ | async).contentId
         "
       ></app-source-manager>
     </div>

@@ -25,7 +25,7 @@ import { GeneralStateService } from './services/general-state.service';
 })
 export class AppComponent implements OnInit, AfterViewInit {
   title = 'nysos-frontend';
-  documentStateObs: Observable<DocumentDataStateInterface>;
+  documentStateObs$: Observable<DocumentDataStateInterface>;
   large: Observable<boolean> = scheduled([false], null);
   isTest: boolean;
 
@@ -84,7 +84,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit() {
-    this.documentStateObs = this.genState.documentStateObservable;
+    this.documentStateObs$ = this.genState.documentStateObservable;
     this.isTest =
       window.location.hostname.includes('test') ||
       window.location.hostname.includes('stage') ||

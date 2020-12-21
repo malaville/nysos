@@ -61,7 +61,10 @@ export class SourceManagerComponent implements OnChanges, OnInit {
       if (this.bibliographyId) {
         this.cytostate.modifyBibliography(this.bibliographyId, bib);
       } else {
-        this.cytostate.addBibliography(bib);
+        this.cytostate.addBibliography(
+          this.appState.documentState.contentId,
+          bib
+        );
       }
     } else {
       this.myForm.controls.title.markAsTouched();

@@ -27,7 +27,7 @@ export class BibliographyLinkComponent implements OnInit {
   // }
 
   onDocumentClicked() {
-    this.cytostate.selectContent(this.bib.contentId);
+    this.cytostate.selectElement(this.bib.contentId);
   }
 
   onBiblioLinkDescriptionChange(content) {

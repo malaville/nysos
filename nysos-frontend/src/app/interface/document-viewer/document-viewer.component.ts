@@ -18,8 +18,8 @@ import { BibliographyItemLink } from '../source-manager/bibliography-item';
   styleUrls: ['./document-viewer.component.css'],
 })
 export class DocumentViewerComponent {
-  public bibliography: Observable<BibliographyItemLink[]> = of([]);
-  documentStateObs: Observable<DocumentDataStateInterface>;
+  public bibliography$: Observable<BibliographyItemLink[]> = of([]);
+  documentStateObs$: Observable<DocumentDataStateInterface>;
   asyncContentState: Observable<AsyncContentStateInterface>;
   @Input() large: boolean;
   isEdgeOrDocument: boolean;
@@ -32,13 +32,13 @@ export class DocumentViewerComponent {
   ) {}
 
   ngOnInit() {
-    this.documentStateObs = this.appState.documentStateObservable;
+    this.documentStateObs$ = this.appState.documentStateObservable;
     this.appState.documentStateObservable.subscribe((state) => {
       this.isEdgeOrDocument = !!state.edgeSourceId || !!state.bibliography;
       this.asyncContentState = state.asyncContent?.asyncContentState;
     });
 
-    this.bibliography = this.documentStateObs.pipe(
+    this.bibliography$ = this.documentStateObs$.pipe(
       map((doc) => this.cytostate.findBibliographyAbout(doc.contentId) || [])
     );
   }
@@ -56,11 +56,15 @@ export class DocumentViewerComponent {
   }
 
   addAChildClicked = () => {
-    this.cytostate.addChildToCurrentNode();
+    const currentId = this.appState.documentState.contentId;
+    this.cytostate.addChildToCurrentNode(currentId) &&
+      this.appState.sidenavref.close();
   };
 
   deleteElementClicked = () => {
-    const edges = this.cytostate.deleteFocusedElement();
+    const edges = this.cytostate.deleteFocusedElement(
+      this.appState.documentState.contentId
+    );
   };
 
   closePanelClicked = () => this.appState.unselectContent();
