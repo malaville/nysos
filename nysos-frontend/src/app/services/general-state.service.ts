@@ -69,12 +69,12 @@ export class GeneralStateService {
     if (keys.length == 0) return;
     const optionSelected = (id: string) => {
       const data = this.cytoState.getThemeNodes().getElementById(id).data();
-      this.appState.contentSelected(data.id, data.name);
+      this.cytoState.selectElement(id);
       this.appState.closeSearchBar();
     };
     this.appState.openSearchBar(keys, optionSelected);
   };
 
-  colorSelected = (color: Color) =>
-    this.cytoState.setColor(this.appState.documentState.contentId, color);
+  colorSelected = (elementId: string, color: Color) =>
+    this.cytoState.setColor(elementId, color);
 }

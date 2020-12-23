@@ -7,12 +7,9 @@ import {
   ViewChild,
 } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
-import { Observable, scheduled } from 'rxjs';
+import { Observable, of, scheduled } from 'rxjs';
 import { map } from 'rxjs/operators';
-import {
-  AppstateService,
-  DocumentDataStateInterface,
-} from './services/app/appstate.service';
+import { DocumentDataStateInterface } from './services/app/appstate.service';
 import { ContentChangesInterface } from './services/cytodatabase/contentChanges';
 import { CytodatabaseService } from './services/cytodatabase/cytodatabase.service';
 import { CytostateService } from './services/cytostate/cytostate.service';
@@ -26,7 +23,7 @@ import { GeneralStateService } from './services/general-state.service';
 export class AppComponent implements OnInit, AfterViewInit {
   title = 'nysos-frontend';
   documentStateObs$: Observable<DocumentDataStateInterface>;
-  large: Observable<boolean> = scheduled([false], null);
+  large: Observable<boolean> = of(false);
   isTest: boolean;
 
   contentChangesObs: Observable<ContentChangesInterface>;

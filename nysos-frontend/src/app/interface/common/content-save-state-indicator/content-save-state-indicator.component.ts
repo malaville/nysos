@@ -12,7 +12,7 @@ import { CytostateService } from 'src/app/services/cytostate/cytostate.service';
   styleUrls: ['./content-save-state-indicator.component.css'],
 })
 export class ContentSaveStateIndicatorComponent implements OnInit {
-  public contentSaveState: Observable<ContentSaveStateInterface>;
+  public contentSaveState: ContentSaveStateInterface;
   public retrying = false;
 
   @Input() showProgress: boolean = false;
@@ -23,7 +23,9 @@ export class ContentSaveStateIndicatorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.contentSaveState = this.cytoDb.contentSaveStateObs;
+    this.cytoDb.contentSaveStateObs.subscribe(
+      (contentSaveState) => (this.contentSaveState = contentSaveState)
+    );
   }
 
   retryClicked() {

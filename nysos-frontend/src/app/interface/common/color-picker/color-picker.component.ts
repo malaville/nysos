@@ -1,6 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-export type Color = [red: number, green: number, blue: number];
+export type Color = [
+  hue: number | undefined,
+  saturation: number,
+  luminance: number
+];
 
 @Component({
   selector: 'app-color-picker',
@@ -9,10 +13,10 @@ export type Color = [red: number, green: number, blue: number];
 })
 export class ColorPickerComponent implements OnInit {
   open = false;
-  colorSelected: Color;
+  colorSelected: Color | undefined;
   timer: number;
   @Input()
-  colorSelectedCallback: (color: Color) => void;
+  colorSelectedCallback: (color: Color | undefined) => void;
 
   @Input()
   colorPalette: Color[];
@@ -37,7 +41,7 @@ export class ColorPickerComponent implements OnInit {
 
   toHSL = (c: Color) => `hsl( ${c[0]} , ${c[1]}% , ${c[2]}%)`;
 
-  colorClicked(color: Color) {
+  colorClicked(color: Color | undefined) {
     this.colorSelectedCallback(color);
     this.colorSelected = color;
   }

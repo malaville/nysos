@@ -1,36 +1,33 @@
 <div class="loaders-container">
   <img
-    [hidden]="!(contentSaveState | async).writing"
+    [hidden]="!contentSaveState.writing"
     style="width: 25px; height: 25px; border-radius: 50%"
     src="/assets/loader.svg"
     alt="Content is saving"
   />
-  <ng-container *ngIf="!(contentSaveState | async).writing">
+  <ng-container *ngIf="!contentSaveState.writing">
     <mat-spinner *ngIf="retrying" [diameter]="20"></mat-spinner>
-    <mat-spinner
-      *ngIf="(contentSaveState | async).saving"
-      [diameter]="20"
-    ></mat-spinner>
-    <ng-container *ngIf="!(contentSaveState | async).saving && !retrying">
-      <mat-icon *ngIf="(contentSaveState | async).error" class="red-icon"
+    <mat-spinner *ngIf="contentSaveState.saving" [diameter]="20"></mat-spinner>
+    <ng-container *ngIf="!contentSaveState.saving && !retrying">
+      <mat-icon *ngIf="contentSaveState.error" class="red-icon"
         >cancel</mat-icon
       >
-      <mat-icon class="green-icon" *ngIf="(contentSaveState | async).saved"
+      <mat-icon class="green-icon" *ngIf="contentSaveState.saved"
         >check_circle</mat-icon
       >
       <mat-icon
         style="cursor: pointer"
         (click)="retryClicked()"
-        *ngIf="(contentSaveState | async).offline"
+        *ngIf="contentSaveState?.offline"
         >cloud_off</mat-icon
       >
     </ng-container>
   </ng-container>
 
   <ng-container *ngIf="showProgress">
-    <span class="show-progress" *ngIf="(contentSaveState | async).progress">
-      {{ (contentSaveState | async).progress.success }} /
-      {{ (contentSaveState | async).progress.total }}
+    <span class="show-progress" *ngIf="contentSaveState.progress">
+      {{ contentSaveState?.progress?.success }} /
+      {{ contentSaveState?.progress?.total }}
     </span>
   </ng-container>
 </div>

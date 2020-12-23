@@ -98,4 +98,5 @@ export const importAllMyDataToTestEnv = (authToken: string): Promise<boolean> =>
     },
   }).then((res) => {
     if (res.status == 200) return true;
+    return false;
   });

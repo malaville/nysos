@@ -2,8 +2,15 @@ import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 import { EdgeCollection, NodeCollection } from 'cytoscape';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { first } from 'rxjs/operators';
+import {
+  BehaviorSubject,
+  combineLatest,
+  concat,
+  Observable,
+  of,
+  zip,
+} from 'rxjs';
+import { first, map, mergeMap } from 'rxjs/operators';
 import { GroupingToolComponent } from 'src/app/interface/grouping-tool/grouping-tool.component';
 import { InfoModalComponent } from 'src/app/interface/info-modal/info-modal.component';
 import { SearchBarComponent } from 'src/app/interface/search-bar/search-bar.component';
@@ -14,14 +21,14 @@ import { CytostateService } from '../cytostate/cytostate.service';
 import { ElementSelectedEvent, NODE_TYPES } from '../cytostate/models';
 
 export interface DocumentDataStateInterface {
-  name: string;
-  contentId: string;
-  content: string;
+  name: string | undefined;
+  contentId: string | undefined;
+  content: string | undefined;
   edgeTargetId?: string;
   edgeSourceId?: string;
-  bibliography: BibliographyItem;
+  bibliography: BibliographyItem | undefined;
   title?: string;
-  asyncContent: AsyncContent;
+  asyncContent: AsyncContent | undefined;
 }
 
 const defaultDocumentState: DocumentDataStateInterface = {
@@ -46,7 +53,7 @@ export interface UIStateInterface {
 })
 export class AppstateService {
   sidenavref: MatSidenav;
-  dialogRef: MatDialogRef<GroupingToolComponent>;
+  dialogRef?: MatDialogRef<GroupingToolComponent>;
   infoModalRef: MatDialogRef<InfoModalComponent>;
   searchBarModalRef: MatDialogRef<SearchBarComponent>;
 
@@ -69,7 +76,19 @@ export class AppstateService {
     private matDialog: MatDialog,
     private cytostate: CytostateService
   ) {
-    this.cytostate.elementSelected$.subscribe(this.contentSelected.bind(this));
+    this.cytostate.elementSelected$.subscribe(($event) =>
+      $event ? this.contentSelected($event) : this.unselectContent()
+    );
+
+    combineLatest([
+      this.cytostate.elementDataUpdated$,
+      this.cytostate.elementSelected$,
+    ]).subscribe(
+      ([elUpdated, elSelected]) =>
+        elUpdated?.id &&
+        elSelected?.id == elUpdated?.id &&
+        this.contentSelected(elUpdated)
+    );
   }
 
   setSidenavRef(sidenavref: MatSidenav) {
@@ -88,7 +107,7 @@ export class AppstateService {
     const name = $event.data.name;
     const id = $event.id;
     const { source, target } = $event.data;
-    let bibliography = undefined;
+    let bibliography: BibliographyItem | undefined = undefined;
     if ($event.type == NODE_TYPES.DOCUMENT_NODE) {
       const { title, link, author, year, name } = $event.data;
       if ([title, link, author, year, name].every((_) => !_)) {
@@ -106,7 +125,7 @@ export class AppstateService {
     this.documentState.asyncContent = this.cytoDb.loadRemoteContentOf(id);
     this.documentState.edgeSourceId = source || undefined;
     this.documentState.edgeTargetId = target || undefined;
-    this.documentState.bibliography = bibliography;
+    bibliography! && (this.documentState.bibliography = bibliography);
     this.documentStateBS.next(this.documentState);
 
     // Closes the adding or editing document whenever selecting new content
@@ -117,7 +136,7 @@ export class AppstateService {
   }
 
   saveContent(content: string) {
-    this.cytoDb.saveDataOrContentOf(this.documentState.contentId, content);
+    this.cytoDb.saveDataOrContentOf(this.documentState.contentId!, content);
   }
 
   openNewDocument(editDocument = false) {

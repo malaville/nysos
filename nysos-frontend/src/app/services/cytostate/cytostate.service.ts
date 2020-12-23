@@ -2,7 +2,6 @@ import { Inject, Injectable } from '@angular/core';
 import {
   Core,
   EdgeCollection,
-  EdgeHandlesApi,
   EdgeSingular,
   EventObject,
   EventObjectNode,
@@ -25,7 +24,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { take } from 'rxjs/operators';
 import { apiIsReachable } from '../cytodatabase/fetchNysosBackend';
 import { Color } from 'src/app/interface/common/color-picker/color-picker.component';
-import { ReplaySubject } from 'rxjs';
+import { Observable, ReplaySubject } from 'rxjs';
 import { CYTOSCAPE, Cytoscape } from './cytoscape.injection.token';
 
 const NEW_NAME = '';
@@ -35,7 +34,7 @@ const NEW_NAME = '';
 })
 export class CytostateService {
   cytocore: Core;
-  edgehandles: EdgeHandlesApi;
+  edgehandles: any;
   hoverednode: boolean = false;
   addedgemode: boolean = false;
   saveDataOfNodeEvent = (event: EventObjectNode) => {
@@ -92,6 +91,7 @@ export class CytostateService {
       );
       this.edgeCreationMode();
     };
+    // @ts-ignore
     this.edgehandles = this.cytocore.edgehandles({ ...defaults, complete });
     this.edgehandles.disable();
 
@@ -233,9 +233,10 @@ export class CytostateService {
           parent: params.parent,
           type: NODE_TYPES.THEME_NODE,
         },
-        position: params.parent
-          ? { x: params.x + 10, y: params.y + 20 }
-          : center,
+        position:
+          params.parent && params.x && params.y
+            ? { x: params.x + 10, y: params.y + 20 }
+            : center,
       })
       .select();
 
@@ -255,6 +256,7 @@ export class CytostateService {
       return element as NodeSingular;
     }
     console.error(`The element you queried was not a node`, element);
+    throw 'Element you queried was not a node';
   }
 
   findEdgeByIdOrThrow(id: string): EdgeSingular {
@@ -263,6 +265,7 @@ export class CytostateService {
       return element as EdgeSingular;
     }
     console.error(`The element you queried was not an edge`, element);
+    throw 'Element you queried was not an edge';
   }
 
   existsById(id: string): boolean {
@@ -564,7 +567,11 @@ export class CytostateService {
     this.saveData(ancestor.last().data());
   }
 
-  setHueToDescendants(ancestor: NodeCollection, hue: number, cleanHue = true) {
+  setHueToDescendants(
+    ancestor: NodeCollection,
+    hue: number | undefined,
+    cleanHue = true
+  ) {
     if (hue === undefined) {
       ancestor
         .descendants()

@@ -5,7 +5,7 @@ export interface AsyncContentStateInterface {
   resolved: boolean;
   resolving: boolean;
   failed: boolean;
-  content: string;
+  content: string | undefined;
 }
 
 export class AsyncContent {

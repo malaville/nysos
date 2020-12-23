@@ -18,8 +18,8 @@ import { BibliographyItemLink } from '../source-manager/bibliography-item';
   styleUrls: ['./document-viewer.component.css'],
 })
 export class DocumentViewerComponent {
-  public bibliography$: Observable<BibliographyItemLink[]> = of([]);
-  documentStateObs$: Observable<DocumentDataStateInterface>;
+  public bibliography: BibliographyItemLink[] = [];
+  public documentState: DocumentDataStateInterface;
   asyncContentState: Observable<AsyncContentStateInterface>;
   @Input() large: boolean;
   isEdgeOrDocument: boolean;
@@ -32,15 +32,20 @@ export class DocumentViewerComponent {
   ) {}
 
   ngOnInit() {
-    this.documentStateObs$ = this.appState.documentStateObservable;
+    this.appState.documentStateObservable.subscribe((documentState) => {
+      this.documentState = documentState;
+      if (documentState.contentId) {
+        this.bibliography = this.cytostate.findBibliographyAbout(
+          documentState.contentId
+        );
+      } else {
+        this.bibliography = [];
+      }
+    });
     this.appState.documentStateObservable.subscribe((state) => {
       this.isEdgeOrDocument = !!state.edgeSourceId || !!state.bibliography;
-      this.asyncContentState = state.asyncContent?.asyncContentState;
+      this.asyncContentState = state.asyncContent?.asyncContentState!;
     });
-
-    this.bibliography$ = this.documentStateObs$.pipe(
-      map((doc) => this.cytostate.findBibliographyAbout(doc.contentId) || [])
-    );
   }
 
   onDescriptionChange(content) {
@@ -57,20 +62,25 @@ export class DocumentViewerComponent {
 
   addAChildClicked = () => {
     const currentId = this.appState.documentState.contentId;
-    this.cytostate.addChildToCurrentNode(currentId) &&
+    currentId &&
+      this.cytostate.addChildToCurrentNode(currentId) &&
       this.appState.sidenavref.close();
   };
 
   deleteElementClicked = () => {
-    const edges = this.cytostate.deleteFocusedElement(
-      this.appState.documentState.contentId
-    );
+    const edges =
+      this.appState.documentState.contentId &&
+      this.cytostate.deleteFocusedElement(
+        this.appState.documentState.contentId
+      );
   };
 
   closePanelClicked = () => this.appState.unselectContent();
 
   searchClicked = () => this.genState.openSearchBarClicked();
 
-  colorSelectedCallback = () => (color: Color) =>
-    this.genState.colorSelected(color);
+  colorSelectedCallback = () => (color: Color) => {
+    const contentId = this.appState.documentState.contentId;
+    contentId && this.cytostate.setColor(contentId, color);
+  };
 }

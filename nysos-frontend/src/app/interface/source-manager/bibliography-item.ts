@@ -8,7 +8,7 @@ export class BibliographyItem {
     public acronym = '',
     public author = '',
     public year = new Date().getFullYear(),
-    public contentId = undefined
+    public contentId: undefined | string = undefined
   ) {}
 
   static fromFormGroup(fg: FormGroup) {
@@ -40,7 +40,7 @@ export class BibliographyItem {
   }
 
   toNodeData() {
-    const data = { ...this, name: this.acronym };
+    const data: any = { ...this, name: this.acronym };
     delete data['acronym'];
     return data;
   }

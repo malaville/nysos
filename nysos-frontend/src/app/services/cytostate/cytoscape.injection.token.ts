@@ -1,5 +1,6 @@
 import { InjectionToken } from '@angular/core';
 import cytoscape from 'cytoscape';
+const edgehandles = require('cytoscape-edgehandles');
 
 export type Cytoscape = typeof cytoscape;
 
@@ -8,9 +9,10 @@ export const CYTOSCAPE = new InjectionToken<Cytoscape>('Browser Storage', {
   factory: () => {
     console.log('Cytoscape gets created');
     try {
-      // @ts-ignore
       cytoscape.use(edgehandles);
-    } catch (e) {}
+    } catch (e) {
+      console.log('failed', e);
+    }
     return cytoscape;
   },
 });

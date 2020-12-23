@@ -22,7 +22,7 @@ export interface ContentSaveStateInterface {
   saved: boolean;
   error: boolean;
   offline: boolean;
-  progress: { total: number; success: number; failed: number };
+  progress?: { total: number; success: number; failed: number };
 }
 
 const defaultContentSaveState = {
@@ -31,7 +31,6 @@ const defaultContentSaveState = {
   saved: false,
   error: false,
   offline: true,
-  progress: undefined,
 };
 
 @Injectable({
@@ -175,8 +174,10 @@ export class CytodatabaseService {
   }
 
   updateProgress(success: number, failed: number) {
-    this.contentSaveState.progress.success += success;
-    this.contentSaveState.progress.failed += failed;
+    if (this.contentSaveState.progress) {
+      this.contentSaveState.progress.success += success;
+      this.contentSaveState.progress.failed += failed;
+    }
     this.contentSaveStateBS.next(this.contentSaveState);
   }
 
@@ -185,7 +186,7 @@ export class CytodatabaseService {
   }
 
   loadFromLocalStorage(): { data: any } {
-    const cytosave = JSON.parse(localStorage.getItem(CYTOSAVE_KEY));
+    const cytosave = JSON.parse(localStorage.getItem(CYTOSAVE_KEY) || '');
     return cytosave;
   }
 
@@ -211,7 +212,7 @@ export class CytodatabaseService {
   async loadFromRemote(): Promise<{ data: any }> {
     let attempts = 0;
     let MAX_ATTEMPTS = 10;
-    let data = undefined;
+    let data: any = undefined;
 
     if (!this.authToken) {
       try {
@@ -246,7 +247,7 @@ export class CytodatabaseService {
     // - data defined but empty => throw {saveAll:true
     //  -data defined and not empty => return :)
 
-    if (data) {
+    if (data && typeof data == 'object') {
       if (data.length == 0) {
         this._snackBar.open(
           "Remote Data was empty, we're saving your local data online",

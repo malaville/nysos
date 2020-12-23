@@ -47,7 +47,7 @@ export class DocumentTitleComponent implements OnInit {
   onNameOut() {
     if (this.nameWasChanged) {
       this.cytostate.changeElementName(
-        this.appState.documentState.contentId,
+        this.appState.documentState.contentId!,
         this.temporaryName
       );
     }

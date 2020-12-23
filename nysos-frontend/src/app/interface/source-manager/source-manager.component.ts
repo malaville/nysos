@@ -62,7 +62,7 @@ export class SourceManagerComponent implements OnChanges, OnInit {
         this.cytostate.modifyBibliography(this.bibliographyId, bib);
       } else {
         this.cytostate.addBibliography(
-          this.appState.documentState.contentId,
+          this.appState.documentState.contentId!,
           bib
         );
       }

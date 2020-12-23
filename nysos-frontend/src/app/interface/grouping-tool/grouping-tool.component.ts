@@ -1,14 +1,13 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import cytoscape, {
   Core,
-  CytoscapeOptions,
   EdgeCollection,
-  EdgeHandlesApi,
   EdgeSingular,
   EventObjectNode,
   NodeCollection,
   NodeSingular,
 } from 'cytoscape';
+
 import { edgehandlestyles } from 'src/app/services/cytostate/edgehandlesstyles';
 import { NODE_TYPES } from 'src/app/services/cytostate/models';
 
@@ -50,7 +49,7 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
   @Input() config: GroupingToolComponentConfigInterface;
   private cytoHierarchy: Core;
   public removeMode: boolean;
-  private static edgeHandles: EdgeHandlesApi;
+  private static edgeHandles: any;
   constructor() {}
 
   async ngOnInit() {

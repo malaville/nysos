@@ -39,7 +39,7 @@ export class ContentChanges implements ContentChangesInterface {
 
   static loadFromLocalStorage(): ContentChanges {
     const localSave: ContentChangesSaveStringInterface = JSON.parse(
-      localStorage.getItem(CONTENTCHANGESSAVE_KEY)
+      localStorage.getItem(CONTENTCHANGESSAVE_KEY) || 'null'
     );
     if (!localSave) return new ContentChanges();
     const objectsToDelete = new Set<string>(localSave.objectsToDelete);
@@ -78,7 +78,7 @@ export class ContentChanges implements ContentChangesInterface {
   defaultParams = { update: true, delete: false };
   addChangesForRemoteAndSaveLocally(
     id: string,
-    dataOrContent: string | object,
+    dataOrContent: string | object | undefined,
     params: Partial<{ update: boolean; delete: boolean }> = this.defaultParams
   ) {
     params = Object.assign({ ...this.defaultParams }, params);

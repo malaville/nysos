@@ -15,7 +15,7 @@
       alt="Image of your google account"
       class="google-photo"
       style="height: 40px; width: 40px"
-      [src]="(auth | async).photoUrl"
+      [src]="(auth | async)?.photoUrl"
     />
   </ng-container>
 </ng-container>
