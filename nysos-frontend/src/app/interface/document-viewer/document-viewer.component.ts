@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, ElementRef, Input } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { concatAll, map } from 'rxjs/operators';
 import {
@@ -9,7 +9,7 @@ import { AsyncContentStateInterface } from 'src/app/services/cytodatabase/asyncC
 import { CytodatabaseService } from 'src/app/services/cytodatabase/cytodatabase.service';
 import { CytostateService } from 'src/app/services/cytostate/cytostate.service';
 import { GeneralStateService } from 'src/app/services/general-state.service';
-import { Color } from '../common/color-picker/color-picker.component';
+import { HSLColor } from '../common/color-picker/color-picker.component';
 import { BibliographyItemLink } from '../source-manager/bibliography-item';
 
 @Component({
@@ -41,10 +41,9 @@ export class DocumentViewerComponent {
       } else {
         this.bibliography = [];
       }
-    });
-    this.appState.documentStateObservable.subscribe((state) => {
-      this.isEdgeOrDocument = !!state.edgeSourceId || !!state.bibliography;
-      this.asyncContentState = state.asyncContent?.asyncContentState!;
+      this.isEdgeOrDocument =
+        !!documentState.edgeSourceId || !!documentState.bibliography;
+      this.asyncContentState = documentState.asyncContent?.asyncContentState!;
     });
   }
 
@@ -79,7 +78,7 @@ export class DocumentViewerComponent {
 
   searchClicked = () => this.genState.openSearchBarClicked();
 
-  colorSelectedCallback = () => (color: Color) => {
+  colorSelectedCallback = () => (color: HSLColor) => {
     const contentId = this.appState.documentState.contentId;
     contentId && this.cytostate.setColor(contentId, color);
   };

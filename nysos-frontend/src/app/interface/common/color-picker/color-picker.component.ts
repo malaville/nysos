@@ -1,6 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 
-export type Color = [
+export type HSLColor = [
   hue: number | undefined,
   saturation: number,
   luminance: number
@@ -11,22 +11,30 @@ export type Color = [
   templateUrl: './color-picker.component.html',
   styleUrls: ['./color-picker.component.css'],
 })
-export class ColorPickerComponent implements OnInit {
+export class ColorPickerComponent implements OnChanges {
   open = false;
-  colorSelected: Color | undefined;
+  colorSelected: HSLColor | undefined;
   timer: number;
-  @Input()
-  colorSelectedCallback: (color: Color | undefined) => void;
 
   @Input()
-  colorPalette: Color[];
+  colorSelectedCallback: (color: HSLColor | undefined) => void;
+
+  @Input()
+  colorPalette: HSLColor[];
 
   @Input()
   counterRotate: boolean = false;
 
+  @Input()
+  initialColor: HSLColor | undefined;
+
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.initialColor) {
+      this.colorSelected = undefined;
+    }
+  }
 
   colorPaletteClicked() {
     this.open = !this.open;
@@ -39,10 +47,11 @@ export class ColorPickerComponent implements OnInit {
     }
   }
 
-  toHSL = (c: Color) => `hsl( ${c[0]} , ${c[1]}% , ${c[2]}%)`;
+  toHSL = (c: HSLColor) => `hsl( ${c[0]} , ${c[1]}% , ${c[2]}%)`;
 
-  colorClicked(color: Color | undefined) {
+  colorClicked(color: HSLColor | undefined) {
     this.colorSelectedCallback(color);
     this.colorSelected = color;
+    this.initialColor = undefined;
   }
 }

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { EdgeCollection } from 'cytoscape';
 import { Observable } from 'rxjs';
-import { Color } from '../interface/common/color-picker/color-picker.component';
+import { HSLColor } from '../interface/common/color-picker/color-picker.component';
 import {
   AppstateService,
   DocumentDataStateInterface,
@@ -19,8 +19,7 @@ export class GeneralStateService {
   readonly UIStateObservable: Observable<UIStateInterface>;
   constructor(
     private appState: AppstateService,
-    private cytoState: CytostateService,
-    private dbState: CytodatabaseService
+    private cytoState: CytostateService
   ) {
     this.documentStateObservable = this.appState.documentStateObservable;
     this.UIStateObservable = this.appState.UIstateObservable;
@@ -75,6 +74,6 @@ export class GeneralStateService {
     this.appState.openSearchBar(keys, optionSelected);
   };
 
-  colorSelected = (elementId: string, color: Color) =>
+  colorSelected = (elementId: string, color: HSLColor) =>
     this.cytoState.setColor(elementId, color);
 }

@@ -23,8 +23,8 @@ import { GoogleLoginProvider, SocialAuthService } from 'angularx-social-login';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { take } from 'rxjs/operators';
 import { apiIsReachable } from '../cytodatabase/fetchNysosBackend';
-import { Color } from 'src/app/interface/common/color-picker/color-picker.component';
-import { Observable, ReplaySubject } from 'rxjs';
+import { HSLColor } from 'src/app/interface/common/color-picker/color-picker.component';
+import { ReplaySubject } from 'rxjs';
 import { CYTOSCAPE, Cytoscape } from './cytoscape.injection.token';
 
 const NEW_NAME = '';
@@ -48,7 +48,7 @@ export class CytostateService {
   readonly elementSelected$ = this.elementSelectedSubject.asObservable();
 
   private elementDataUpdatedSubject = new ReplaySubject<ElementSelectedEvent>();
-  readonly elementDataUpdated$ = this.elementSelectedSubject.asObservable();
+  readonly elementDataUpdated$ = this.elementDataUpdatedSubject.asObservable();
 
   constructor(
     private cyDb: CytodatabaseService,
@@ -455,7 +455,7 @@ export class CytostateService {
       this.deleteElement(elementId);
 
       if (this.existsById(elementId)) {
-        this.updateElementDataUpdate(this.findElementByIdOrThrow(elementId));
+        this.updatedElementData(this.findElementByIdOrThrow(elementId));
       } else {
         this.elementSelectedSubject.next(undefined);
       }
@@ -466,14 +466,6 @@ export class CytostateService {
         { duration: 3000 }
       );
     }
-  }
-
-  updateElementDataUpdate(element: SingularElementArgument) {
-    this.elementDataUpdatedSubject.next({
-      id: element.id(),
-      data: element.data(),
-      type: element.data().type,
-    });
   }
 
   deleteFocusedElement(elementId: string) {
@@ -559,7 +551,7 @@ export class CytostateService {
     }
   }
 
-  setColor(nodeId: string, color: Color | number) {
+  setColor(nodeId: string, color: HSLColor | number) {
     if (color === undefined) {
       color = [undefined, 0, 0];
     }
@@ -572,8 +564,7 @@ export class CytostateService {
       ancestor = targetNode.ancestors().last().union([]);
     }
     this.setHueToDescendants(ancestor, color[0]);
-
-    ancestor.last().data({ hue: color[0] });
+    this.updatedElementData(targetNode);
     this.saveData(ancestor.last().data());
   }
 
@@ -582,16 +573,13 @@ export class CytostateService {
     hue: number | undefined,
     cleanHue = true
   ) {
-    if (hue === undefined) {
+    if (hue === undefined || hue === null) {
       ancestor
         .descendants()
         .union(ancestor)
         .removeStyle('background-color')
-        .forEach((node) => {
-          if (node.data().hue) {
-            node.removeData('hue');
-          }
-        });
+        .removeData('inheritedHue hue');
+
       return;
     }
     let maxdepth = 0;
