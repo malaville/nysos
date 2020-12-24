@@ -110,6 +110,16 @@ export class CytostateService {
         node.target.data().name == NEW_NAME &&
         this.selectElement(node.target.id())
     );
+
+    this.cytocore.on('vmouseup', 'node', ($nodeEvent) => {
+      ($nodeEvent.target as NodeSingular)
+        .descendants()
+        .union($nodeEvent.target as NodeSingular)
+        .filter((node: NodeSingular) => node.descendants().length == 0)
+        .forEach((node) =>
+          this.saveData({ ...node.data(), position: node.position() })
+        );
+    });
     const timeoutId = setTimeout(
       () => this.loadWithSave(this.cyDb.loadFromLocalStorage().data),
       1000
