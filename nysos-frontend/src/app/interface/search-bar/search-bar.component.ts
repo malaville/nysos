@@ -1,7 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { Observable } from 'rxjs';
+import { FormControl } from '@angular/forms';
 import { startWith } from 'rxjs/operators';
 import Fuse from 'fuse.js';
 
@@ -51,8 +49,6 @@ export class SearchBarComponent implements OnInit {
   }
 
   onKeyDown($event) {
-    console.log($event.key);
-    console.log($event.key === 'ArrowDown', !this.inputControl.value);
     if ($event.key === 'ArrowDown' && !this.inputControl.value) {
       this.filteredOptions = this.initialOptions;
       this.xlheight = true;

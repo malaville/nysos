@@ -68,8 +68,8 @@ export class GeneralStateService {
     }));
     if (keys.length == 0) return;
     const optionSelected = (id: string) => {
-      const data = this.cytoState.getThemeNodes().getElementById(id).data();
       this.cytoState.selectElement(id);
+      this.cytoState.zoomAndCenterOn(id);
       this.appState.closeSearchBar();
     };
     this.appState.openSearchBar(keys, optionSelected);

@@ -651,4 +651,14 @@ export class CytostateService {
     const factorReaching0 = (depth - 1) / maxdepth;
     return [h, 60 * factorReaching0 + 20, 80 * (1 - factorReaching0)];
   }
+
+  zoomAndCenterOn(id: string) {
+    const constellation = this.findElementByIdOrThrow(id);
+
+    this.cytocore.fit(constellation, 300);
+    this.cytocore.panBy({
+      x: 200,
+      y: 0,
+    });
+  }
 }
