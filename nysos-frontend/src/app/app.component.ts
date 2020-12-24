@@ -33,6 +33,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.genState.setSidenavRef(s);
   }
 
+  @ViewChild('sidenav', { read: ElementRef }) _sidenav: ElementRef;
+
   @ViewChild('cy') cy: ElementRef;
 
   @HostListener('document:keyup.escape', ['$event'])
@@ -78,7 +80,18 @@ export class AppComponent implements OnInit, AfterViewInit {
     private cytostate: CytostateService,
     private cytoDb: CytodatabaseService,
     private genState: GeneralStateService
-  ) {}
+  ) {
+    this.genState.documentStateObservable.subscribe((documentState) => {
+      if (this._sidenav) {
+        if (documentState.hue !== undefined) {
+          const hslColor = `hsl( ${documentState.hue} , 50% , 70%)`;
+          this._sidenav.nativeElement.style.backgroundColor = hslColor;
+        } else {
+          this._sidenav.nativeElement.style.backgroundColor = 'white';
+        }
+      }
+    });
+  }
 
   ngOnInit() {
     this.documentStateObs$ = this.genState.documentStateObservable;

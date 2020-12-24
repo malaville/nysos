@@ -21,7 +21,13 @@ mat-sidenav-container {
 mat-sidenav {
   width: 600px;
   padding: 50px;
-  transition: width 0.3s;
+  transition: width 0.3s, background-color 1s;
+  background-image: linear-gradient(
+    to bottom,
+    transparent,
+    white 10%,
+    white 100%
+  );
 }
 @media only screen and (max-width: 600px) {
   mat-sidenav {
