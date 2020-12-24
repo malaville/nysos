@@ -2,15 +2,9 @@ import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 import { EdgeCollection, NodeCollection } from 'cytoscape';
-import {
-  BehaviorSubject,
-  combineLatest,
-  concat,
-  Observable,
-  of,
-  zip,
-} from 'rxjs';
-import { first, map, mergeMap } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest } from 'rxjs';
+import { first } from 'rxjs/operators';
+import { HSLColor } from 'src/app/interface/common/color-picker/color-picker.component';
 import { GroupingToolComponent } from 'src/app/interface/grouping-tool/grouping-tool.component';
 import { InfoModalComponent } from 'src/app/interface/info-modal/info-modal.component';
 import { SearchBarComponent } from 'src/app/interface/search-bar/search-bar.component';
@@ -29,6 +23,7 @@ export interface DocumentDataStateInterface {
   bibliography: BibliographyItem | undefined;
   title?: string;
   asyncContent: AsyncContent | undefined;
+  hue?: HSLColor | undefined;
 }
 
 const defaultDocumentState: DocumentDataStateInterface = {
@@ -106,7 +101,7 @@ export class AppstateService {
   contentSelected($event: ElementSelectedEvent) {
     const name = $event.data.name;
     const id = $event.id;
-    const { source, target } = $event.data;
+    const { source, target, inheritedHue } = $event.data;
     let bibliography: BibliographyItem | undefined = undefined;
     if ($event.type == NODE_TYPES.DOCUMENT_NODE) {
       const { title, link, author, year, name } = $event.data;
@@ -118,7 +113,6 @@ export class AppstateService {
       }
       bibliography = new BibliographyItem(title, link, name, author, year);
     }
-
     this.documentState.name = name;
     this.documentState.contentId = id;
     this.documentState.content = this.cytoDb.loadContentOf(id);
@@ -126,6 +120,7 @@ export class AppstateService {
     this.documentState.edgeSourceId = source || undefined;
     this.documentState.edgeTargetId = target || undefined;
     bibliography! && (this.documentState.bibliography = bibliography);
+    this.documentState.hue = inheritedHue;
     this.documentStateBS.next(this.documentState);
 
     // Closes the adding or editing document whenever selecting new content
