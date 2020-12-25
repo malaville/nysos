@@ -10,6 +10,7 @@ import {
 } from './app/appstate.service';
 import { CytodatabaseService } from './cytodatabase/cytodatabase.service';
 import { CytostateService } from './cytostate/cytostate.service';
+import { RouterListenerService } from './router-listener/router-listener.service';
 
 @Injectable({
   providedIn: 'root',
@@ -19,10 +20,14 @@ export class GeneralStateService {
   readonly UIStateObservable: Observable<UIStateInterface>;
   constructor(
     private appState: AppstateService,
-    private cytoState: CytostateService
+    private cytoState: CytostateService,
+    private routeListener: RouterListenerService
   ) {
     this.documentStateObservable = this.appState.documentStateObservable;
     this.UIStateObservable = this.appState.UIstateObservable;
+    this.routeListener.currentScope$.subscribe((scope) =>
+      console.log('Scope', scope)
+    );
   }
 
   // AppState Only Methods
