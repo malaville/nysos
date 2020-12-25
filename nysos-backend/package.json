@@ -23,7 +23,7 @@
     "build": "rm -rf build/ && tsc && node build/index.js",
     "start:dev": "nodemon",
     "start:function": "functions-framework",
-    "stage": "rm -r build/ && tsc && zip -r nysos-backend.zip package.json build/ && gsutil cp nysos-backend.zip gs://nysos/nysos-backend.zip  && gcloud functions deploy nysos-backend --trigger-http --runtime nodejs10 --source=gs://nysos/nysos-backend.zip --allow-unauthenticated --region=europe-west1 "
+    "stage": "rm -r build/ && tsc && zip -r nysos-backend${BACKVER}.zip package.json build/ && gsutil cp nysos-backend${BACKVER}.zip gs://nysos/nysos-backend${BACKVER}.zip  && gcloud functions deploy nysos-backend$BACKVER --trigger-http --runtime nodejs10 --source=gs://nysos/nysos-backend${BACKVER}.zip --allow-unauthenticated --region=europe-west1 "
   },
   "author": "",
   "license": "ISC"

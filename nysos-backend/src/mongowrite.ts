@@ -107,70 +107,58 @@ export const saveOneObjectData = async (
   });
 };
 
-export const copyProdToTest = async (uid: number) => {
+export const useCollectionReplication = async (
+  uid: number,
+  sourceSuffix: string,
+  targetSuffix: string
+) => {
   return new Promise(async (resolve, reject) => {
     if (!client.isConnected()) {
       await client.connect().catch((err) => reject(err));
     }
 
     let resolved = 0;
-
-    client
-      .db("nysos-test")
-      .collection(`${uid}:content`, async (err, targetForContent) => {
-        var sourceOfContent = await client
-          .db("nysos")
-          .collection(`${uid}:content`)
-          .find()
-          .toArray();
-        if (sourceOfContent.length > 0) {
-          targetForContent
-            .bulkWrite(
-              sourceOfContent.map((content) => ({
-                insertOne: { document: content },
-              }))
-            )
-            .then(() => {
-              console.log(
-                `${new Date().toISOString()} COPIED all content from prod to test`
-              );
-              resolved++;
-              resolved == 2 && resolve(true);
-            });
-        } else {
-          console.log(`${new Date().toISOString()} COPIED no content to copy`);
-          resolved++;
-          resolved == 2 && resolve(true);
-        }
-      });
-
-    client
-      .db("nysos-test")
-      .collection(`${uid}:data`, async (err, targetForData) => {
-        var sourceOfData = await client
-          .db("nysos")
-          .collection(`${uid}:data`)
-          .find()
-          .toArray();
-        if (sourceOfData.length > 0) {
-          targetForData
-            .bulkWrite(
-              sourceOfData.map((data) => ({
-                insertOne: { document: data },
-              }))
-            )
-            .then(() => {
-              console.log(
-                `${new Date().toISOString()} COPIED all data from prod to test`
-              );
-              resolved++;
-              resolved == 2 && resolve(true);
-            });
-        } else {
-          console.log(`${new Date().toISOString()} COPIED no data to copy`);
-          resolved++;
-          resolved == 2 && resolve(true);
-        }
-      });
+    const dataTypes = ["data", "content"];
+    const sourceDb = "nysos" + sourceSuffix;
+    const targetDb = "nysos" + targetSuffix;
+    for (let dataType of dataTypes) {
+      client
+        .db(targetDb)
+        .collection(`${uid}:${dataType}`, async (err, targetForData) => {
+          var sourceOfData = await client
+            .db(sourceDb)
+            .collection(`${uid}:data`)
+            .find()
+            .toArray();
+          if (sourceOfData.length > 0) {
+            targetForData
+              .bulkWrite(
+                sourceOfData.map((data) => ({
+                  insertOne: { document: data },
+                }))
+              )
+              .then(() => {
+                console.log(
+                  `${new Date().toISOString()} COPIED all ${dataType} from prod to test`
+                );
+                resolved++;
+                resolved == 2 && resolve(true);
+              })
+              .catch((err) => {
+                console.log(
+                  `Failure on bulkWrite from ${sourceDb} to ${targetDb} on ${dataType}`,
+                  err
+                );
+                reject(false);
+              });
+          } else {
+            console.log(
+              `${new Date().toISOString()} COPIED no ${dataType} to copy`
+            );
+            resolved++;
+            resolved == 2 && resolve(true);
+          }
+        });
+    }
   });
 };

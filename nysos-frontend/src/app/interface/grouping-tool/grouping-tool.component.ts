@@ -1,13 +1,17 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import cytoscape, {
+import { Component, Inject, Input, OnDestroy, OnInit } from '@angular/core';
+import {
   Core,
   EdgeCollection,
+  EdgeHandlesApi,
   EdgeSingular,
   EventObjectNode,
   NodeCollection,
   NodeSingular,
 } from 'cytoscape';
-
+import {
+  Cytoscape,
+  CYTOSCAPE,
+} from 'src/app/services/cytostate/cytoscape.injection.token';
 import { edgehandlestyles } from 'src/app/services/cytostate/edgehandlesstyles';
 import { NODE_TYPES } from 'src/app/services/cytostate/models';
 
@@ -49,8 +53,8 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
   @Input() config: GroupingToolComponentConfigInterface;
   private cytoHierarchy: Core;
   public removeMode: boolean;
-  private static edgeHandles: any;
-  constructor() {}
+  private static edgeHandles: EdgeHandlesApi;
+  constructor(@Inject(CYTOSCAPE) private cytoscape: Cytoscape) {}
 
   async ngOnInit() {
     const dagreOpen = import(
@@ -60,8 +64,8 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
       /* webpackChunkName: 'dagre_compound' */ 'cytoscape-compound-drag-and-drop'
     ).then((module) => module.default);
     try {
-      cytoscape.use(await compoundDragAndDropOpen);
-      cytoscape.use(await dagreOpen);
+      this.cytoscape.use(await compoundDragAndDropOpen);
+      this.cytoscape.use(await dagreOpen);
     } catch (err) {
       console.warn('TECHNICAL DEBT, library was charged more than one');
     }
@@ -80,7 +84,7 @@ export class GroupingToolComponent implements OnInit, OnDestroy {
       transform: (node, pos) => ({ x: pos.x * 1.2, y: -pos.y * 1.4 }),
       padding: 20,
     };
-    this.cytoHierarchy = cytoscape({
+    this.cytoHierarchy = this.cytoscape({
       container: document.getElementById('hierarchicalCytoscape'),
       elements: {
         nodes: nodesWithParentsOrChildren,
