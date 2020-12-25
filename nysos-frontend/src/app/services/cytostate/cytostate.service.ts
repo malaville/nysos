@@ -494,6 +494,7 @@ export class CytostateService {
       ancestor = targetNode.ancestors().last().union([]);
     }
     this.setHueToDescendants(ancestor, color[0]);
+    ancestor.last().data({ hue: color[0] });
     this.updatedElementData(targetNode);
     this.saveData(ancestor.last().data());
   }
