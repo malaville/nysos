@@ -44,6 +44,7 @@ import {
 import { InfoModalComponent } from './interface/info-modal/info-modal.component';
 import { SearchBarComponent } from './interface/search-bar/search-bar.component';
 import { ColorPickerComponent } from './interface/common/color-picker/color-picker.component';
+import { HttpClientModule } from '@angular/common/http';
 const config = new SocialAuthService({
   autoLogin: true,
   providers: [
@@ -82,6 +83,7 @@ export function provideConfig() {
   ],
   imports: [
     BrowserModule,
+    HttpClientModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     MatButtonModule,

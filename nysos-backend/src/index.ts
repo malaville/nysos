@@ -108,6 +108,39 @@ app.get("/content/:contentId", async function (req: Request, res: Response) {
   }
 });
 
+app.get(
+  "share/:userId/content/:contentId",
+  async function (req: Request, res: Response) {
+    let token = "" + req.query.token;
+    let userId = "" + req.query.userId;
+    let uid = undefined;
+    if (!userId) {
+      res.statusCode = 400;
+      res.send("The user id is invalid");
+    }
+    try {
+      uid = await identifyGoogleUser(token);
+    } catch (err) {
+      console.log("identifyUser failed", err.name);
+      res.statusCode = 401;
+      res.send(err);
+      return;
+    }
+    try {
+      const document = await getOneDocument(
+        req.params.contentId,
+        parseInt(userId)
+      );
+      const { _id, content } = document;
+      res.send({ id: _id, content });
+    } catch (err) {
+      console.log("getOneDocument failed", err.name);
+      res.statusCode = 404;
+      res.send({ err });
+    }
+  }
+);
+
 app.get("/data", async function (req: Request, res: Response) {
   let token = "" + req.query.token;
   let uid = undefined;
@@ -148,7 +181,6 @@ app.get("/graph/:graphid/data", async function (req: Request, res: Response) {
   }
   try {
     const allData = await getAllData(graphId);
-
     res.send(allData);
   } catch (err) {
     console.log("getAllData failed", err.name);
