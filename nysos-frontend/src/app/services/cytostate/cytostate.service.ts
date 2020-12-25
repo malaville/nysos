@@ -111,7 +111,7 @@ export class CytostateService {
         this.selectElement(node.target.id())
     );
 
-    this.cytocore.on('vmouseup', 'node', ($nodeEvent) => {
+    this.cytocore.on('drag', 'node', ($nodeEvent) => {
       ($nodeEvent.target as NodeSingular)
         .descendants()
         .union($nodeEvent.target as NodeSingular)
