@@ -44,6 +44,7 @@ import {
 import { InfoModalComponent } from './interface/info-modal/info-modal.component';
 import { SearchBarComponent } from './interface/search-bar/search-bar.component';
 import { ColorPickerComponent } from './interface/common/color-picker/color-picker.component';
+import { RouterListenerService } from './services/router-listener/router-listener.service';
 const config = new SocialAuthService({
   autoLogin: true,
   providers: [
