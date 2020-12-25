@@ -33,7 +33,7 @@ const defaultContentSaveState = {
   saving: false,
   saved: false,
   error: false,
-  offline: true,
+  offline: false,
   canSave: true,
 };
 
@@ -227,72 +227,6 @@ export class CytodatabaseService {
             'Content was not found, probably the document is empty'
           ) + ''
       );
-  }
-
-  async loadFromRemote(): Promise<{ data: any }> {
-    let attempts = 0;
-    let MAX_ATTEMPTS = 10;
-    let data: any = undefined;
-
-    if (!this.authToken) {
-      try {
-        await this.authService.signIn(GoogleLoginProvider.PROVIDER_ID);
-      } catch (err) {
-        throw { name: 'NoAuthentication' };
-      }
-    }
-
-    const snackMessage = this.contentSaveState.error
-      ? "There was an error, we're still going to try getting data from remote ..."
-      : 'Loading from remote ...';
-    this._snackBar.open(snackMessage, undefined, {
-      duration: 2000,
-    });
-
-    // Loop on trying to fetch
-    let timeoutReached = false;
-    setTimeout(() => (timeoutReached = true), 1000);
-    while (!timeoutReached && attempts < MAX_ATTEMPTS && !data) {
-      try {
-        data = await this.tryFetchFromRemote();
-        if (!data) throw { name: 'DataUndefined' };
-      } catch (err) {
-        attempts += 1;
-      }
-    }
-
-    //////////////////
-    //  After the loop :
-    // - data not defined => throw
-    // - data defined but empty => throw {saveAll:true
-    //  -data defined and not empty => return :)
-
-    if (data && typeof data == 'object') {
-      if (data.length == 0) {
-        this._snackBar.open(
-          "Remote Data was empty, we're saving your local data online",
-          'GOT IT',
-          {
-            duration: 5000,
-          }
-        );
-        throw { name: 'DataEmpty', empty: true };
-      }
-      // this.loadCytocoreWithSave(cytocore, data);
-      // cytocore.fit(undefined, 100);
-      this.updateContentSaveState({ saved: true });
-      return { data };
-    } else {
-      this._snackBar.open(
-        "Remote unreachable... you're working offline",
-        undefined,
-        {
-          duration: 2000,
-        }
-      );
-      this.updateContentSaveState({ offline: true, saved: false });
-      throw { name: `MaxAttemptsReached${MAX_ATTEMPTS}` };
-    }
   }
 
   saveDataOrContentOf(id: string, dataOrContent: string | object) {

@@ -29,6 +29,6 @@ export class ContentSaveStateIndicatorComponent implements OnInit {
 
   retryClicked() {
     this.retrying = true;
-    this.cytoState.restartStartUp().then(() => (this.retrying = false));
+    // this.cytoState.restartStartUp().then(() => (this.retrying = false));
   }
 }

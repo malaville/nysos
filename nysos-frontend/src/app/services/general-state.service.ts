@@ -2,13 +2,15 @@ import { Injectable } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { SocialAuthService } from 'angularx-social-login';
 import { EdgeCollection } from 'cytoscape';
-import { combineLatest, Observable } from 'rxjs';
+import { combineLatest, Observable, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { HSLColor } from '../interface/common/color-picker/color-picker.component';
 import {
   AppstateService,
   DocumentDataStateInterface,
   UIStateInterface,
 } from './app/appstate.service';
+import { ClientService } from './client/client.service';
 import { fetchAllScopeData } from './cytodatabase/fetchNysosBackend';
 import { CytostateService } from './cytostate/cytostate.service';
 import { ScopeService } from './scope/scope.service';
@@ -23,20 +25,24 @@ export class GeneralStateService {
     private appState: AppstateService,
     private cytoState: CytostateService,
     private scope: ScopeService,
-    private authState: SocialAuthService
+    private authState: SocialAuthService,
+    private client: ClientService
   ) {
     this.documentStateObservable = this.appState.documentStateObservable;
     this.UIStateObservable = this.appState.UIstateObservable;
-    combineLatest([
-      this.scope.currentScope$,
-      this.authState.authState,
-    ]).subscribe(([scope, authState]) => {
-      if (scope?.isShared) {
-        fetchAllScopeData(authState.authToken, scope.targetId).then((res) =>
-          res.json().then((json) => this.cytoState.loadWithSave(json))
-        );
-      }
-    });
+    combineLatest([this.scope.currentScope$, this.authState.authState])
+      .pipe(
+        switchMap(([scope, authState]) => {
+          if (scope?.isShared) {
+            return this.client.fetchAllScopeData(
+              authState.authToken,
+              scope.targetId
+            );
+          }
+          return this.client.fetchAllData(authState.authToken);
+        })
+      )
+      .subscribe((data) => this.cytoState.loadWithSave(data));
   }
 
   // AppState Only Methods
