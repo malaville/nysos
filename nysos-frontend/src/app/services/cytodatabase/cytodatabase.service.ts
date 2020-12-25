@@ -4,6 +4,7 @@ import { GoogleLoginProvider, SocialAuthService } from 'angularx-social-login';
 import { CollectionReturnValue, Core } from 'cytoscape';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { ScopeService } from '../scope/scope.service';
 import { AsyncContent } from './asyncContent';
 import { ContentChanges, ContentChangesInterface } from './contentChanges';
 import {
@@ -22,7 +23,9 @@ export interface ContentSaveStateInterface {
   saved: boolean;
   error: boolean;
   offline: boolean;
+  canSave: boolean;
   progress?: { total: number; success: number; failed: number };
+  stored?: number;
 }
 
 const defaultContentSaveState = {
@@ -31,13 +34,15 @@ const defaultContentSaveState = {
   saved: false,
   error: false,
   offline: true,
+  canSave: true,
 };
 
 @Injectable({
   providedIn: 'root',
 })
 export class CytodatabaseService {
-  authToken: string;
+  private authToken: string;
+  private canSave = true;
 
   private contentChanges: ContentChanges;
   readonly contentChangesObs: Observable<ContentChangesInterface>;
@@ -50,8 +55,16 @@ export class CytodatabaseService {
 
   constructor(
     private authService: SocialAuthService,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private scope: ScopeService
   ) {
+    this.scope.currentScope$.subscribe((scope) => {
+      const canSave = !scope?.isShared;
+      this.updateContentSaveState({ canSave });
+      if (canSave) {
+        this.updateContentSaveState({ stored: undefined });
+      }
+    });
     this.contentChanges = ContentChanges.loadFromLocalStorage();
     this.contentChangesObs = this.contentChanges.contentChangesObs;
     this.authService.authState.subscribe((st) => {
@@ -110,7 +123,7 @@ export class CytodatabaseService {
     if (state.offline) {
       // Do Nothing
     }
-    if (!state.offline) {
+    if (!state.offline && state.canSave) {
       // Show saving loader
       this.updateContentSaveState({ saving: true });
       if (state.error) {
@@ -139,6 +152,13 @@ export class CytodatabaseService {
         }
       }
       this.updateContentSaveState({ saving: false });
+    }
+    if (!state.offline && !state.canSave) {
+      this.updateContentSaveState({
+        saved: true,
+        stored: this.contentChanges.getNumberOfUpdates(),
+      });
+      // The user is logged in but can't save
     }
   }
 
@@ -186,7 +206,7 @@ export class CytodatabaseService {
   }
 
   loadFromLocalStorage(): { data: any } {
-    const cytosave = JSON.parse(localStorage.getItem(CYTOSAVE_KEY) || '');
+    const cytosave = JSON.parse(localStorage.getItem(CYTOSAVE_KEY) || 'null');
     return cytosave;
   }
 
@@ -388,7 +408,7 @@ export class CytodatabaseService {
   }
 
   loadContentOf(id: string): string {
-    return localStorage.getItem(`${id}:content`) || '';
+    return localStorage.getItem(`${id}:content`) || 'null';
   }
 
   loadRemoteContentOf(id: string): AsyncContent {

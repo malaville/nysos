@@ -25,9 +25,15 @@
   </ng-container>
 
   <ng-container *ngIf="showProgress">
-    <span class="show-progress" *ngIf="contentSaveState.progress">
+    <span
+      class="show-progress"
+      *ngIf="!contentSaveState.stored && contentSaveState.progress"
+    >
       {{ contentSaveState?.progress?.success }} /
       {{ contentSaveState?.progress?.total }}
+    </span>
+    <span *ngIf="contentSaveState.stored" class="show-progress">
+      {{ contentSaveState.stored }} stored
     </span>
   </ng-container>
 </div>

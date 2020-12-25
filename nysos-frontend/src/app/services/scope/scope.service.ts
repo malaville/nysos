@@ -11,7 +11,7 @@ type Scope = {
 @Injectable({
   providedIn: 'root',
 })
-export class RouterListenerService {
+export class ScopeService {
   private _currentScope: Scope | undefined;
   private currentScopeBS = new BehaviorSubject<Scope | undefined>(undefined);
 
@@ -36,20 +36,26 @@ export class RouterListenerService {
   }
 
   private updateScope(url: string) {
-    if (!this.isShareRoute(url)) this._currentScope = undefined;
-    else {
+    if (this.isShareRoute(url)) {
       this._currentScope = {
         isShared: true,
         targetId: this.getTargetId(url),
       };
+      this.currentScopeBS.next(this._currentScope);
+      return;
     }
-    this.currentScopeBS.next(this._currentScope);
+    if (url == '/') {
+      this._currentScope = undefined;
+
+      this.currentScopeBS.next(this._currentScope);
+      return;
+    }
+    this.router.navigate(['/']);
   }
 
   private isShareRoute = (url: string): boolean => {
-    if (url.split('/')[1].toLowerCase() !== 'share') return false;
-    if (url.split('/').length <= 2) return false;
-    return true;
+    const regex = /^\/share\/([0-9]){15,25}$/g;
+    return regex.test(url);
   };
 
   private getTargetId = (url: string): string => {

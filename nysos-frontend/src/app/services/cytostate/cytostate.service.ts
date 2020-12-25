@@ -182,7 +182,7 @@ export class CytostateService {
         this.loadWithSave(data);
         this.cyDb.saveNodesAndEdgesLocally(cytocore.elements());
       } catch (err) {
-        this.loadWithSave(this.cyDb.loadFromLocalStorage().data);
+        this.loadWithSave(this.cyDb.loadFromLocalStorage()?.data);
         if (err.empty) {
           this.cyDb.saveAllToRemote(this.cytocore);
         }

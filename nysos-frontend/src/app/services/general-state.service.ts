@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
+import { SocialAuthService } from 'angularx-social-login';
 import { EdgeCollection } from 'cytoscape';
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 import { HSLColor } from '../interface/common/color-picker/color-picker.component';
 import {
   AppstateService,
   DocumentDataStateInterface,
   UIStateInterface,
 } from './app/appstate.service';
-import { CytodatabaseService } from './cytodatabase/cytodatabase.service';
+import { fetchAllScopeData } from './cytodatabase/fetchNysosBackend';
 import { CytostateService } from './cytostate/cytostate.service';
-import { RouterListenerService } from './router-listener/router-listener.service';
+import { ScopeService } from './scope/scope.service';
 
 @Injectable({
   providedIn: 'root',
@@ -21,13 +22,21 @@ export class GeneralStateService {
   constructor(
     private appState: AppstateService,
     private cytoState: CytostateService,
-    private routeListener: RouterListenerService
+    private scope: ScopeService,
+    private authState: SocialAuthService
   ) {
     this.documentStateObservable = this.appState.documentStateObservable;
     this.UIStateObservable = this.appState.UIstateObservable;
-    this.routeListener.currentScope$.subscribe((scope) =>
-      console.log('Scope', scope)
-    );
+    combineLatest([
+      this.scope.currentScope$,
+      this.authState.authState,
+    ]).subscribe(([scope, authState]) => {
+      if (scope?.isShared) {
+        fetchAllScopeData(authState.authToken, scope.targetId).then((res) =>
+          res.json().then((json) => this.cytoState.loadWithSave(json))
+        );
+      }
+    });
   }
 
   // AppState Only Methods
